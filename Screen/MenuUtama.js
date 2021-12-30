@@ -7,21 +7,25 @@ import Search from "../assets/image/search_icon.png";
 import illus from "../assets/image/ilustrasi.png";
 import FloatingTabBar from "../components/FloatingTabBar";
 import { ScrollView } from "react-native-gesture-handler";
+import { Asset } from 'expo-asset';
+import { AntDesign } from '@expo/vector-icons'
 const win = Dimensions.get("window");
-// import { TextInput } from "react-native-gesture-handler";
 
 
 export default function MenuUtama({navigation}) {
   const [data, setData] = useState([]);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  useEffect(async() => {
+    setIsLoading(true);
     fetch('http://c9d1-2001-448a-6060-6dc0-9d8f-d267-4f6e-a658.ngrok.io/api/equipments')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
         setCari(hasil);
+        setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
@@ -45,24 +49,20 @@ export default function MenuUtama({navigation}) {
 
   const listEquipments = ({item}) => {
     return (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Detail', {alat: item}
-            // ToastAndroid.show(
-            //   "You navigated to 'Detail'!",
-            //   ToastAndroid.SHORT
-            // );
-          )}
-        >
-          <View style={styles.section2Container}>
-            <View style={styles.sectionNavContainer}>
-              <View style={styles.mybookItem}>
-                <Image source={{uri: item.foto}} style={styles.mybookImage} />
-                <Text style={styles.mybookAuthor}>{item.nama}</Text>
-                <Text style={styles.mybookTitle}>{item.harga_sewa_perhari}</Text>
-              </View>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Detail', {alat: item}
+        )}
+      >
+        <View style={styles.section2Container}>
+          <View style={styles.sectionNavContainer}>
+            <View style={styles.mybookItem}>
+              <Image source={{uri: item.foto}} style={styles.mybookImage} />
+              <Text style={styles.mybookAuthor}>{item.nama}</Text>
+              <Text style={styles.mybookTitle}>{item.harga_sewa_perhari}</Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     );
   }
 
@@ -86,15 +86,17 @@ export default function MenuUtama({navigation}) {
             placeholder="Cari nama alat..."
           />
         </View>
-        {/* {isLoading ? <Text>Loading...</Text> : ( */}
-          <FlatList
-            data={data}
-            horizontal
-            fadingEdgeLength={80}
-            keyExtractor={item=>item.id}
-            renderItem={listEquipments}
-          />
-        {/* )} */}
+        <View style={{ alignItems:'center', justifyContent: 'center' }}>
+          {isLoading ? <AntDesign name="loading1" size={36} color='#25185A' /> : (
+            <FlatList
+              data={data}
+              horizontal
+              fadingEdgeLength={80}
+              keyExtractor={item=>item.id}
+              renderItem={listEquipments}
+            />
+          )}
+          </View>
         </View>
         <View style={styles.perda}>
           <Image style={styles.illus} source={illus} />

@@ -1442,10 +1442,10 @@
     "sudo-prompt" "^9.0.0"
     "wcwidth" "^1.0.1"
 
-"@react-native-community/datetimepicker@^5.1.0":
-  "integrity" "sha512-DsKmdthZIb1AfuvpPE0iOiw4iQLXUWY3mJEYpGe9iUJt7pOkNnqHk6D95wqg4wjZ2bEBLAPfvndoeWZAjAZKfw=="
-  "resolved" "https://registry.npmjs.org/@react-native-community/datetimepicker/-/datetimepicker-5.1.0.tgz"
-  "version" "5.1.0"
+"@react-native-community/datetimepicker@4.0.0":
+  "integrity" "sha512-q3JfDHX5PI0AxFeMsB6jcHSXODloXAqBVsOfkIvm+YbAe1TUs/xZ3qGazsKVBk9EdFyHO4k+S1Q8tQkEnk2YrQ=="
+  "resolved" "https://registry.npmjs.org/@react-native-community/datetimepicker/-/datetimepicker-4.0.0.tgz"
+  "version" "4.0.0"
   dependencies:
     "invariant" "^2.2.4"
 
@@ -4922,6 +4922,15 @@
   "integrity" "sha512-+Oj4XJYVl9CJUNljhFiu53+4UeyLEr/Z0YNEzpyV2xYiJBx50+k/I9ddo91F9C3HaVCCpSCQdSEYY/REUd7Cjg=="
   "resolved" "https://registry.npmjs.org/react-native-material-dropdown-v2-fixed/-/react-native-material-dropdown-v2-fixed-0.11.3.tgz"
   "version" "0.11.3"
+  dependencies:
+    "prop-types" "^15.5.9"
+    "react-native-material-buttons" "^0.5.0"
+    "react-native-material-ripple" "^0.8.0"
+
+"react-native-material-dropdown-v2@^0.11.1":
+  "integrity" "sha512-fLom8DJ7tkB1wZsjkU3lPBcDdNRcLBZTKoRojolMOnD3AHfS+POkORh2g6VToMfhnz4rHBeLGzScu7VGsf8jow=="
+  "resolved" "https://registry.npmjs.org/react-native-material-dropdown-v2/-/react-native-material-dropdown-v2-0.11.1.tgz"
+  "version" "0.11.1"
   dependencies:
     "prop-types" "^15.5.9"
     "react-native-material-buttons" "^0.5.0"
