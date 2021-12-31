@@ -8,6 +8,7 @@ import Login from "./Screen/Login";
 import Register from "./Screen/Register";
 import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
+import DetailTest from "./Screen/DetailTest";
 const Stack = createNativeStackNavigator();
 
 // function MenuUtama() {
@@ -24,6 +25,11 @@ export default function App() {
       <StatusBar hidden />
       <NavigationContainer>
         <Stack.Navigator>
+          {/* <Stack.Screen
+            name="DetailTest"
+            component={DetailTest}
+            options={{ headerShown: false }}
+          /> */}
           <Stack.Screen
             name="Login"
             component={Login}
