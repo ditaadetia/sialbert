@@ -6,17 +6,17 @@ import { AntDesign } from '@expo/vector-icons'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
 const win = Dimensions.get("window");
-import DatePicker from 'react-native-datepicker';
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DatePicker from 'react-native-datepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 
 
 export default function LoginPage({ navigation, route }) {
     const {alat} = route.params
-    let data = [{
-        value: 'Perjam',
-    }, {
-        value: 'Perhari',
-    }];
+    // let data = [{
+    //     value: 'Perjam',
+    // }, {
+    //     value: 'Perhari',
+    // }];
     const [tglMulai, setTglMulai] = useState('');
     const [tglSelesai, setTglSelesai] = useState('');
     const [value, onChange] = useState('10:00');
@@ -45,7 +45,7 @@ export default function LoginPage({ navigation, route }) {
                 <Text style={{ fontSize: 16,fontWeight: 'bold', marginLeft:16, marginTop:16 }}>Atur rentang waktu sewa</Text>
                 <Dropdown style={{ backgroundColor:'#fff', margin: 8, }} label='Rentang Waktu' data={data}/>
                 <View  style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
-                    <View>
+                    {/* <View>
                         <Text style={{ fontWeight: 'bold' }}>Tanggal Mulai :</Text>
                         <DatePicker
                             style={styles.datePickerStyle}
@@ -73,8 +73,8 @@ export default function LoginPage({ navigation, route }) {
                                 setTglMulai(date);
                             }}
                         />
-                    </View>
-                    <View>
+                    </View> */}
+                    {/* <View>
                         <Text style={{ fontWeight: 'bold' }}>Tanggal Selesai :</Text>
                         <DatePicker
                             style={styles.datePickerStyle}
@@ -102,7 +102,7 @@ export default function LoginPage({ navigation, route }) {
                                 setTglSelesai(date);
                             }}
                         />
-                    </View>
+                    </View> */}
                 </View>
             </View>
         </View>

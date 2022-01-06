@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Notif from "../assets/image/notif.png";
 import Cart from "../assets/image/cart.png";
 import Search from "../assets/image/search_icon.png";
-import illus from "../assets/image/ilustrasi.png";
+import illus from "../assets/image/illustrasi.png";
 import FloatingTabBar from "../components/FloatingTabBar";
 import { ScrollView } from "react-native-gesture-handler";
 import { Asset } from 'expo-asset';
