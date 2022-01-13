@@ -4,23 +4,42 @@ import Cart from "../assets/image/cart.png";
 import Notif from "../assets/image/notif.png";
 import { AntDesign } from '@expo/vector-icons'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
+// import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
 const win = Dimensions.get("window");
-// import DatePicker from 'react-native-datepicker';
-// import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-datepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
-export default function LoginPage({ navigation, route }) {
+export default function MenuUtama({ navigation, route }) {
     const {alat} = route.params
-    // let data = [{
-    //     value: 'Perjam',
-    // }, {
-    //     value: 'Perhari',
-    // }];
-    const [tglMulai, setTglMulai] = useState('');
-    const [tglSelesai, setTglSelesai] = useState('');
-    const [value, onChange] = useState('10:00');
-    const today = new Date();
+    let data = [{
+        value: 'Perjam',
+    }, {
+        value: 'Perhari',
+    }];
+    const [date, setDate] = useState(new Date(1598051730000));
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShow(Platform.OS === 'android');
+        setDate(currentDate);
+    };
+
+    const showMode = (currentMode) => {
+        setShow(true);
+        setMode(currentMode);
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
     return (
         <View style={{ backgroundColor:'#fff' }}>
             <View style={styles.headerContainer}>
@@ -43,67 +62,48 @@ export default function LoginPage({ navigation, route }) {
             <View style={{ borderBotomColor:'yellow', borderBottomWidth: 2 }} opacity={0.1}/>
             <View>
                 <Text style={{ fontSize: 16,fontWeight: 'bold', marginLeft:16, marginTop:16 }}>Atur rentang waktu sewa</Text>
-                <Dropdown style={{ backgroundColor:'#fff', margin: 8, }} label='Rentang Waktu' data={data}/>
+                {/* <Dropdown style={{ backgroundColor:'#fff', margin: 8, }} label='Rentang Waktu' data={data}/> */}
                 <View  style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
-                    {/* <View>
+                    <View>
                         <Text style={{ fontWeight: 'bold' }}>Tanggal Mulai :</Text>
-                        <DatePicker
-                            style={styles.datePickerStyle}
-                            date={tglMulai} // Initial date from state
-                            mode="date" // The enum of date, datetime and time
-                            placeholder="select date"
-                            format="DD-MM-YYYY"
-                            minDate={today}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                //display: 'none',
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0,
-                                },
-                                dateInput: {
-                                marginLeft: 36,
-                                borderRadius: 30,
-                                },
-                            }}
-                            onDateChange={(date) => {
-                                setTglMulai(date);
-                            }}
-                        />
-                    </View> */}
-                    {/* <View>
-                        <Text style={{ fontWeight: 'bold' }}>Tanggal Selesai :</Text>
-                        <DatePicker
-                            style={styles.datePickerStyle}
-                            date={tglSelesai} // Initial date from state
-                            mode="date" // The enum of date, datetime and time
-                            placeholder="select date"
-                            format="DD-MM-YYYY"
-                            minDate={tglMulai}
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                                dateIcon: {
-                                //display: 'none',
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0,
-                                },
-                                dateInput: {
-                                marginLeft: 36,
-                                borderRadius: 30
-                                },
-                            }}
-                            onDateChange={(date) => {
-                                setTglSelesai(date);
-                            }}
-                        />
-                    </View> */}
+                        <View>
+                            <Button onPress={showDatepicker} title="Show date picker!" />
+                        </View>
+                        <View>
+                            <Button onPress={showTimepicker} title="Show time picker!" />
+                        </View>
+                            {show && (
+                                <DateTimePicker
+                                testID="dateTimePicker"
+                                value={date}
+                                mode={mode}
+                                is24Hour={true}
+                                display="default"
+                                onChange={onChange}
+                                />
+                            )}
+                        </View>
+                        <View>
+                            <Text style={{ fontWeight: 'bold' }}>Tanggal Selesai :</Text>
+                            <View>
+                                <Button onPress={showDatepicker} title="Show date picker!" />
+                            </View>
+                            <View>
+                                <Button onPress={showTimepicker} title="Show time picker!" />
+                            </View>
+                            {show && (
+                                <DateTimePicker
+                                testID="dateTimePicker"
+                                value={date}
+                                mode={mode}
+                                is24Hour={true}
+                                display="default"
+                                onChange={onChange}
+                                />
+                            )}
+                        </View>
                 </View>
+
             </View>
         </View>
     );

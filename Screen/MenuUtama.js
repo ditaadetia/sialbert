@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, } from "react-native";
 import { useState, useEffect } from "react";
 
 import Notif from "../assets/image/notif.png";
@@ -9,10 +9,12 @@ import FloatingTabBar from "../components/FloatingTabBar";
 import { ScrollView } from "react-native-gesture-handler";
 import { Asset } from 'expo-asset';
 import { AntDesign } from '@expo/vector-icons'
+import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 const win = Dimensions.get("window");
 
 
-export default function MenuUtama({navigation}) {
+export default function MenuUtama({navigation, route}) {
+  const {nama, email} = route.params;
   const [data, setData] = useState([]);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
@@ -53,13 +55,10 @@ export default function MenuUtama({navigation}) {
         onPress={() => navigation.navigate('Detail', {alat: item}
         )}
       >
-        <View style={styles.section2Container}>
-          <View style={styles.sectionNavContainer}>
-            <View style={styles.mybookItem}>
-              <Image source={{uri: item.foto}} style={styles.mybookImage} />
-              <Text style={styles.mybookAuthor}>{item.nama}</Text>
-              <Text style={styles.mybookTitle}>{item.harga_sewa_perhari}</Text>
-            </View>
+        <View style={styles.sectionNavContainer}>
+          <View style={styles.myequipemntItem}>
+            <Image source={{uri: item.foto}} style={styles.myequipmentImage} />
+            <Text>{item.nama}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -67,7 +66,7 @@ export default function MenuUtama({navigation}) {
   }
 
   return (
-    <View>
+    <View style={{ backgroundColor: '#FFFFFF' }}>
       <View style={styles.headerContainer}>
         <Image source={Notif} />
         <Text style={styles.textHeader}>SI-ALBERT</Text>
@@ -75,8 +74,8 @@ export default function MenuUtama({navigation}) {
       </View>
       <View style={styles.container}>
         <View style={styles.greeting}>
-        <Text>Selamat Pagi, </Text>
-          <Text style={styles.greetingName}>User</Text>
+        <Text>Halo, </Text>
+          <Text style={styles.greetingName}>{nama}</Text>
         </View>
         <View style={styles.textInput}>
           <Image style={styles.btnSearch} source={Search} />
@@ -86,12 +85,15 @@ export default function MenuUtama({navigation}) {
             placeholder="Cari nama alat..."
           />
         </View>
-        <View style={{ alignItems:'center', justifyContent: 'center' }}>
-          {isLoading ? <AntDesign name="loading1" size={36} color='#25185A' /> : (
+        <View style={{ alignItems:'center', textAlignVertical: 'center', marginTop: 0, justifyContent: 'center', flexDirection: "row", }}>
+          {isLoading ? <ActivityIndicatorExample style={"styles.progress"}/> : (
             <FlatList
+              style={{ margin:4 }}
               data={data}
-              horizontal
-              fadingEdgeLength={80}
+              vertical
+              key={4}
+              numColumns={4}
+              fadingEdgeLength={10}
               keyExtractor={item=>item.id}
               renderItem={listEquipments}
             />
@@ -108,6 +110,9 @@ export default function MenuUtama({navigation}) {
 }
 
 const styles = StyleSheet.create({
+  back: {
+    backgroundColor: "#25185A",
+  },
   container: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 50,
@@ -154,17 +159,6 @@ const styles = StyleSheet.create({
     marginTop: -4,
     fontWeight: "bold",
   },
-  section2Container: {
-    marginTop: 16,
-    marginBottom: 8,
-  },
-
-  sectionNavContainer: {
-    paddingHorizontal: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   sectionHeading: {
     color: "#212121",
     fontSize: 16,
@@ -177,42 +171,55 @@ const styles = StyleSheet.create({
     textDecorationStyle: "solid",
     fontFamily: "DMSans_400Regular",
   },
-  mybookItemContainer: {
-    borderRadius: 30,
+  sectionNavContainer: {
+    justifyContent:'space-between',
+    margin: 8,
+    width:75,
+    justifyContent: 'center',
+    borderRadius: 75,
+    alignItems:'center',
+  },
+  myequipmentItem: {
+    alignItems:'center',
     elevation: 16,
-    marginRight: 16,
-    marginBottom: 36,
-    marginTop: 16,
-    overflow: "hidden",
+    width: 75,
+    borderRadius: 75,
+    borderWidth: 1,
+    height: 75,
   },
-  mybookItem: {
-    backgroundColor: "#FAD603",
-    borderRadius: 30,
-    padding: 12,
-    justifyContent: "center",
-    alignItems: "center",
+
+  myequipmentImage: {
+    width: 50,
+    height: 50,
+    borderWidth: 2,
+    borderRadius: 75,
   },
-  mybookImage: {
-    width: 137,
-    height: 155,
-    borderRadius: 30,
-  },
-  mybookAuthor: {
-    marginTop: 12,
+  // myequipmentImage: {
+  //   flex:1,
+  //   width: '80%',
+  //   height: '80%',
+  //   borderWidth: 2,
+  //   borderRadius: 20,
+  //   resizeMode: 'contain',
+  //   justifyContent: 'center',
+  //   alignItems:'center'
+  // },
+  myequipmentName: {
+    marginTop: 4,
     color: "#8D8D8D",
     fontSize: 14,
   },
   mybookTitle: {
+    width:65,
     color: "#212121",
-    fontSize: 14,
   },
   textInput: {
     elevation: 12,
     flexDirection: "row",
-    margin: 16,
+    marginHorizontal: 16,
     backgroundColor: '#fff',
     padding: 10,
-    marginVertical: 36,
+    marginVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 20,
     borderColor: '#364878'
@@ -222,5 +229,14 @@ const styles = StyleSheet.create({
     height: 18,
     marginEnd: 8,
     marginVertical: 8,
+  }, 
+  progress: {
+    justifyContent: 'center',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    marginTop:0,
+    textAlign: 'center',
+    flex: 1,
+    alignItems: 'center'
   }
 });
