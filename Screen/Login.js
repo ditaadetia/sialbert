@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useContext} from "react";
 import Button from 'react-native-button';
 import { useState } from "react";
 import { Formik } from 'formik';
@@ -19,6 +19,10 @@ import {  Alert,
 
 import Svg, { Path } from 'react-native-svg';
 import axios from 'axios';
+import { AxiosResponse, AxiosError } from "axios";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CredentialsContext } from './../components/CredentialsContext';
 
 import SVGImg from '../assets/wave.svg';
 import Illust from "../assets/image/icon.png"
@@ -28,15 +32,28 @@ import openedEye from "../assets/image/opened-eye.png";
 import closeEye from "../assets/image/closed-eye.png";
 import { withSafeAreaInsets } from "react-native-safe-area-context";
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
+import * as yup from 'yup'
 
 export default function LoginPage({ navigation }) {
   const [hidePassword, setHidePassword] = useState(true);
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
 
+  const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+
+  const loginValidationSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email("Harap masukkan email yang valid!")
+      .required('Alamat email wajib diisi!'),
+    password: yup
+      .string()
+      .required('Password wajib diisi'),
+  })
+
   const handleLogin = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://c9d1-2001-448a-6060-6dc0-9d8f-d267-4f6e-a658.ngrok.io/api/login';
+    const url = 'http://1f74-2001-448a-6060-6dc0-e5a3-9e6b-8be2-adbd.ngrok.io/api/login';
 
     axios
       .post(url, credentials)
@@ -45,27 +62,36 @@ export default function LoginPage({ navigation }) {
         const { message, status, data } = result;
 
         if (status == 'success') {
-          navigation.navigate('MenuUtama', {...data[0]});
+          // navigation.navigate('MenuUtama', {...data[0]});
+          persistLogin({...data[0]}, message, status);
+        }
+        else {
+          handleMessage("Email atau password salah, silahkan coba kembali!");
         }
         setSubmitting(false);
       })
 
-      // if(error.response!.status === 401) {
-      //   .catch(function(error) {
-      //     setSubmitting(false);
-      //     handleMessage("Email atau password salah, silahkan coba kembali!");
-      //   });
-      // }
       .catch((error)=> {
-        if(error.response!.status === 401) {
-          setSubmitting(false);
-          handleMessage("An error occured. Check your internet and try again!");
+        setSubmitting(false);
+        handleMessage("Tidak ada koneksi internet!");
       });
     };
 
     const handleMessage = (message, type = 'failed') => {
       setMessage(message);
       setMessageType(type);
+    }
+
+    const persistLogin = (credentials, message, status) => {
+      AsyncStorage.setItem('sialbertCredentials', JSON.stringify(credentials))
+      .then(() => {
+        handleMessage(message, status);
+        setStoredCredentials(credentials);
+      })
+      .catch((error) => {
+        console.log(error);
+        handleMessage('Persisting login failed');
+      })
     }
 
     return (
@@ -95,56 +121,62 @@ export default function LoginPage({ navigation }) {
             <Text style={styles.subtitle}>Masuk ke akun si-albert</Text>
 
             <Formik
-              initialValues={{email: '', password: ''}}
+              validationSchema={loginValidationSchema}
+              initialValues={{  email: '', password: '' }}
               onSubmit={(values, {setSubmitting}) => {
-                if (values.email == '' || values.password == '') {
-                  handleMessage('Harap isi semua informasi login');
-                  setSubmitting(false);
-                }else {
-                  handleLogin(values, setSubmitting);
-                }
+                handleLogin(values, setSubmitting);
               }}
             >
-              {({ handleChange, handleSubmit, values, isSubmitting }) => (
+              {({ handleChange, handleSubmit, values, isSubmitting, errors }) => (
                 <View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Email} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCompleteType="email"
-                      autoCorrect={false}
-                      keyboardType="email-address"
-                      returnKeyType="next"
-                      placeholder="Email"
-                      style={styles.textInput}
-                      textContentType="username"
-                      onChangeText={handleChange('email')}
-                      value={values.email}
-                    />
+                  <View>
+                    <View style={styles.form}>
+                      <Image style={styles.icon} source={Email} />
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCompleteType="email"
+                        autoCorrect={false}
+                        keyboardType="email-address"
+                        returnKeyType="next"
+                        placeholder="Email"
+                        style={styles.textInput}
+                        textContentType="username"
+                        onChangeText={handleChange('email')}
+                        value={values.email}
+                      />
+                    </View>
+                    {errors.email &&
+                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.email}</Text>
+                    }
                   </View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Password} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCompleteType="password"
-                      autoCorrect={false}
-                      returnKeyType="done"
-                      style={styles.textInput}
-                      textContentType="password"
-                      onChangeText={handleChange('password')}
-                      value={values.password}
-                      placeholder="Password"
-                      secureTextEntry={hidePassword}
-                      setHidePassword={setHidePassword}
-                    />
-                    <TouchableOpacity onPress={() => {
-                      setHidePassword(prev=>!prev)
-                    }}>
-                      {hidePassword && 
-                        <Image style={styles.icon} source={openedEye} />}
-                      {!hidePassword && 
-                        <Image style={styles.icon} source={closeEye} />}
-                    </TouchableOpacity>
+                  <View>
+                    <View style={styles.form}>
+                      <Image style={styles.icon} source={Password} />
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCompleteType="password"
+                        autoCorrect={false}
+                        returnKeyType="done"
+                        style={styles.textInput}
+                        textContentType="password"
+                        onChangeText={handleChange('password')}
+                        value={values.password}
+                        placeholder="Password"
+                        secureTextEntry={hidePassword}
+                        setHidePassword={setHidePassword}
+                      />
+                      <TouchableOpacity onPress={() => {
+                        setHidePassword(prev=>!prev)
+                      }}>
+                        {hidePassword &&
+                          <Image style={styles.icon} source={openedEye} />}
+                        {!hidePassword &&
+                          <Image style={styles.icon} source={closeEye} />}
+                      </TouchableOpacity>
+                    </View>
+                    {errors.password &&
+                      <Text style={{ fontSize: 10, color: 'red' }}>{errors.password}</Text>
+                    }
                   </View>
                   {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
                   <Text type ={messageType} style={styles.message}>{message}</Text>

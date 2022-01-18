@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useContext} from "react";
 import Button from 'react-native-button';
 import { useState } from "react";
 import { Formik } from 'formik';
@@ -15,10 +15,14 @@ import {  Alert,
   ToastAndroid,
   Image,
   View,
-  KeyboardAvoidingViewBase} from "react-native";
+  KeyboardAvoidingViewBase,
+  TouchableNativeFeedbackBase} from "react-native";
 
 import Svg, { Path } from 'react-native-svg';
 import axios from 'axios';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CredentialsContext } from './../components/CredentialsContext';
 
 import SVGImg from '../assets/wave.svg';
 import Illust from "../assets/image/icon.png";
@@ -29,6 +33,8 @@ import openedEye from "../assets/image/opened-eye.png";
 import closeEye from "../assets/image/closed-eye.png";
 import { withSafeAreaInsets } from "react-native-safe-area-context";
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
+import * as yup from 'yup'
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function RegisterPage({ navigation }) {
   const [hidePassword, setHidePassword] = useState(true);
@@ -36,9 +42,28 @@ export default function RegisterPage({ navigation }) {
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
 
+  const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+
+  const regisValidationSchema = yup.object().shape({
+    nama: yup
+      .string()
+      .required('Nama wajib diisi!'),
+    email: yup
+      .string()
+      .email("Harap masukkan email yang valid!")
+      .required('Alamat email wajib diisi!'),
+    password: yup
+      .string()
+      .min(8, ({ min }) => `Password minimal ${min} karakter`)
+      .required('Password wajib diisi'),
+    repassword: yup.string()
+      .oneOf([yup.ref('password'), null], 'Password tidak cocok!')
+      .required('Konfirmasi password wajib diisi'),
+  })
+
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://c9d1-2001-448a-6060-6dc0-9d8f-d267-4f6e-a658.ngrok.io/api/register';
+    const url = 'http://1f74-2001-448a-6060-6dc0-e5a3-9e6b-8be2-adbd.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -47,7 +72,11 @@ export default function RegisterPage({ navigation }) {
         const { message, status, data } = result;
 
         if (status == 'success') {
-          navigation.navigate('MenuUtama', {...data[0]});
+          navigation.navigate('Login');
+          // persistLogin({...data}, message, status);
+        }
+        else {
+          handleMessage("Email telah terdaftar!");
         }
         setSubmitting(false);
       })
@@ -66,6 +95,18 @@ export default function RegisterPage({ navigation }) {
     const handleMessage = (message, type = 'failed') => {
       setMessage(message);
       setMessageType(type);
+    }
+
+    const persistLogin = (credentials, message, status) => {
+      AsyncStorage.setItem('sialbertCredentials', JSON.stringify(credentials))
+      .then(() => {
+        handleMessage(message, status);
+        setStoredCredentials(credentials);
+      })
+      .catch((error) => {
+        console.log(error);
+        handleMessage('Persisting login failed');
+      })
     }
 
     return (
@@ -92,132 +133,164 @@ export default function RegisterPage({ navigation }) {
             {/* <Text style={styles.title}>Welcome Back!</Text> */}
             <Text style={styles.title2}>REGISTER SI-ALBERT</Text>
 
-            <Formik
-              initialValues={{nama: '', email: '', password: '', repassword: ''}}
-              onSubmit={(values, {setSubmitting}) => {
-                if (values.naa == '' || values.email == '' || values.password == '' || values.repassword == '') {
-                  handleMessage('Harap isi semua informasi pendaftaran akun!');
-                  setSubmitting(false);
-                }
-                else if(values.password != values.repassword) {
-                  handleMessage('Password tidak cocok, harap masukkan password yang sama!');
-                  setSubmitting(false);
-                }
-                else {
+            <ScrollView pagingEnabled showsHorizontalScrollIndicator={false}>
+              <Formik
+                // initialValues={{nama: '', email: '', password: '', repassword: ''}}
+                // onSubmit={(values, {setSubmitting}) => {
+                //   if (values.nama == '' || values.email == '' || values.password == '' || values.repassword == '') {
+                //     handleMessage('Harap isi semua informasi pendaftaran akun!');
+                //     setSubmitting(false);
+                //   }
+                //   else if(values.password != values.repassword) {
+                //     handleMessage('Password tidak cocok, harap masukkan password yang sama!');
+                //     setSubmitting(false);
+                //   }
+                //   else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+                //     handleMessage('Email tidak valid!');
+                //     setSubmitting(false);
+                //   }
+                //   else {
+                //     handleRegister(values, setSubmitting);
+                //     navigation.navigate('Login');
+                //   }
+                // }}
+                validationSchema={regisValidationSchema}
+                initialValues={{  nama: '', email: '', password: '', repassword: ''  }}
+                onSubmit={(values, {setSubmitting})  => {
                   handleRegister(values, setSubmitting);
-                }
-              }}
-            >
-              {({ handleChange, handleSubmit, values, isSubmitting }) => (
-                <View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Username} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCorrect={false}
-                      returnKeyType="next"
-                      placeholder="Nama"
-                      style={styles.textInput}
-                      textContentType="nama"
-                      onChangeText={handleChange('nama')}
-                      value={values.nama}
-                    />
-                  </View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Email} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCompleteType="email"
-                      autoCorrect={false}
-                      keyboardType="email-address"
-                      returnKeyType="next"
-                      placeholder="Email"
-                      style={styles.textInput}
-                      textContentType="username"
-                      onChangeText={handleChange('email')}
-                      value={values.email}
-                    />
-                  </View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Password} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCompleteType="password"
-                      autoCorrect={false}
-                      returnKeyType="done"
-                      style={styles.textInput}
-                      textContentType="password"
-                      onChangeText={handleChange('password')}
-                      value={values.password}
-                      placeholder="Password"
-                      secureTextEntry={hidePassword}
-                      setHidePassword={setHidePassword}
-                    />
-                    <TouchableOpacity onPress={() => {
-                      setHidePassword(prev=>!prev)
-                    }}>
-                      {hidePassword &&
-                        <Image style={styles.icon} source={openedEye} />}
-                      {!hidePassword &&
-                        <Image style={styles.icon} source={closeEye} />}
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.form}>
-                    <Image style={styles.icon} source={Password} />
-                    <TextInput
-                      autoCapitalize="none"
-                      autoCompleteType="password"
-                      autoCorrect={false}
-                      returnKeyType="done"
-                      style={styles.textInput}
-                      textContentType="password"
-                      onChangeText={handleChange('repassword')}
-                      value={values.repassword}
-                      placeholder="Ulangi Password"
-                      secureTextEntry={hideRePassword}
-                      setHidePassword={setHideRePassword}
-                    />
-                    <TouchableOpacity onPress={() => {
-                      setHideRePassword(prev=>!prev)
-                    }}>
-                      {hideRePassword &&
-                        <Image style={styles.icon} source={openedEye} />}
-                      {!hideRePassword &&
-                        <Image style={styles.icon} source={closeEye} />}
-                    </TouchableOpacity>
-                  </View>
-                  {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
-                  <Text type ={messageType} style={styles.message}>{message}</Text>
-                  <View style={styles.regis}>
-                    <Text style={styles.textButton}>Sudah Punya Akun?</Text>
-                    <TouchableOpacity onPress={() => {
-                      navigation.navigate("login");
-                    }}
-                    >
-                      <Text style={styles.linkText}> LOGIN DISINI!</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.forgotPasswordContainer}>
-                    <Text style={styles.textButton}>Lupa Password?</Text>
-                  </View>
-                  {!isSubmitting &&
+                }}
+              >
+                {({ handleChange, handleSubmit, values, isSubmitting, errors }) => (
                   <View>
-                    <TouchableOpacity onPress={handleSubmit}>
-                      <View style={styles.button}>
-                        <Text style={styles.buttonTitle}>REGISTER</Text>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Username} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Nama"
+                          style={styles.textInput}
+                          textContentType="nama"
+                          onChangeText={handleChange('nama')}
+                          value={values.nama}
+                        />
                       </View>
-                    </TouchableOpacity>
-                  </View>
-                  }
-                  {isSubmitting &&
-                    <View style={styles.button}>
-                      <ActivityIndicatorExample/>
+                      {errors.nama &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.nama}</Text>
+                      }
                     </View>
-                  }
-                </View>
-              )}
-            </Formik>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Email} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCompleteType="email"
+                          autoCorrect={false}
+                          keyboardType="email-address"
+                          returnKeyType="next"
+                          placeholder="Email"
+                          style={styles.textInput}
+                          textContentType="username"
+                          onChangeText={handleChange('email')}
+                          value={values.email}
+                        />
+                      </View>
+                      {errors.email &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.email}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Password} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCompleteType="password"
+                          autoCorrect={false}
+                          returnKeyType="done"
+                          style={styles.textInput}
+                          textContentType="password"
+                          onChangeText={handleChange('password')}
+                          value={values.password}
+                          placeholder="Password"
+                          secureTextEntry={hidePassword}
+                          setHidePassword={setHidePassword}
+                        />
+                        <TouchableOpacity onPress={() => {
+                          setHidePassword(prev=>!prev)
+                        }}>
+                          {hidePassword &&
+                            <Image style={styles.icon} source={openedEye} />}
+                          {!hidePassword &&
+                            <Image style={styles.icon} source={closeEye} />}
+                        </TouchableOpacity>
+                      </View>
+                      {errors.password &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.password}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Password} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCompleteType="password"
+                          autoCorrect={false}
+                          returnKeyType="done"
+                          style={styles.textInput}
+                          textContentType="password"
+                          onChangeText={handleChange('repassword')}
+                          value={values.repassword}
+                          placeholder="Ulangi Password"
+                          secureTextEntry={hideRePassword}
+                          setHidePassword={setHideRePassword}
+                        />
+                        <TouchableOpacity onPress={() => {
+                          setHideRePassword(prev=>!prev)
+                        }}>
+                          {hideRePassword &&
+                            <Image style={styles.icon} source={openedEye} />}
+                          {!hideRePassword &&
+                            <Image style={styles.icon} source={closeEye} />}
+                        </TouchableOpacity>
+                      </View>
+                      {errors.repassword &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.repassword}</Text>
+                      }
+                    </View>
+                    {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
+                    <Text type ={messageType} style={styles.message}>{message}</Text>
+                    <View style={styles.regis}>
+                      <Text style={styles.textButton}>Sudah Punya Akun?</Text>
+                      <TouchableOpacity onPress={() => {
+                        navigation.navigate("Login");
+                      }}
+                      >
+                        <Text style={styles.linkText}> LOGIN DISINI!</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.forgotPasswordContainer}>
+                      <Text style={styles.textButton}>Lupa Password?</Text>
+                    </View>
+                    {!isSubmitting &&
+                    <View>
+                      <TouchableOpacity onPress={handleSubmit}>
+                        <View style={styles.button}>
+                          <Text style={styles.buttonTitle}>REGISTER</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                    }
+                    {isSubmitting &&
+                      <View style={styles.button}>
+                        <ActivityIndicatorExample/>
+                      </View>
+                    }
+                  </View>
+                )}
+              </Formik>
+            </ScrollView>
           </KeyboardAvoidingView>
         </SafeAreaView>
       </View>
@@ -312,6 +385,7 @@ const styles = {
     mainImageContainer: {
     justifyContent: "center",
     alignItems: "center",
+    marginTop:130
   },
   mainImage: {
     resizeMode: "cover",
