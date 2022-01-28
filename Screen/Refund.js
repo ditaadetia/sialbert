@@ -1,11 +1,7 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
-import Notif from "../assets/image/notif.png";
-import Cart from "../assets/image/cart.png";
-import Search from "../assets/image/search_icon.png";
-import illus from "../assets/image/illustrasi.png";
 import FloatingTabBar from "../components/FloatingTabBar";
 import { ScrollView } from "react-native-gesture-handler";
 import { Asset } from 'expo-asset';
@@ -13,10 +9,9 @@ import { AntDesign } from '@expo/vector-icons'
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './../components/CredentialsContext';
-import { StatusBar } from 'expo-status-bar';
 const win = Dimensions.get("window");
 
-export default function MenuUtama({navigation}) {
+export default function Refund({navigation}) {
   // const {nama, email} = route.params;
   const [data, setData] = useState([]);
   const [text, setText] = useState('');
@@ -32,107 +27,23 @@ export default function MenuUtama({navigation}) {
       setStoredCredentials("");
     })
     .catch(error => console.log(error))
-
-    Alert.alert("Logout", "Anda berhasil Logout!", [
-      {
-        text:"OK",
-        onPress: () => {clearLogin},
-      },
-    ]);
   }
 
-  useEffect(async() => {
-    setIsLoading(true);
-    fetch('http://858b-2001-448a-6060-6dc0-d8e-843-21f3-41e1.ngrok.io/api/equipments')
-      .then((response) => response.json())
-      .then((hasil) => {
-        setData(hasil);
-        setCari(hasil);
-        setIsLoading(false);
-      })
-      // .finally(() => setLoading(false));
-      .catch(error => { console.log; });
-
-  }, []);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   getEquipments();
-  // }, []);
-
-  const cariData = (text) => {
-    const newData = cari.filter((item) => {
-      const itemData = item.nama.toLowerCase();
-      const textData = text.toLowerCase();
-      return itemData.indexOf(textData) > -1;
-    });
-    setData(newData);
-    setText(text);
-  };
-
-  const listEquipments = ({item}) => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Detail', {alat: item}
-        )}
-      >
-        <View style={styles.sectionNavContainer}>
-          <View style={styles.myequipemntItem}>
-            <Image source={{uri: item.foto}} style={styles.myequipmentImage} />
-            <Text>{item.nama}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  }
 
   return (
-    <>
-      <View style={{ backgroundColor: '#FFFFFF' }}>
-        <View style={styles.headerContainer}>
-          <Image source={Notif} />
-          <Text style={styles.textHeader}>SI-ALBERT</Text>
-          <Image source={Cart} />
+    <View style={{ backgroundColor: '#FFFFFF' }}>
+        <View style={styles.greeting}>
+            <Text>Refund </Text>
+            <Text>Halo, </Text>
+          <Text style={styles.greetingName}>{nama}</Text>
         </View>
-        <View style={styles.container}>
-          <View style={styles.greeting}>
-          <Text>Halo, </Text>
-            <Text style={styles.greetingName}>{nama}</Text>
+        <TouchableOpacity onPress={clearLogin}>
+          <View style={styles.button}>
+            <Text style={styles.buttonTitle}>Logout</Text>
           </View>
-          <TouchableOpacity onPress={clearLogin}>
-            <View style={styles.button}>
-              <Text style={styles.buttonTitle}>Logout</Text>
-            </View>
-          </TouchableOpacity>
-          <View style={styles.textInput}>
-            <Image style={styles.btnSearch} source={Search} />
-            <TextInput
-              onChangeText={(text) => cariData(text)}
-              value={text}
-              placeholder="Cari nama alat..."
-            />
-          </View>
-          <View style={{ alignItems:'center', textAlignVertical: 'center', marginTop: 0, justifyContent: 'center', flexDirection: "row", }}>
-            {isLoading ? <ActivityIndicatorExample style={"styles.progress"}/> : (
-              <FlatList
-                style={{ margin:16 }}
-                data={data}
-                vertical
-                key={4}
-                numColumns={4}
-                fadingEdgeLength={10}
-                keyExtractor={item=>item.id}
-                renderItem={listEquipments}
-              />
-            )}
-            </View>
-          </View>
-          <View style={styles.perda}>
-            <Image style={styles.illus} source={illus} />
-            <Text style={styles.perdaText}>Sesuai Perda No 15 Tahun 2015 UPTD Alat Berat PUPR Kota Pontianak menyewakan alat berat sesuai tarif yang berlaku</Text>
-          </View>
-      </View>
-    </>
+        </TouchableOpacity>
+      <FloatingTabBar />
+    </View>
   );
 }
 
@@ -150,7 +61,7 @@ const styles = StyleSheet.create({
   perda: {
     // flex: 1,
     position: "absolute",
-    bottom: 80,
+    bottom: 170,
     width: '100%',
   },
   illus: {

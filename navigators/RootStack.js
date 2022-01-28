@@ -10,46 +10,14 @@ import Register from "./../Screen/Register";
 import MenuUtama from "./../Screen/MenuUtama";
 import Detail from "./../Screen/Detail";
 
+import TabNavigator from '../components/FloatingTabBar';
+
 import { CredentialsContext } from './../components/CredentialsContext';
 
 const RootStack = () => {
     return (
-    <>
-        <CredentialsContext.Consumer>
-            {({storedCredentials}) => (
-            <NavigationContainer>
-                <Stack.Navigator initialRouteName="Login">
-                {storedCredentials ? (
-                <>
-                    <Stack.Screen
-                    name="MenuUtama"
-                    component={MenuUtama}
-                    options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                    name="Detail"
-                    component={Detail}
-                    options={{ headerShown: false }}
-                    />
-                </>
-                ) : (
-                <>
-                    <Stack.Screen
-                    name="Login"
-                    component={Login}
-                    options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                    name="Register"
-                    component={Register}
-                    options={{ headerShown: false }}
-                    />
-                </>
-                )}
-                </Stack.Navigator>
-            </NavigationContainer>
-            )}
-        </CredentialsContext.Consumer>
-    </>
-    )
-}
+            <TabNavigator/>
+    );
+};
+
+export default RootStack;

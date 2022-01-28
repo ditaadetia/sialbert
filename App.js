@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image, style } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -10,10 +10,19 @@ import Register from "./Screen/Register";
 import EditProfil from "./Screen/EditProfil";
 import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
+import Penyewaan from "./Screen/Penyewaan";
+import Refund from "./Screen/Refund";
+import Reschedule from "./Screen/Reschedule";
 
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './components/CredentialsContext';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import FloatingTabBar from './components/FloatingTabBar';
+import Icon from 'react-native-vector-icons/AntDesign';
+import { Ionicons } from '@expo/vector-icons';
+import { Button } from 'react-native-paper';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -24,7 +33,93 @@ const Stack = createNativeStackNavigator();
 //     </Tab.Navigator>
 //   );
 // }
+const Tab = createBottomTabNavigator();
+function nav() {
+  const [appReady, setAppReady] = useState(false);
+  const [storedCredentials, setStoredCredentials] = useState("");
 
+  const checkLoginCredentials = () => {
+    AsyncStorage
+      .getItem('sialbertCredentials')
+      .then((result) => {
+        if (result !== null) {
+          setStoredCredentials(JSON.parse(result));
+        } else {
+          setStoredCredentials(null);
+        }
+      })
+      .catch(error => console.log(error))
+  }
+
+  if (!appReady) {
+    return (
+      <AppLoading
+        startAsync={checkLoginCredentials}
+        onFinish={() => setAppReady(true)}
+        onError={console.warn}
+      />
+    )
+  }
+  return (
+    <>
+    <StatusBar hidden/>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({focused, color, size}) => {
+          let activeIcon, iconStyle;
+
+          if (route.name === 'Home') {
+            activeIcon = focused
+            ? require("./assets/image/home-active.png")
+            : require("./assets/image/home-inactive.png")
+          } else if (route.name === 'Penyewaan') {
+            activeIcon = focused
+            ? require("./assets/image/rent-active.png")
+            : require("./assets/image/rent-inactive.png")
+          } else if (route.name === 'Refund') {
+            activeIcon = focused
+            ? require("./assets/image/refund-active.png")
+            : require("./assets/image/refund-inactive.png")
+          } else if (route.name === 'Reschedule') {
+            activeIcon = focused
+            ? require("./assets/image/reschedule-active.png")
+            : require("./assets/image/reschedule-inactive.png")
+          } else if (route.name === 'Edit Profil') {
+            activeIcon = focused
+            ? require("./assets/image/acount-active.png")
+            : require("./assets/image/acount-inactive.png")
+          }
+          return <Image style = {{ height: 32, width: 32 }}
+            source={activeIcon}
+            // style={iconStyle}
+          />;
+        },
+        backgroundColor: 'tomato',
+        tabBarActiveTintColor: '#FBCB33',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tab.Screen name='Home' component={MenuUtama} options={{ headerShown: false }}/>
+      <Tab.Screen name='Penyewaan' component={Penyewaan} options={{ headerShown: false }}/>
+      <Tab.Screen name='Refund' component={Refund} options={{ headerShown: false }}/>
+      <Tab.Screen name='Reschedule' component={Reschedule} options={{ headerShown: false }}/>
+      <Tab.Screen
+        name='Edit Profil'
+        component={EditProfil}
+        options={{
+          headerRight: () => (
+            <Button
+              onPress={ () => alert ('This is a button!') }
+              title="info"
+              color='#fff'
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+    </>
+  );
+}
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
@@ -53,47 +148,60 @@ export default function App() {
   }
 
   return (
+    <>
     <CredentialsContext.Provider value={{ storedCredentials, setStoredCredentials }}>
       <CredentialsContext.Consumer>
             {({storedCredentials}) => (
-            <NavigationContainer>
-                <Stack.Navigator initialRouteName="Login">
-                {storedCredentials ? (
-                <>
-                  {/* <Stack.Screen
-                  name="EditProfil"
-                  component={EditProfil}
-                  options={{ headerShown: false }}
-                  /> */}
-                  <Stack.Screen
-                  name="MenuUtama"
-                  component={MenuUtama}
-                  options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                  name="Detail"
-                  component={Detail}
-                  options={{ headerShown: false }}
-                  />
-                </>
-                ) : (
-                <>
+            <>
+              <NavigationContainer>
+                  <Stack.Navigator initialRouteName="nav">
+                  {storedCredentials ? (
+                  <>
+                    {/* <Stack.Screen
+                    name="EditProfil"
+                    component={EditProfil}
+                    options={{ headerShown: false }}
+                    /> */}
                     <Stack.Screen
-                    name="Login"
-                    component={Login}
+                    name="nav"
+                    component={nav}
                     options={{ headerShown: false }}
                     />
                     <Stack.Screen
-                    name="Register"
-                    component={Register}
+                    name="MenuUtama"
+                    component={MenuUtama}
                     options={{ headerShown: false }}
                     />
-                </>
-                )}
-                </Stack.Navigator>
-            </NavigationContainer>
+                    <Stack.Screen
+                    name="Detail"
+                    component={Detail}
+                    options={{ headerShown: false }}
+                    />
+                  </>
+                  ) : (
+                  <>
+                      <Stack.Screen
+                      name="Login"
+                      component={Login}
+                      options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                      name="Register"
+                      component={Register}
+                      options={{ headerShown: false }}
+                      />
+                  </>
+                  )}
+                  </Stack.Navigator>
+              </NavigationContainer>
+              <StatusBar hidden />
+            </>
             )}
         </CredentialsContext.Consumer>
     </CredentialsContext.Provider>
+    {/* <NavigationContainer>
+        <FloatingTabBar/>
+    </NavigationContainer> */}
+    </>
   );
 }

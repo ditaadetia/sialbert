@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, KeyboardAvoidingView, SafeAreaView, Alert, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import FloatingTabBar from "../components/FloatingTabBar";
@@ -9,7 +9,11 @@ import { AntDesign } from '@expo/vector-icons'
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './../components/CredentialsContext';
+import { Formik } from 'formik';
+import * as yup from 'yup'
 const win = Dimensions.get("window");
+
+import picture_account from "../assets/image/acount-inactive.png";
 
 export default function EditProfil({navigation}) {
   // const {nama, email} = route.params;
@@ -17,6 +21,8 @@ export default function EditProfil({navigation}) {
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState();
+  const [messageType, setMessageType] = useState();
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email} = storedCredentials;
@@ -27,153 +33,237 @@ export default function EditProfil({navigation}) {
       setStoredCredentials("");
     })
     .catch(error => console.log(error))
+    Alert.alert("Logout", "Anda berhasil Logout!", [
+      {
+        text:"OK",
+        onPress: () => {clearLogin},
+      },
+    ]);
   }
 
+  const editProfilValidationSchema = yup.object().shape({
+    nama: yup
+      .string()
+      .required('Nama wajib diisi!'),
+    email: yup
+      .string()
+      .email("Harap masukkan email yang valid!")
+      .required('Alamat email wajib diisi!'),
+    nohp: yup
+      .number()
+      .required('No. HP wajib diisi!'),
+    kontak: yup
+      .number()
+      .required('Kontak Darurat wajib diisi!'),
+    alamat: yup
+      .string()
+      .required('Alamat wajib diisi!'),
+  })
 
   return (
-    <View style={{ backgroundColor: '#FFFFFF' }}>
-        <View style={styles.greeting}>
-            <Text>Halo, </Text>
-          <Text style={styles.greetingName}>{nama}</Text>
-        </View>
-        <TouchableOpacity onPress={clearLogin}>
-          <View style={styles.button}>
-            <Text style={styles.buttonTitle}>Logout</Text>
-          </View>
-        </TouchableOpacity>
-      <FloatingTabBar />
-    </View>
+    <>
+      <SafeAreaView style={styles.safeAreaView}>
+        <ScrollView showsVerticalScrollIndicator={true}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.content}
+          >
+            <View style={{ backgroundColor: '#FFFFFF', flex:1 }}>
+                {/* <View style={styles.greeting}>
+                    <Text>Halo, </Text>
+                  <Text style={styles.greetingName}>{nama}</Text>
+                </View> */}
+                <TouchableOpacity onPress={clearLogin}>
+                  <View style={styles.button}>
+                    <Text style={styles.buttonTitle}>Logout</Text>
+                  </View>
+                </TouchableOpacity>
+            </View>
+            <View opacity={0.5} style={styles.banner}>
+              <Image source={picture_account} style={picture_account}></Image>
+              <Text style={{ fontWeight: "bold" }}>Ubah</Text>
+              <Text>Tekan untuk ubah</Text>
+            </View>
+            <View style={styles.border}></View>
+            <View>
+              <Formik
+                validationSchema={editProfilValidationSchema}
+                initialValues={{  nama: '', email: '', nohp: '', kontak: '', alamat: ''}}
+                onSubmit={(values, {setSubmitting})  => {
+                  handleProfil(values, setSubmitting);
+                }}
+              >
+                {({ handleChange, handleSubmit, values, isSubmitting, errors }) => (
+                  <View>
+                    <View>
+                      <View style={styles.form}>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Nama"
+                          style={styles.textInput}
+                          onChangeText={handleChange('nama')}
+                          value={values.nama}
+                        />
+                      </View>
+                      {errors.nama &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCompleteType="email"
+                          autoCorrect={false}
+                          keyboardType="email-address"
+                          returnKeyType="next"
+                          placeholder="Email"
+                          style={styles.textInput}
+                          onChangeText={handleChange('email')}
+                          value={values.email}
+                        />
+                      </View>
+                      {errors.email &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.email}</Text>
+                      }
+                    </View>
+                    <View style={styles.border2}></View>
+                    {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
+                    <View>
+                      <View style={styles.form}>
+                          <TextInput
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            returnKeyType="next"
+                            placeholder="No. Handphone"
+                            style={styles.textInput}
+                            onChangeText={handleChange('nohp')}
+                            value={values.nohp}
+                          />
+                        </View>
+                      {errors.nohp &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nohp}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Kontak Darurat"
+                          style={styles.textInput}
+                          onChangeText={handleChange('kontak')}
+                          value={values.kontak}
+                        />
+                      </View>
+                      {errors.kontak &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.kontak}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Alamat"
+                          style={styles.textInput}
+                          onChangeText={handleChange('alamat')}
+                          value={values.alamat}
+                        />
+                      </View>
+                      {errors.alamat &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.alamat}</Text>
+                      }
+                    </View>
+                    {!isSubmitting &&
+                    <View>
+                      <TouchableOpacity onPress={handleSubmit}>
+                        <View style={styles.button}>
+                          <Text style={styles.buttonTitle}>SIMPAN</Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                    }
+                    {isSubmitting &&
+                      <View style={styles.button}>
+                        <ActivityIndicatorExample/>
+                      </View>
+                    }
+                  </View>
+                )}
+              </Formik>
+            </View>
+          </KeyboardAvoidingView>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  banner: {
+    backgroundColor: "#FAD603",
+    height: "25%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  picture_account: {
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  border: {
+    backgroundColor: "#C4C4C4",
+    height: "2%",
+    opacity: 0.7
+  },
+  border2: {
+    backgroundColor: "#C4C4C4",
+    height: "5%",
+    opacity: 0.3
+  },
   back: {
     backgroundColor: "#25185A",
-  },
-  container: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-    marginTop:-36,
-    height: '100%'
-  },
-  perda: {
-    // flex: 1,
-    position: "absolute",
-    bottom: 170,
-    width: '100%',
-  },
-  illus: {
-    width: "100%"
-  },
-  perdaText: {
-    position:"absolute",
-    marginTop: 105,
-    margin: 8
-  },
-
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingBottom: 24,
-    height:108,
-    paddingHorizontal: 29,
-    backgroundColor: "#FAD603",
-  },
-  textHeader: {
-    fontSize: 20,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
-  greeting: {
-    flexDirection: "row",
-    marginTop: 24,
-    marginStart: 24
-  },
-  greetingName: {
-    fontSize: 20,
-    marginTop: -4,
-    fontWeight: "bold",
-  },
-  sectionHeading: {
-    color: "#212121",
-    fontSize: 16,
-    fontFamily: "DMSans_700Bold",
-  },
-  moreNav: {
-    color: "#8D8D8D",
-    fontSize: 14,
-    textDecorationLine: "underline",
-    textDecorationStyle: "solid",
-    fontFamily: "DMSans_400Regular",
-  },
-  sectionNavContainer: {
-    justifyContent:'space-between',
-    margin: 8,
-    width:75,
-    justifyContent: 'center',
-    borderRadius: 75,
-    alignItems:'center',
-  },
-  myequipmentItem: {
-    alignItems:'center',
-    elevation: 16,
-    width: 75,
-    borderRadius: 75,
-    borderWidth: 1,
-    height: 75,
-  },
-
-  myequipmentImage: {
-    width: 50,
-    height: 50,
-    borderWidth: 2,
-    borderRadius: 75,
-  },
-  // myequipmentImage: {
-  //   flex:1,
-  //   width: '80%',
-  //   height: '80%',
-  //   borderWidth: 2,
-  //   borderRadius: 20,
-  //   resizeMode: 'contain',
-  //   justifyContent: 'center',
-  //   alignItems:'center'
-  // },
-  myequipmentName: {
-    marginTop: 4,
-    color: "#8D8D8D",
-    fontSize: 14,
-  },
-  mybookTitle: {
-    width:65,
-    color: "#212121",
   },
   textInput: {
     elevation: 12,
     flexDirection: "row",
     marginHorizontal: 16,
+    marginVertical: 16,
     backgroundColor: '#fff',
     padding: 10,
-    marginVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 20,
     borderColor: '#364878'
   },
-  btnSearch: {
-    width: 18,
-    height: 18,
-    marginEnd: 8,
-    marginVertical: 8,
-  }, 
-  progress: {
+  safeAreaView: {
+    flex: 1,
+    height:'100%'
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 32,
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#ffd700',
+    borderRadius: 8,
+    height: 48,
     justifyContent: 'center',
     textAlign: 'center',
-    textAlignVertical: 'center',
-    marginTop:0,
+    margin: 16
+  },
+  buttonTitle: {
+    alignItems: 'center',
     textAlign: 'center',
-    flex: 1,
-    alignItems: 'center'
-  }
+    marginTop: 0,
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '600',
+    lineHeight: 22,
+  },
 });

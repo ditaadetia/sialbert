@@ -12,8 +12,8 @@ const win = Dimensions.get("window");
 const navBar = [
   {
     title: "Home",
-    activeIcon: require("../assets/image/home_icon_active.png"),
-    inactiveIcon: require("../assets/image/home_icon_inactive.png"),
+    activeIcon: require("../assets/image/home-active.png"),
+    inactiveIcon: require("../assets/image/home-inactive.png"),
     iconStyle: { width: 19, height: 20 },
   },
   {
@@ -59,7 +59,7 @@ function TabBarItem({
           if (!active) {
             setIdx(idx);
           }
-          ToastAndroid.show(`You navigated to '${title}'!`, ToastAndroid.SHORT);
+          // ToastAndroid.show(`You navigated to '${title}'!`, ToastAndroid.SHORT);
         }}
       >
         <View
