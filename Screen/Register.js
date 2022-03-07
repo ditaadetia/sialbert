@@ -64,7 +64,7 @@ export default function RegisterPage({ navigation }) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://858b-2001-448a-6060-6dc0-d8e-843-21f3-41e1.ngrok.io/api/register';
+    const url = 'http://8208-2001-448a-6060-6dc0-ad-73e2-576a-3d7c.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -73,8 +73,15 @@ export default function RegisterPage({ navigation }) {
         const { message, status, data } = result;
 
         if (status == 'success') {
-          navigation.navigate('Login');
-          // persistLogin({...data}, message, status);
+          // navigation.navigate('Register2');
+          persistLogin({ ...data }, message, status);
+          Alert.alert("Register", "Anda berhasil registrasi!", [
+            {
+              text:"OK",
+              onPress: () => {},
+            },
+          ]);
+          persistLogin({...data}, message, status);
         }
         else {
           handleMessage("Email telah terdaftar!");
@@ -132,10 +139,9 @@ export default function RegisterPage({ navigation }) {
             <View style={styles.mainImageContainer}>
             <Image source={Illust} style={styles.deco}></Image>
             </View>
-            {/* <Text style={styles.title}>Welcome Back!</Text> */}
-            <Text style={styles.title2}>REGISTER SI-ALBERT</Text>
+            <Text style={styles.title}>REGISTER SI-ALBERT</Text>
 
-            <ScrollView showsHorizontalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={true}>
               <Formik
                 // initialValues={{nama: '', email: '', password: '', repassword: ''}}
                 // onSubmit={(values, {setSubmitting}) => {
@@ -157,12 +163,12 @@ export default function RegisterPage({ navigation }) {
                 //   }
                 // }}
                 validationSchema={regisValidationSchema}
-                initialValues={{  nama: '', email: '', password: '', repassword: ''  }}
+                initialValues={{  nama: '', email: '', password: '', repassword: '', foto: 'tenant/no-pict.png'  }}
                 onSubmit={(values, {setSubmitting})  => {
                   handleRegister(values, setSubmitting);
                 }}
               >
-                {({ handleChange, handleSubmit, values, isSubmitting, errors }) => (
+                {({ handleChange, handleSubmit, touched, values, isSubmitting, errors }) => (
                   <View>
                     <View>
                       <View style={styles.form}>
@@ -177,7 +183,7 @@ export default function RegisterPage({ navigation }) {
                           value={values.nama}
                         />
                       </View>
-                      {errors.nama &&
+                      {(errors.nama && touched.nama) &&
                         <Text style={{ fontSize: 10, color: 'red' }}>{errors.nama}</Text>
                       }
                     </View>
@@ -196,7 +202,7 @@ export default function RegisterPage({ navigation }) {
                           value={values.email}
                         />
                       </View>
-                      {errors.email &&
+                      {(errors.email && touched.email) &&
                         <Text style={{ fontSize: 10, color: 'red' }}>{errors.email}</Text>
                       }
                     </View>
@@ -224,7 +230,7 @@ export default function RegisterPage({ navigation }) {
                             <Image style={styles.icon} source={closeEye} />}
                         </TouchableOpacity>
                       </View>
-                      {errors.password &&
+                      {(errors.password && touched.password) &&
                         <Text style={{ fontSize: 10, color: 'red' }}>{errors.password}</Text>
                       }
                     </View>
@@ -252,10 +258,69 @@ export default function RegisterPage({ navigation }) {
                             <Image style={styles.icon} source={closeEye} />}
                         </TouchableOpacity>
                       </View>
-                      {errors.repassword &&
+                      {(errors.repassword && touched.repassword) &&
                         <Text style={{ fontSize: 10, color: 'red' }}>{errors.repassword}</Text>
                       }
                     </View>
+                    <View style={{ width:0, display:'none', height: 0 }}>
+                      <TextInput
+                        type="hidden"
+                        value={values.foto}
+                      />
+                    </View>
+                    {/* <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Username} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          keyboardType='numeric'
+                          returnKeyType="next"
+                          placeholder="No. Handphone"
+                          style={styles.textInput}
+                          onChangeText={handleChange('no_hp')}
+                          value={values.no_hp}
+                        />
+                      </View>
+                      {(errors.no_hp && touched.no_hp) &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.no_hp}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Email} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          keyboardType='numeric'
+                          returnKeyType="next"
+                          placeholder="Kontak Darurat"
+                          style={styles.textInput}
+                          onChangeText={handleChange('kontak_darurat')}
+                          value={values.kontak_darurat}
+                        />
+                      </View>
+                      {(errors.kontak_darurat && touched.kontak_darurat) &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.kontak_darurat}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <Image style={styles.icon} source={Password} />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="done"
+                          style={styles.textInput}
+                          onChangeText={handleChange('alamat')}
+                          value={values.alamat}
+                          placeholder="Alamat"
+                        />
+                      </View>
+                      {(errors.alamat && touched.alamat) &&
+                        <Text style={{ fontSize: 10, color: 'red' }}>{errors.alamat}</Text>
+                      }
+                    </View> */}
                     {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
                     <Text type ={messageType} style={styles.message}>{message}</Text>
                     <View style={styles.regis}>
@@ -356,7 +421,7 @@ const styles = {
       fontSize: 15,
       fontWeight: '400',
       lineHeight: 20,
-      marginTop: -20
+      // marginTop: -10
     },
     linkText: {
       color: 'blue',
@@ -376,14 +441,8 @@ const styles = {
       fontSize: 28,
       fontWeight: '700',
       lineHeight: 34,
-      marginTop: 20,
-    },
-    title2: {
-      color: 'grey',
-      fontSize: 28,
-      fontWeight: '700',
-      lineHeight: 34,
-      marginBottom: 10
+      marginBottom: 10,
+      marginTop: -60
     },
     mainImageContainer: {
     justifyContent: "center",

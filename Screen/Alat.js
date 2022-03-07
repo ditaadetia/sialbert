@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -7,7 +7,7 @@ import { Asset } from 'expo-asset';
 import { AntDesign } from '@expo/vector-icons'
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CredentialsContext } from './../components/CredentialsContext';
+import { CredentialsContext } from '../components/CredentialsContext';
 import { StatusBar } from 'expo-status-bar';
 
 import Notif from "../assets/image/notif.png";
@@ -20,7 +20,9 @@ import More from "../assets/image/more.png";
 const win = Dimensions.get("window");
 
 export default function MenuUtama({navigation}) {
+  // const {nama, email} = route.params;
   const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,9 +45,15 @@ export default function MenuUtama({navigation}) {
     ]);
   }
 
+  const handleLoadMore = () => {
+      setPage(page+1)
+    // {page: page+1},
+    // data
+  }
+
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/equipments')
+    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/equipments-all')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -54,7 +62,6 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
 
   }, []);
 
@@ -73,27 +80,57 @@ export default function MenuUtama({navigation}) {
     setText(text);
   };
 
-  const handleLoadMore = () => {
-    console.warn('hanlemore')
+  const ItemDivider = () =>{
+    return(
+      <View style={{ height:2, width: '100%', backgroundColor: "#C4C4C4", alignItems:'center', opacity:0.4 }}/>
+    )
   }
 
-  const listEquipments = ({item}) => {
+  const renderFooter = () => {
     return (
-      <View>
+      //Footer View with Load More button
+      <View style={styles.footer}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Detail', {alat: item}
-          )}
-        >
-          <View style={styles.sectionNavContainer}>
-            <View style={styles.myequipemntItem}>
-              <Image source={{uri: item.foto}} style={styles.myequipmentImage} />
-              <Text>{item.nama}</Text>
-            </View>
-          </View>
+          activeOpacity={0.9}
+          onPress={data}
+          //On Click of button load more data
+          style={styles.loadMoreBtn}>
+          <Text style={styles.btnText}>Load More</Text>
+          {isLoading ? (
+            <ActivityIndicator
+              color="white"
+              style={{marginLeft: 8}} />
+          ) : null}
         </TouchableOpacity>
       </View>
     );
+  };
+
+  const listEquipments = ({item}) => {
+    return (
+      <>
+        <View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Detail', {alat: item}
+            )}
+          >
+            <View style={{ flexDirection:'row', textAlign:'center', textAlignVertical: 'center'}}>
+              <View style={{ flexDirection:'row', margin:16, textAlign:'center', textAlignVertical: 'center',justifyContent: 'center' }}>
+                <Image source={{uri: item.foto}} style={styles.myequipmentImage} />
+                <Text style={{ marginTop: '23%', textAlign:'center', justifyContent:'center', marginLeft:16 }}>{item.nama}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </>
+    );
   }
+  // const getItemCount = (data) => 20
+
+  // const getItem = (data, index) => ({
+  //   key:index,
+  //   id: Math.random().toString(12).substring(0),
+  // })
 
   return (
     <>
@@ -112,7 +149,7 @@ export default function MenuUtama({navigation}) {
               placeholder="Cari nama alat..."
             />
           </View>
-          <View style={{ alignItems:'center', textAlignVertical: 'center', marginTop: 0, justifyContent: 'center'}}>
+          <SafeAreaView style={{ marginBottom: 150, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -125,36 +162,24 @@ export default function MenuUtama({navigation}) {
               }}>
                 <ActivityIndicatorExample style={ styles.progress }/>
               </View> : (
-              <>
-                <View style={{ alignItems:'center', textAlignVertical: 'center', marginTop: 0, justifyContent: 'center', flexDirection: "row", }}>
-                  <FlatList
-                    style={{ margin:8 }}
-                    data={data}
-                    vertical
-                    // key={4}
-                    numColumns={4}
-                    fadingEdgeLength={10}
-                    keyExtractor={item=>item.id}
-                    renderItem={listEquipments}
-                    showsHorizontalScrollIndicator
-                    // onEndReached={handleLoadMore}
-                    onEndReachedThreshold={0.5}
-                  />
-                </View>
-                <View style={{ alignItems:'center', textAlignVertical: 'center', marginTop: '-4%', justifyContent: 'center', flexDirection: "row", }}>
-                  <TouchableOpacity style={{ alignItems:'center', textAlignVertical: 'center', justifyContent: 'center'}} onPress={() => navigation.navigate('Alat')}>
-                    <Image source={More} style={styles.myequipmentImage}/>
-                    <Text>Lihat alat lainnya</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
+              <FlatList
+                data={data}
+                vertical
+                key={1}
+                numColumns={1}
+                nestedScrollEnabled
+                // fadingEdgeLength={10}
+                ItemSeparatorComponent={ItemDivider}
+                keyExtractor={item=>item.id}
+                renderItem={listEquipments}
+                onEndReached={renderFooter}
+                onEndReachedThreshold={0.5}
+                // getItemCount={getItemCount}
+                // getItem={getItem}
+              />
             )}
-          </View>
+          </SafeAreaView>
         </View>
-          <View style={styles.perda}>
-            <Image style={styles.illus} source={illus} />
-            <Text style={styles.perdaText}>Sesuai Perda No 15 Tahun 2015 UPTD Alat Berat PUPR Kota Pontianak menyewakan alat berat sesuai tarif yang berlaku</Text>
-          </View>
       </View>
     </>
   );
@@ -223,30 +248,23 @@ const styles = StyleSheet.create({
     fontFamily: "DMSans_400Regular",
   },
   sectionNavContainer: {
-    justifyContent:'space-between',
-    marginBottom: 24,
-    marginTop: 4,
-    marginLeft:8,
-    marginRight:8,
-    width:75,
-    justifyContent: 'center',
-    borderRadius: 75,
-    alignItems:'center',
+    flexDirection:'row'
   },
   myequipmentItem: {
     alignItems:'center',
     elevation: 16,
-    width: 75,
     borderRadius: 75,
     borderWidth: 1,
-    height: 75,
+    margin:16,
+    flexDirection:'row'
   },
 
   myequipmentImage: {
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     borderWidth: 2,
     borderRadius: 75,
+    margin:8
   },
   // myequipmentImage: {
   //   flex:1,
@@ -262,6 +280,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: "#8D8D8D",
     fontSize: 14,
+    margin: 8
   },
   mybookTitle: {
     width:65,
@@ -276,6 +295,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 20,
+    borderColor: '#364878'
   },
   btnSearch: {
     width: 18,
@@ -284,16 +304,40 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   }, 
   progress: {
+    justifyContent: 'center',
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    marginTop:0,
     textAlign: 'center',
     flex: 1,
-    alignItems: 'center',
-    textAlignVertical: 'center',
-    marginTop: 0,
-    justifyContent: 'center',
-    flexDirection: "row",
+    alignItems: 'center'
   },
   lainnya: {
+    marginLeft:-90,
+    marginTop:196
+  },
+  border2: {
+    backgroundColor: "#C4C4C4",
+    height: "2%",
+    opacity: 0.4,
+  },
+  footer: {
+    padding: 10,
     justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  loadMoreBtn: {
+    padding: 10,
+    backgroundColor: '#800000',
+    borderRadius: 4,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnText: {
+    color: 'white',
+    fontSize: 15,
     textAlign: 'center',
-  }
+  },
 });

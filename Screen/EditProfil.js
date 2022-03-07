@@ -9,23 +9,107 @@ import { AntDesign } from '@expo/vector-icons'
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './../components/CredentialsContext';
-import { Formik } from 'formik';
+import * as ImagePicker from 'expo-image-picker';
+import { Formik, useFormik } from 'formik';
 import * as yup from 'yup'
+import axios from 'axios';
+import FormData from 'form-data';
 const win = Dimensions.get("window");
+
+import openedEye from "../assets/image/opened-eye.png";
+import closeEye from "../assets/image/closed-eye.png";
 
 import picture_account from "../assets/image/acount-inactive.png";
 
-export default function EditProfil({navigation}) {
-  // const {nama, email} = route.params;
-  const [data, setData] = useState([]);
-  const [text, setText] = useState('');
-  const [cari, setCari] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState();
-  const [messageType, setMessageType] = useState();
+// constructor(props) {
+//   super(props);
+//   this.state = {
+  //     nama : '',
+  //   };
+  // }
+  export default function EditProfil({route, navigation, props}) {
+    const [image, setImage] = useState(null);
+    const [data, setData] = useState([]);
+    const [text, setText] = useState('');
+    const [cari, setCari] = useState([]);
+    const [hidePassword, setHidePassword] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState();
+    const [messageType, setMessageType] = useState();
+    const [fileContent, setFileContent] = useState(null);
+    const [fileUri, setFileUri] = useState('');
+    const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+    const {nama, email, no_hp, foto, kontak_darurat, alamat, id} = storedCredentials;
 
-  const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-  const {nama, email} = storedCredentials;
+    const pickImage = async () => {
+      // No permissions request is necessary for launching the image library
+      let response = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+    console.log(response);
+
+    if (!response.cancelled) {
+      setImage(response.uri);
+    }
+  };
+
+  const handleUploadPhoto = () => {
+    handleMessage(null);
+    // const url = `http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/updatePicture/${id}`;
+    const datas = new FormData();
+
+    datas.append('foto', {
+      name: 'foto.jpg',
+      type: 'image/jpeg',
+      uri:  image,
+    });
+    // datas.append('image', image);
+    // datas.append('name', 'dita');
+    console.log(image);
+    console.log(datas);
+    if (image != null) {
+      axios({
+        url:`http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/updatePicture/${id}`,
+        method:"POST",
+        data:datas
+      })
+      .then((response) => {
+        const result = response.data;
+        const { message, success, status, data } = result;
+        console.log(response.data);
+
+        if (success == true) {
+          // navigation.navigate('MenuUtama');
+          // navigation.navigate('MenuUtama');
+          // persistLogin({ ...data[0] }, message, status);
+          Alert.alert("Edit Foto Profil", "Edit Foto Profil Berhasil!", [
+            {
+              text:"OK",
+              onPress: () => {},
+            },
+          ]);
+          console.log(response.data);
+        }
+        else {
+          handleMessage("Email atau password salah, silahkan coba kembali!");
+        }
+      })
+    } else {
+      alert('Please Select File first');
+    }
+
+      // .catch((error)=> {
+      //   console.error('error', error);
+      //   console.response(response.uri);
+
+      //   handleMessage("Tidak ada koneksi internet!");
+      // });
+  };
+  // const {no_hp} = route.params;
   const clearLogin = () => {
     AsyncStorage
     .removeItem('sialbertCredentials')
@@ -33,12 +117,61 @@ export default function EditProfil({navigation}) {
       setStoredCredentials("");
     })
     .catch(error => console.log(error))
-    Alert.alert("Logout", "Anda berhasil Logout!", [
+    Alert.alert("Logout", "Anda berhasil logout!", [
       {
         text:"OK",
         onPress: () => {clearLogin},
       },
     ]);
+  }
+
+  const handleEditProfil = (credentials, setSubmitting) => {
+    handleMessage(null);
+    const url = `http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/editProfil/${id}`;
+
+    axios
+      .post(url, credentials)
+      .then((response) => {
+        const result = response.data;
+        const { message, success, status, data } = result;
+        console.log(response.data);
+
+        if (success == true) {
+          // navigation.navigate('MenuUtama');
+          // navigation.navigate('MenuUtama');
+          // persistLogin({ ...data[0] }, message, status);
+          Alert.alert("Edit Profil", "Edit Profil Berhasil!", [
+            {
+              text:"OK",
+              onPress: () => {},
+            },
+          ]);
+          console.log(response.data);
+        }
+        else {
+          handleMessage("Email atau password salah, silahkan coba kembali!");
+        }
+        // navigation.navigate('MenuUtama');
+          // persistLogin({ ...data[0] }, message, status);
+          Alert.alert("Edit Profil", "Edit Profil Berhasil!", [
+            {
+              text:"OK",
+              onPress: () => {},
+            },
+          ]);
+        setSubmitting(false);
+    })
+
+    .catch((error)=> {
+      console.error('error', error);
+      setSubmitting(false);
+      handleMessage("Tidak ada koneksi internet!");
+    });
+  };
+
+  const handleMessage = (message, type = 'failed') => {
+    setMessage(message);
+    setMessageType(type);
   }
 
   const editProfilValidationSchema = yup.object().shape({
@@ -49,10 +182,10 @@ export default function EditProfil({navigation}) {
       .string()
       .email("Harap masukkan email yang valid!")
       .required('Alamat email wajib diisi!'),
-    nohp: yup
+    no_hp: yup
       .number()
-      .required('No. HP wajib diisi!'),
-    kontak: yup
+      .required('No. Handphone wajib diisi!'),
+    kontak_darurat: yup
       .number()
       .required('Kontak Darurat wajib diisi!'),
     alamat: yup
@@ -68,35 +201,60 @@ export default function EditProfil({navigation}) {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.content}
           >
-            <View style={{ backgroundColor: '#FFFFFF', flex:1 }}>
-                {/* <View style={styles.greeting}>
-                    <Text>Halo, </Text>
-                  <Text style={styles.greetingName}>{nama}</Text>
-                </View> */}
-                <TouchableOpacity onPress={clearLogin}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonTitle}>Logout</Text>
+            {/* <View style={{ backgroundColor: '#FFFFFF', flex:1 }}>
+              <TouchableOpacity onPress={clearLogin}>
+                <View style={styles.button}>
+                  <Text style={styles.buttonTitle}>Logout</Text>
+                </View>
+              </TouchableOpacity>
+            </View> */}
+            <View
+              opacity={1} style={styles.banner}
+            >
+              <TouchableOpacity onPress={pickImage} style={styles.banner2}>
+                <Text style={{color: '#fff'}}>Pilih Image</Text>
+                <View style={{borderRadius: 70, padding: 16}}>
+                  {image ?
+                    <Image source={{ uri: image, width: 90, height: 90 }} style={{ borderRadius: 70 }} /> :
+                      <>
+                        {{foto}==='' &&
+                          <Image source={picture_account} style={picture_account}></Image>
+                        }
+                        {{foto}!='' &&
+                          <Image source={{uri: foto, width: 90, height: 90}} style={{borderRadius: 70}}></Image>
+                        }
+                      </>
+                  }
+                </View>
+                <Text style={{ fontWeight: "bold"}}>Ubah</Text>
+                <Text>Tekan untuk ubah</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleUploadPhoto}>
+                  <View style={styles.btn}>
+                    <Text style={styles.buttonTitle}>Upload Photo</Text>
                   </View>
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
-            <View opacity={0.5} style={styles.banner}>
-              <Image source={picture_account} style={picture_account}></Image>
-              <Text style={{ fontWeight: "bold" }}>Ubah</Text>
-              <Text>Tekan untuk ubah</Text>
-            </View>
-            <View style={styles.border}></View>
+            {/* <TouchableOpacity
+              onPress={myfun}>
+            </TouchableOpacity> */}
             <View>
               <Formik
                 validationSchema={editProfilValidationSchema}
-                initialValues={{  nama: '', email: '', nohp: '', kontak: '', alamat: ''}}
+                enableReinitialize={true}
+                initialValues={{  nama: nama, email: email, no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, image:'tes.jpeg'}}
+                // initialValues={data}
                 onSubmit={(values, {setSubmitting})  => {
-                  handleProfil(values, setSubmitting);
+                  handleEditProfil(values, setSubmitting);
                 }}
+                // onSubmit={async (values) => alert(JSON.stringify(values, null, 2))}
               >
-                {({ handleChange, handleSubmit, values, isSubmitting, errors }) => (
+                {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
                   <View>
+                    <View style={styles.border}></View>
                     <View>
                       <View style={styles.form}>
+                        <Text style={{ marginLeft:24, marginTop:4 }}>Nama :</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCorrect={false}
@@ -104,15 +262,18 @@ export default function EditProfil({navigation}) {
                           placeholder="Nama"
                           style={styles.textInput}
                           onChangeText={handleChange('nama')}
-                          value={values.nama}
+                          onBlur={handleBlur('nama')}
+                          defaultValue={nama}
+                          editable={true}
                         />
                       </View>
-                      {errors.nama &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama}</Text>
+                      {(errors.nama && touched.nama) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama}</Text>
                       }
                     </View>
                     <View>
                       <View style={styles.form}>
+                        <Text style={{ marginLeft:24, marginTop:4 }}>Email :</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCompleteType="email"
@@ -122,49 +283,59 @@ export default function EditProfil({navigation}) {
                           placeholder="Email"
                           style={styles.textInput}
                           onChangeText={handleChange('email')}
-                          value={values.email}
+                          defaultValue={email}
+                          editable={true}
                         />
                       </View>
-                      {errors.email &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.email}</Text>
+                      {(errors.email && touched.alamat) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.email}</Text>
                       }
+                      {/* {values.email=="" &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>Alamat email wajib diisi</Text>
+                      } */}
                     </View>
                     <View style={styles.border2}></View>
                     {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
                     <View>
                       <View style={styles.form}>
-                          <TextInput
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            returnKeyType="next"
-                            placeholder="No. Handphone"
-                            style={styles.textInput}
-                            onChangeText={handleChange('nohp')}
-                            value={values.nohp}
-                          />
-                        </View>
-                      {errors.nohp &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nohp}</Text>
-                      }
-                    </View>
-                    <View>
-                      <View style={styles.form}>
+                        <Text style={{ marginLeft:24, marginTop:4 }}>No. Handphone:</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCorrect={false}
                           returnKeyType="next"
-                          placeholder="Kontak Darurat"
+                          keyboardType='numeric'
+                          // dataDetectorTypes={'phoneNumber'}
+                          placeholder="No. Handphone"
                           style={styles.textInput}
-                          onChangeText={handleChange('kontak')}
-                          value={values.kontak}
+                          onChangeText={handleChange('no_hp')}
+                          defaultValue={no_hp}
                         />
                       </View>
-                      {errors.kontak &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.kontak}</Text>
+                      {(errors.no_hp && touched.no_hp) &&
+                      <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.no_hp}</Text>
                       }
                     </View>
                     <View>
                       <View style={styles.form}>
+                        <Text style={{ marginLeft:24, marginTop:4 }}>Kontak Darurat:</Text>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          keyboardType='numeric'
+                          placeholder="Kontak Darurat"
+                          style={styles.textInput}
+                          onChangeText={handleChange('kontak_darurat')}
+                          defaultValue={kontak_darurat}
+                        />
+                      </View>
+                      {(errors.kontak_darurat && touched.kontak_darurat) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.kontak_darurat}</Text>
+                      }
+                    </View>
+                    <View>
+                      <View style={styles.form}>
+                        <Text style={{ marginLeft:24, marginTop:4 }}>Alamat :</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCorrect={false}
@@ -172,11 +343,11 @@ export default function EditProfil({navigation}) {
                           placeholder="Alamat"
                           style={styles.textInput}
                           onChangeText={handleChange('alamat')}
-                          value={values.alamat}
+                          defaultValue={alamat}
                         />
                       </View>
-                      {errors.alamat &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.alamat}</Text>
+                      {(errors.alamat && touched.alamat) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.alamat}</Text>
                       }
                     </View>
                     {!isSubmitting &&
@@ -207,13 +378,24 @@ export default function EditProfil({navigation}) {
 const styles = StyleSheet.create({
   banner: {
     backgroundColor: "#FAD603",
-    height: "25%",
+    height: "35%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop:0
+  },
+  banner2: {
     alignItems: "center",
     justifyContent: "center",
   },
+  picture: {
+    borderRadius: 70,
+    opacity:1
+  },
   picture_account: {
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    borderRadius: 70,
+    opacity:1,
   },
   border: {
     backgroundColor: "#C4C4C4",
@@ -222,7 +404,7 @@ const styles = StyleSheet.create({
   },
   border2: {
     backgroundColor: "#C4C4C4",
-    height: "5%",
+    height: "3%",
     opacity: 0.3
   },
   back: {
@@ -232,7 +414,7 @@ const styles = StyleSheet.create({
     elevation: 12,
     flexDirection: "row",
     marginHorizontal: 16,
-    marginVertical: 16,
+    marginVertical: 8,
     backgroundColor: '#fff',
     padding: 10,
     paddingHorizontal: 16,
@@ -241,7 +423,6 @@ const styles = StyleSheet.create({
   },
   safeAreaView: {
     flex: 1,
-    height:'100%'
   },
   content: {
     flex: 1,
@@ -256,6 +437,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center',
     margin: 16
+  },
+  btn: {
+    backgroundColor: '#25185A',
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop:16,
+    padding:8,
   },
   buttonTitle: {
     alignItems: 'center',

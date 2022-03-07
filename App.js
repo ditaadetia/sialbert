@@ -7,10 +7,16 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Login from "./Screen/Login";
 import Register from "./Screen/Register";
+import Register2 from "./Screen/Register2";
+import Setting from "./Screen/Setting";
 import EditProfil from "./Screen/EditProfil";
 import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
+import Alat from "./Screen/Alat";
 import Penyewaan from "./Screen/Penyewaan";
+import DetailOrder from "./Screen/DetailOrder";
+import DetailRefund from "./Screen/DetailRefund";
+import DetailReschedule from "./Screen/DetailReschedule";
 import Refund from "./Screen/Refund";
 import Reschedule from "./Screen/Reschedule";
 
@@ -84,10 +90,10 @@ function nav() {
             activeIcon = focused
             ? require("./assets/image/reschedule-active.png")
             : require("./assets/image/reschedule-inactive.png")
-          } else if (route.name === 'Edit Profil') {
+          } else if (route.name === 'Setting') {
             activeIcon = focused
-            ? require("./assets/image/acount-active.png")
-            : require("./assets/image/acount-inactive.png")
+            ? require("./assets/image/setting-active.png")
+            : require("./assets/image/setting-inactive.png")
           }
           return <Image style = {{ height: 32, width: 32 }}
             source={activeIcon}
@@ -103,9 +109,10 @@ function nav() {
       <Tab.Screen name='Penyewaan' component={Penyewaan} options={{ headerShown: false }}/>
       <Tab.Screen name='Refund' component={Refund} options={{ headerShown: false }}/>
       <Tab.Screen name='Reschedule' component={Reschedule} options={{ headerShown: false }}/>
-      <Tab.Screen
-        name='Edit Profil'
-        component={EditProfil}
+      <Tab.Screen name='Setting' component={Setting} options={{ headerShown: false }}/>
+      {/* <Tab.Screen
+        name='Setting'
+        component={Setting}
         options={{
           headerRight: () => (
             <Button
@@ -115,7 +122,7 @@ function nav() {
             />
           ),
         }}
-      />
+      /> */}
     </Tab.Navigator>
     </>
   );
@@ -177,6 +184,31 @@ export default function App() {
                     component={Detail}
                     options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                    name="Alat"
+                    component={Alat}
+                    options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                    name="Edit Profil"
+                    component={EditProfil}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="Detail Order"
+                    component={DetailOrder}
+                    options={{ headerShown: true }}
+                    />
+                     <Stack.Screen
+                    name="Detail Refund"
+                    component={DetailRefund}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="Detail Reschedule"
+                    component={DetailReschedule}
+                    options={{ headerShown: true }}
+                    />
                   </>
                   ) : (
                   <>
@@ -188,6 +220,11 @@ export default function App() {
                       <Stack.Screen
                       name="Register"
                       component={Register}
+                      options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                      name="Register2"
+                      component={Register2}
                       options={{ headerShown: false }}
                       />
                   </>
