@@ -24,7 +24,7 @@ class FormFirstStep extends Component {
     const [ next, saveState ] = useState([]);
     // Save state for use in other steps
     saveState({ name: "dita" });
-    console.log(name)
+    // console.log(name)
 
     // Go to next step
     next();
@@ -38,7 +38,7 @@ class FormFirstStep extends Component {
 
   render() {
     const { currentStep, totalSteps } = this.state;
-    console.log(name)
+    // console.log(name)
     return(
       <View style={styles.root}>
         <View>
