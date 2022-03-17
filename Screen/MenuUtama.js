@@ -45,7 +45,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/equipments')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/equipments')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -101,7 +101,9 @@ export default function MenuUtama({navigation}) {
         <View style={styles.headerContainer}>
           <Image source={Notif} />
           <Text style={styles.textHeader}>SI-ALBERT</Text>
-          <Image source={Cart} />
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+            <Image source={Cart} />
+          </TouchableOpacity>
         </View>
         <View style={styles.container}>
           <View style={styles.textInput}>

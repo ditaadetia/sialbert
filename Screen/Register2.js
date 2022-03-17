@@ -59,7 +59,7 @@ export default function RegisterPage({ navigation }) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://858b-2001-448a-6060-6dc0-d8e-843-21f3-41e1.ngrok.io/api/register';
+    const url = 'http://5b4d-180-242-234-204.ngrok.io/api/register';
 
     axios
       .post(url, credentials)

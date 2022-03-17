@@ -59,7 +59,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleUploadPhoto = () => {
     handleMessage(null);
-    // const url = `http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/updatePicture/${id}`;
+    // const url = `http://5b4d-180-242-234-204.ngrok.io/api/updatePicture/${id}`;
     const datas = new FormData();
 
     datas.append('foto', {
@@ -73,7 +73,7 @@ import picture_account from "../assets/image/acount-inactive.png";
     console.log(datas);
     if (image != null) {
       axios({
-        url:`http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/updatePicture/${id}`,
+        url:`http://5b4d-180-242-234-204.ngrok.io/api/updatePicture/${id}`,
         method:"POST",
         data:datas
       })
@@ -127,7 +127,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleEditProfil = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/editProfil/${id}`;
+    const url = `http://5b4d-180-242-234-204.ngrok.io/api/editProfil/${id}`;
 
     axios
       .post(url, credentials)
@@ -455,5 +455,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     lineHeight: 22,
+  },
+  root: {
+    flex: 1,
+    backgroundColor: 'white'
   },
 });

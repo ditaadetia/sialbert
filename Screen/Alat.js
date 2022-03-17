@@ -53,7 +53,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/equipments-all')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/equipments-all')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);

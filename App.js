@@ -14,6 +14,7 @@ import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
 import Alat from "./Screen/Alat";
 import Penyewaan from "./Screen/Penyewaan";
+import FormulirOrder from "./Screen/FormulirOrder";
 import DetailOrder from "./Screen/DetailOrder";
 import DetailRefund from "./Screen/DetailRefund";
 import DetailReschedule from "./Screen/DetailReschedule";
@@ -197,6 +198,11 @@ export default function App() {
                     <Stack.Screen
                     name="Detail Order"
                     component={DetailOrder}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="Formulir Order"
+                    component={FormulirOrder}
                     options={{ headerShown: true }}
                     />
                      <Stack.Screen

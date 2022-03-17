@@ -8,6 +8,8 @@ import { AntDesign } from '@expo/vector-icons'
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import Moment from 'moment';
+// import { downloadToFolder } from 'expo-file-dl';
+// import { Constants } from 'react-native-unimodules';
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from '../components/CredentialsContext';
@@ -32,7 +34,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/orders')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/orders/')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -46,7 +48,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/detail-orders')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -135,7 +137,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <Text>{item.nama_instansi}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <Image source={{ uri:'http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <View>
                         <Text>{nama}</Text>
                         <Text>x1</Text>
@@ -173,6 +175,9 @@ export default function MenuUtama({navigation}) {
                       </View>
                     </TouchableOpacity>
                     <TouchableOpacity>
+                    {/* <TouchableOpacity onPress={async () => {
+                      await downloadToFolder('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                    }}> */}
                       <View style={styles.btn}>
                         <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
                       </View>
@@ -214,10 +219,12 @@ export default function MenuUtama({navigation}) {
   return (
     <>
       <View>
-        <View style={{ borderWidth:2, margin: 16, width:'50%', borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
-          <Ionicons name="add" size={32} color="#25185A" />
-          <Text style={{ fontWeight: 'bold' }}>Ajukan Penyewaan</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Formulir Order')}>
+          <View style={{ borderWidth:2, margin: 16, width:'50%', borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
+            <Ionicons name="add" size={32} color="#25185A" />
+            <Text style={styles.buttonTitle}>Ajukan Penyewaan</Text>
+          </View>
+        </TouchableOpacity>
         <View style={styles.container}>
           <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
@@ -405,7 +412,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     marginTop: 0,
-    color: '#FFFFFF',
+    color: 'green',
     fontWeight: '600',
     lineHeight: 22,
   },

@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.3",
+    "@mui/styles": "^5.5.0",
     "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-native-community/datetimepicker": "^5.1.0",
     "@react-native-community/masked-view": "^0.1.11",
@@ -38,6 +40,7 @@
     "react-hook-form": "^7.22.5",
     "react-native": "0.64.3",
     "react-native-24h-timepicker": "^1.1.0",
+    "react-native-animated-multistep": "^1.1.1",
     "react-native-button": "^3.0.1",
     "react-native-calendario": "^3.0.1",
     "react-native-calendars": "^1.1278.0",
@@ -55,6 +58,7 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-material-dropdown-v2-fixed": "^0.11.3",
     "react-native-modal-datetime-picker": "^13.0.1",
+    "react-native-multistep-forms": "^0.0.1",
     "react-native-navigation": "^7.25.0",
     "react-native-paper": "^4.11.2",
     "react-native-safe-area-context": "3.3.2",

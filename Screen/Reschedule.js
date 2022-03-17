@@ -32,7 +32,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/reschedules')
+    fetch('http://5b4d-180-242-234-204.ngrok.io/api/reschedules')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -46,7 +46,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/detail-reschedules')
+    fetch('http://5b4d-180-242-234-204.ngrok.io/api/detail-reschedules')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -120,7 +120,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                       <View>
-                        <Image source={{ uri:'http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                        <Image source={{ uri:'http://5b4d-180-242-234-204.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                         <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{alat?.[0]?.nama}</Text>
                       </View>
                       <View>

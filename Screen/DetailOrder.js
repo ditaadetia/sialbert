@@ -40,7 +40,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/orders')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/orders')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -54,7 +54,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/detail-orders')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -110,7 +110,7 @@ export default function DetailOrder({ navigation, route }) {
               <Card key={item.id} {...item} >
                 <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
                   <View style={{ flexDirection:'row' }}>
-                    <Image source={{ uri:'http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                    <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                     <View style={{ justifyContent:'center', textAlignVertical:'center' }}>
                       <Text>{item.nama}</Text>
                       <Text>x1</Text>

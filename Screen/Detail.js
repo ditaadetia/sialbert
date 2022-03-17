@@ -9,7 +9,7 @@ const win = Dimensions.get("window");
 import DatePicker from 'react-native-datepicker';
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
+import Moment from 'moment';
 // import DateRangePicker from "react-native-daterange-picker";
 // import * as Calendar from 'expo-calendar';
 // import EventCalendar from 'react-native-events-calendar';
@@ -17,12 +17,15 @@ import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 // import { Calendar } from 'react-native-calendario';
 import DateRangePicker from "rnv-date-range-picker";
 let {width} = Dimensions.get('window');
+import { CartContext } from './CartContext';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
 export default function Detail({ navigation, route }) {
     const {alat} = route.params
+    const [product, setProduct] = useState({});
     const [data, setData] = useState([]);
+    const [selectedDate, setSelectedDate] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedRange, setRange] = useState({});
     const [date1, setDate] = useState(new Date());
@@ -35,7 +38,7 @@ export default function Detail({ navigation, route }) {
 
     useEffect(async() => {
         setIsLoading(true);
-        fetch('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/orders')
+        fetch('http://8b06-2001-448a-6060-f025-9d82-a133-3805-e5be.ngrok.io/api/schedule/' + alat.id)
           .then((response) => response.json())
           .then((hasil) => {
             setData(hasil);
@@ -46,8 +49,9 @@ export default function Detail({ navigation, route }) {
           .catch(error => { console.log; });
 
     }, []);
-
-    console.log(data)
+    const listOrders = ({item}) => {
+        const tanggal = [...item.tanggal_mulai]
+    }
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -92,23 +96,106 @@ export default function Detail({ navigation, route }) {
         showMode2('time');
     };
 
-    const listSchedules = ({item}) => {
-        console.log(item.tanggal_mulai)
-        return (
-          <>
-            <View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate(''
-                )}
-              >
-                <View style={{ flexDirection:'row', textAlign:'center', textAlignVertical: 'center'}}>
-                  <Text>{item.tanggal_mulai}</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </>
-        );
-    }
+    // const data2= data.map((item, idx) => {
+    //     const tanggal_mulai = item.tanggal_mulai
+    //     const tanggal_selesai = item.tanggal_selesai
+    //     console.log(tanggal_mulai)
+    // })
+
+    // objectList.map((item, idx)=>{
+    //     const month = item.month
+    //     const range = [...month]
+    //     let anyString = 'tes'
+    //     range.map((item, idx)=>{
+    //         const rentang = item.substring(0,10)
+    //         // console.log(rentang)
+    //     })
+    // })
+
+    // let calenderItems = objectList.reduce((acc, leave) => {
+    //     let { tanggal_mulai, tanggal_selesai } = leave;
+    //     var fromDateObject = {
+    //         ...acc,
+    //         [tanggal_mulai]: {
+    //             startingDay: true,
+    //             endingDay: false,
+    //             color: '#ffd700'
+    //         },
+    //     }
+    //     return {
+    //       ...fromDateObject,
+    //       [tanggal_selesai]: {
+    //         startingDay: false,
+    //         endingDay: true,
+    //         color: '#ffd700'
+    //       },
+    //     };
+    // }, {});
+
+    const objectList = [...data]
+    let calenderItems = objectList.reduce((acc, leave) => {
+        let { tanggal_mulai, tanggal_selesai } = leave;
+        let start = Moment(tanggal_mulai).startOf('day').add(1, 'days');
+        let end = Moment(tanggal_selesai).startOf('day');
+        const dateRange = {
+            [tanggal_mulai]: { selected: true, startingDay: true, color: '#ffd700' },
+            [tanggal_selesai]: { selected: true, endingDay: true, color: '#ffd700' },
+        };
+        while (end.isAfter(start)) {
+            Object.assign(dateRange, { [start.format('YYYY-MM-DD')]: { selected: true, color: '#ffd700' } });
+            start = start.add(1, 'days');
+        }
+        return {...acc, ...dateRange};
+    }, {});
+    console.log(calenderItems)
+    // calenderItems = Object.keys(calenderItems)
+    // .sort()
+    // .reduce((obj, key) => {
+    //     obj[key] = calenderItems[key];
+    //     return obj;
+    // }, {});
+
+
+    let a = objectList.map((item, idx)=>{
+        const month = item.month
+        const range = [...month]
+        let anyString = 'tes'
+        const b = range.map((item, idx)=>{
+            const rentang = item.substring(0,10)
+            return rentang;
+            // const deliveryDates = [
+            //     {date:rentang, deliveryStatus:false, endingDay:false, startingDay:true},
+            // ];
+
+            // const markedDates = deliveryDates.reduce((acc, {date,endingDay,startingDay}) => {
+            //     acc[date] = {disabled: true, color: 'green', startingDay, endingDay};
+            //     return acc;
+            // },{});
+            // return markedDates;
+            // console.log(markedDates)
+        })
+        return b;
+    })
+    // const k = a.map((item, idx)=>{
+    //     const deliveryDates = [
+    //         {date:a, deliveryStatus:false, endingDay:false, startingDay:true},
+    //     ];
+    //     const markedDates = deliveryDates.reduce((acc, {date,endingDay,startingDay}) => {
+    //         acc[date] = {disabled: true, color: 'green', startingDay, endingDay};
+    //         return acc;
+    //     },{});
+    //     return markedDates;
+    // })
+
+    let newDaysObject = {};
+    const i =a.forEach((day) => {
+        newDaysObject[day] = {
+            selected: true,
+            marked: true
+        }
+        return newDaysObject[day]
+    });
+
 
     return (
         <ScrollView>
@@ -199,39 +286,12 @@ export default function Detail({ navigation, route }) {
                         onDayPress={day => {
                             console.log('selected day', day);
                         }}
-                        markedDates={{
-                            '2022-03-20': {textColor: 'green'},
-                            '2022-03-22': {startingDay: true, color: 'green'},
-                            '2022-03-25': {selected: true, endingDay: true, color: 'green', textColor: 'gray'},
-                            '2022-04-04': {disabled: true, startingDay: true, color: 'green', endingDay: true}
+                        markedDates={calenderItems}
+                        // disabledDaysIndexes={[0, 6]}
+                        theme={{
+                            selectedColor: 'blue'
                         }}
                     />
-                    {isLoading ?
-                        <View style={{
-                            justifyContent: 'center',
-                            textAlign: 'center',
-                            textAlignVertical: 'center',
-                            marginTop:0,
-                            textAlign: 'center',
-                            flex: 1,
-                            alignItems: 'center'
-                        }}>
-                        <ActivityIndicatorExample style={ styles.progress }/>
-                        </View> : (
-                        <FlatList
-                            data={data}
-                            vertical
-                            key={1}
-                            numColumns={1}
-                            nestedScrollEnabled
-                            // fadingEdgeLength={10}
-                            keyExtractor={item=>item.id}
-                            renderItem={listSchedules}
-                            onEndReachedThreshold={0.5}
-                            // getItemCount={getItemCount}
-                            // getItem={getItem}
-                        />
-                    )}
                 </View>
             </SafeAreaView>
         </ScrollView>
