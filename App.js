@@ -15,6 +15,7 @@ import Detail from "./Screen/Detail";
 import Alat from "./Screen/Alat";
 import Penyewaan from "./Screen/Penyewaan";
 import FormulirOrder from "./Screen/FormulirOrder";
+import FormSecondStep from "./Screen/forms/FormSecondStep";
 import DetailOrder from "./Screen/DetailOrder";
 import DetailRefund from "./Screen/DetailRefund";
 import DetailReschedule from "./Screen/DetailReschedule";
@@ -204,6 +205,11 @@ export default function App() {
                     name="Formulir Order"
                     component={FormulirOrder}
                     options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="FormSecondStep"
+                    component={FormSecondStep}
+                    options={{ headerShown: false }}
                     />
                      <Stack.Screen
                     name="Detail Refund"

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Text, View, Image, SafeAreaView, TextInput, TouchableHighlightComponent, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import FloatingTabBar from "../components/FloatingTabBar";
@@ -12,7 +12,11 @@ import { CredentialsContext } from '../components/CredentialsContext';
 import { Formik, useFormik, Form } from 'formik';
 import Step1 from "./forms/FormFirstStep";
 import Step2 from "./forms/FormSecondStep";
-import AnimatedMultistep from "react-native-animated-multistep";
+// import AnimatedMultistep from "react-native-animated-multistep";
+import { Stepper } from 'react-form-stepper';
+import borderdark from "../assets/image/borderdark.png";
+import borderlight from "../assets/image/borderlight.png";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // import { FormSuccess } from "./forms/FormSuccess";
 import * as yup from 'yup';
@@ -20,47 +24,42 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const win = Dimensions.get("window");
 
-const allSteps = [
-  { name: "step 1", component: Step1 },
-  { name: "step 1", component: Step2 },
-];
-
-export default function FormulirOrder({navigation}) {
-  // const {nama, email} = route.params;
+export default function FormulirOrder({navigation, route}) {
   const [data, setData] = useState([]);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-  const {nama, email} = storedCredentials;
+  const {nama, email, no_hp, foto, kontak_darurat, alamat, id} = storedCredentials;
 
-  onNext = () => {
-    console.log("Next");
-  };
-
-  /* define the method to be called when you go on back step */
-
-  onBack = () => {
-    console.log("Back");
-  };
-
-/* define the method to be called when the wizard is finished */
-
-  finish = finalState => {
-    console.log(finalState);
-  };
-
-  const handleSubmit = () => setStep(step => step + 1);
+  const handleSubmit = (values) => {
+    Alert.alert("Edit Profil", "Edit Profil Berhasil!", [
+      {
+        text:"OK",
+        onPress: () => {},
+      },
+    ]);
+    console.log(values);
+  }
 
   const editProfilValidationSchema = yup.object().shape({
-    nama: yup
+    nama_penyewa: yup
       .string()
       .required('Nama wajib diisi!'),
     email: yup
       .string()
       .email("Harap masukkan email yang valid!")
       .required('Alamat email wajib diisi!'),
+    nama_instansi: yup
+      .string()
+      .required('Nama wajib diisi!'),
+    nama_instansi: yup
+      .string()
+      .required('Nama wajib diisi!'),
+    jabatan: yup
+      .string()
+      .required('Nama wajib diisi!'),
     no_hp: yup
       .number()
       .required('No. Handphone wajib diisi!'),
@@ -71,7 +70,7 @@ export default function FormulirOrder({navigation}) {
       .string()
       .required('Alamat wajib diisi!'),
     nama_kegiatan: yup
-      .number()
+      .string()
       .required('Nama Kegiatan wajib diisi!'),
     status_kegiatan: yup
       .string()
@@ -81,6 +80,9 @@ export default function FormulirOrder({navigation}) {
       .required('Metode Pembayaran Kegiatan wajib diisi!'),
   })
 
+  const submit = () => {
+    async (values) => alert(JSON.stringify(values, null, 2))
+  }
   return (
     <View style={styles.root}>
       <View style={{ justifyContent:'center', alignItems:'center' }}>
@@ -89,26 +91,236 @@ export default function FormulirOrder({navigation}) {
       <Formik
         validationSchema={editProfilValidationSchema}
         enableReinitialize={true}
-        initialValues={{  nama: '', email: '', no_hp: '', kontak_darurat: '', alamat: '', nama_kegiatan: '', status_kegiatan:''}}
-        // initialValues={data}
-        onSubmit={(values, {setSubmitting})  => {
-          handleEditProfil(values, setSubmitting);
-        }}
-        // onSubmit={async (values) => alert(JSON.stringify(values, null, 2))}
+        initialValues={{  nama_penyewa: nama, email: email, nama_instansi: '', jabatan:'', no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, nama_kegiatan: '', status_kegiatan:'', metode_pembayaran:''}}
+        onSubmit={values  => console.log(values)}
       >
         {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
-          <View style={{ flex: 1 }}>
-            <AnimatedMultistep
-              steps={allSteps}
-              // onFinish={this.finish}
-              // onBack={this.onBack}
-              // onNext={this.onNext}
-              comeInOnNext="bounceInUp"
-              OutOnNext="bounceOutDown"
-              comeInOnBack="bounceInDown"
-              OutOnBack="bounceOutUp"
-            />
-          </View>
+          <View style={styles.root}>
+            <View>
+            <View style={{ margin:16, flexDirection: 'row' }}>
+              <View style={{justifyContent:'center', alignItems:'center' }}>
+                <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                  <Text style={{textAlign: 'center' }}>1</Text>
+                </View>
+                <Text style={{textAlign: 'center' }}>Step 1</Text>
+              </View>
+              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+              <TouchableOpacity onPress={() => navigation.navigate('FormSecondStep', {value: values})}>
+                <View style={{ justifyContent:'center', alignItems:'center' }}>
+                  <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                    <Text style={{textAlign: 'center' }}>2</Text>
+                  </View>
+                  <Text style={{textAlign: 'center' }}>Step 2</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+              <TouchableOpacity onPress={() => navigation.navigate('FormSecondStep', {value: values})}>
+                <View style={{ justifyContent:'center', alignItems:'center' }}>
+                  <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                    <Text style={{textAlign: 'center' }}>3</Text>
+                  </View>
+                  <Text style={{textAlign: 'center' }}>Step 3</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+              {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
+                <Text style={styles.currentStepText}>1 of 2
+                </Text>
+              </View>
+              <View style={{ marginBottom: 8, flexDirection:'row' }}>
+                <Image source={borderdark} style={{ marginBottom: 8, width: '50%' }} resizeMode="cover"/>
+                <Image source={borderlight} style={{ marginBottom: 8, width: '50%' }} resizeMode="cover"/>
+              </View>
+              <Image source={from1} style={{ marginBottom: 8, width: '100%' }} resizeMode="cover"/> */}
+              <View style={{ flexDirection:'row' }}>
+                <View style={{ width: '50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>Nama Penyewa:</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      placeholder="Nama Penyewa"
+                      style={styles.textInput}
+                      onChangeText={handleChange('nama_penyewa')}
+                      onBlur={handleBlur('nama_penyewa')}
+                      defaultValue={nama}
+                      editable={true}
+                    />
+                  </View>
+                  {(errors.nama_penyewa && touched.nama_penyewa) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama_penyewa}</Text>
+                  }
+                </View>
+                <View style={{ width: '50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>Email :</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCompleteType="email"
+                      autoCorrect={false}
+                      keyboardType="email-address"
+                      returnKeyType="next"
+                      placeholder="Email"
+                      style={styles.textInput}
+                      onChangeText={handleChange('email')}
+                      defaultValue={email}
+                      editable={true}
+                    />
+                  </View>
+                  {(errors.email && touched.email) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.email}</Text>
+                  }
+                </View>
+              </View>
+              <View style={{ flexDirection:'row' }}>
+                <View style={{ width: '50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>Nama Instansi :</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      placeholder="Nama Instansi"
+                      style={styles.textInput}
+                      onChangeText={handleChange('nama_instansi')}
+                      editable={true}
+                    />
+                  </View>
+                  {(errors.nama_instansi && touched.nama_instansi) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama_instansi}</Text>
+                  }
+                </View>
+                <View style={{ width: '50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>Jabatan :</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      placeholder="Jabatan"
+                      style={styles.textInput}
+                      onChangeText={handleChange('jabatan')}
+                      editable={true}
+                    />
+                  </View>
+                  {(errors.jabatan && touched.jabatan) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.jabatan}</Text>
+                  }
+                </View>
+              </View>
+              <View style={styles.border}></View>
+              {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
+              <View style={{ flexDirection:'row' }}>
+                <View style={{ width:'50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>No. Handphone:</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      keyboardType='numeric'
+                      // dataDetectorTypes={'phoneNumber'}
+                      placeholder="No. Handphone"
+                      defaultValue={no_hp}
+                      style={styles.textInput}
+                      onChangeText={handleChange('no_hp')}
+                    />
+                  </View>
+                  {(errors.no_hp && touched.no_hp) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.no_hp}</Text>
+                  }
+                </View>
+                <View style={{ width:'50%' }}>
+                  <View style={styles.form}>
+                    <Text style={{ marginLeft:24, marginTop:4 }}>Kontak Darurat:</Text>
+                    <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      keyboardType='numeric'
+                      placeholder="Kontak Darurat"
+                      style={styles.textInput}
+                      defaultValue={kontak_darurat}
+                      onChangeText={handleChange('kontak_darurat')}
+                    />
+                  </View>
+                  {(errors.kontak_darurat && touched.kontak_darurat) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.kontak_darurat}</Text>
+                  }
+                </View>
+              </View>
+              <View>
+                <View style={styles.form}>
+                  <Text style={{ marginLeft:24, marginTop:4 }}>Alamat :</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    placeholder="Alamat"
+                    defaultValue={alamat}
+                    style={styles.textInputAlamat}
+                    onChangeText={handleChange('alamat')}
+                  />
+                </View>
+                {(errors.alamat && touched.alamat) &&
+                  <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.alamat}</Text>
+                }
+              </View>
+              <View style={styles.border}></View>
+              <View>
+                <View style={styles.form}>
+                  <Text style={{ marginLeft:24, marginTop:4 }}>Nama Kegiatan :</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    placeholder="Nama Kegiatan"
+                    style={styles.textInput}
+                    onChangeText={handleChange('nama_kegiatan')}
+                  />
+                </View>
+                {(errors.nama_kegiatan && touched.nama_kegiatan) &&
+                  <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama_kegiatan}</Text>
+                }
+              <View>
+                <View style={styles.form}>
+                  <Text style={{ marginLeft:24, marginTop:4 }}>Status Kegiatan :</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    placeholder="Status Kegiatan"
+                    style={styles.textInput}
+                    onChangeText={handleChange('status_kegiatan')}
+                  />
+                  </View>
+                </View>
+                {(errors.status_kegiatan && touched.status_kegiatan) &&
+                  <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.status_kegiatan}</Text>
+                }
+              </View>
+              <View>
+              {/* <TouchableOpacity onPress={() => navigation.navigate('FormSecondStep', {value: values})}>
+                <View style={styles.button}>
+                    <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                </View>
+              </TouchableOpacity> */}
+              {!isSubmitting &&
+                <TouchableOpacity onPress={handleSubmit}>
+                  <View style={styles.button}>
+                      <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                  </View>
+                </TouchableOpacity>
+              }
+              {isSubmitting &&
+                <View style={styles.button}>
+                <ActivityIndicatorExample/>
+                </View>
+              }
+            </View>
+        </View>
+      </View>
         )}
       </Formik>
     </View>
@@ -139,21 +351,48 @@ const styles = StyleSheet.create({
   border: {
     backgroundColor: "#C4C4C4",
     height: "2%",
-    opacity: 0.7
+    opacity: 0.7,
+    marginVertical: 4
   },
   border2: {
     backgroundColor: "#C4C4C4",
     height: "3%",
-    opacity: 0.3
+    opacity: 0.3,
+    marginVertical: 4
+  },
+  line:{
+    borderBottomColor: 'black',
+    height: 1,
+    width:'5%'
+  },
+  borderdark: {
+    backgroundColor: "#787171",
+    height: "2%",
+  },
+  borderlight: {
+    backgroundColor: "#C4C4C4",
+    height: "2%",
   },
   textInput: {
     elevation: 12,
     flexDirection: "row",
-    marginHorizontal: 16,
+    marginHorizontal: 8,
     marginVertical: 8,
     backgroundColor: '#fff',
     padding: 4,
-    paddingHorizontal: 4,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderColor: '#364878'
+  },
+  textInputAlamat: {
+    elevation: 12,
+    height: 60,
+    flexDirection: "row",
+    marginHorizontal: 8,
+    marginVertical: 8,
+    backgroundColor: '#fff',
+    padding: 4,
+    paddingHorizontal: 12,
     borderRadius: 20,
     borderColor: '#364878'
   },
@@ -186,5 +425,6 @@ const styles = StyleSheet.create({
   },
   root: {
     flex: 1,
+    backgroundColor:'#ffffff'
   },
 });

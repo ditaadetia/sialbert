@@ -25,7 +25,6 @@ export default function Detail({ navigation, route }) {
     const {alat} = route.params
     const [product, setProduct] = useState({});
     const [data, setData] = useState([]);
-    const [selectedDate, setSelectedDate] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedRange, setRange] = useState({});
     const [date1, setDate] = useState(new Date());
@@ -54,21 +53,15 @@ export default function Detail({ navigation, route }) {
     }
 
     const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
+        const currentDate = selectedDate || date1;
         setShow(Platform.OS === 'ios');
         setDate(currentDate);
     };
 
-    const onChange2 = (event, selectedDate2) => {
-        const currentDate2 = selectedDate2 || date;
-        setShow(Platform.OS === 'ios');
-        setDate2(currentDate2);
-    };
-
-    const onChange3 = (event, selectedDate2) => {
-        const currentDate2 = selectedDate2 || date;
-        setShow(Platform.OS === 'ios');
-        setDate2(currentDate2);
+    const onChange2 = (event, selectedDate) => {
+        const currentDate = selectedDate || date2;
+        setShow2(Platform.OS === 'ios');
+        setDate2(currentDate);
     };
 
     const showMode = (currentMode) => {
@@ -96,6 +89,8 @@ export default function Detail({ navigation, route }) {
         showMode2('time');
     };
 
+    console.log(date1)
+    console.log(date2)
     // const data2= data.map((item, idx) => {
     //     const tanggal_mulai = item.tanggal_mulai
     //     const tanggal_selesai = item.tanggal_selesai
@@ -241,12 +236,12 @@ export default function Detail({ navigation, route }) {
                             <View style={styles.pickedDateContainer}>
                                 <Text style={styles.pickedDate}>{date2.toLocaleString()}</Text>
                             </View>
-                            <TouchableOpacity onPress={showDatepicker}>
+                            <TouchableOpacity onPress={showDatepicker2}>
                                 <View style={styles.pickButton}>
                                     <Text style={styles.buttonTitle}>Atur Tanggal Kembali!</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={showTimepicker}>
+                            <TouchableOpacity onPress={showTimepicker2}>
                                 <View style={styles.pickButton}>
                                     <Text style={styles.buttonTitle}>Atur Jam Kembali!</Text>
                                 </View>
@@ -269,9 +264,8 @@ export default function Detail({ navigation, route }) {
                         <DateTimePicker
                         testID="dateTimePicker2"
                         value={date2}
-                        mode={showMode}
+                        mode={mode2}
                         is24Hour={true}
-                        display="default"
                         onChange={onChange2}
                         minimumDate={new Date()}
                         locale='id'

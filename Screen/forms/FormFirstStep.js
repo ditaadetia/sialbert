@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { Image, View, TouchableOpacity, TextInput, Text, StyleSheet } from "react-native";
 import Notif from "../../assets/image/1from2.png";
 
@@ -8,7 +8,7 @@ class FormFirstStep extends Component {
     this.state = {
       totalSteps: "",
       currentStep: "",
-      nama: 'ita'
+      name: "dita",
     };
   }
 
@@ -21,12 +21,11 @@ class FormFirstStep extends Component {
   };
 
   nextStep = () => {
-    const [ next, saveState ] = useState([]);
+    const { next, saveState } = this.props;
     // Save state for use in other steps
-    saveState({ name: "dita" });
-    // console.log(name)
+    saveState({ name: "raja" });
 
-    // Go to next step
+    console.log(next.name)
     next();
   };
 
@@ -37,50 +36,55 @@ class FormFirstStep extends Component {
   }
 
   render() {
-    const { currentStep, totalSteps } = this.state;
-    // console.log(name)
+    const { currentStep, totalSteps, name } = this.state;
     return(
       <View style={styles.root}>
         <View>
-        <View style={{ justifyContent:'center', alignItems:'center' }}>
+          {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
             <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
             </Text>
-          </View>
-          <Image
+          </View> */}
+          {/* <Image
             source={require("../../assets/image/2-2.png")}
             style={{ marginBottom: 8, width: '100%' }}
             resizeMode="cover"
-          />
+          /> */}
           <View>
-          <View style={styles.form}>
-            <Text style={{ marginLeft:24, marginTop:4 }}>Nama :</Text>
-            <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                placeholder="Nama"
-                style={styles.textInput}
-                // onChangeText={handleChange('nama')}
-                // onBlur={handleBlur('nama')}
-                editable={true}
-            />
+            <View style={styles.form}>
+              <Text style={{ marginLeft:24, marginTop:4 }}>Nama :</Text>
+              <TextInput
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  placeholder="Nama"
+                  style={styles.textInput}
+                  // onChangeText={handleChange('nama')}
+                  // onBlur={handleBlur('nama')}
+                  editable={true}
+              />
+              </View>
+            {(errors.nama && touched.nama) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama}</Text>
+            }
             </View>
-          </View>
           <View>
             <View style={styles.form}>
               <Text style={{ marginLeft:24, marginTop:4 }}>Email :</Text>
               <TextInput
-                  autoCapitalize="none"
-                  autoCompleteType="email"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  returnKeyType="next"
-                  placeholder="Email"
-                  style={styles.textInput}
-                  // onChangeText={handleChange('email')}
-                  editable={true}
+                autoCapitalize="none"
+                autoCompleteType="email"
+                autoCorrect={false}
+                keyboardType="email-address"
+                returnKeyType="next"
+                placeholder="Email"
+                style={styles.textInput}
+                // onChangeText={handleChange('email')}
+                editable={true}
               />
-              </View>
+            </View>
+            {(errors.email && touched.email) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.email}</Text>
+            }
           </View>
           <View style={styles.border2}></View>
           {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
@@ -88,73 +92,88 @@ class FormFirstStep extends Component {
             <View style={styles.form}>
               <Text style={{ marginLeft:24, marginTop:4 }}>No. Handphone:</Text>
               <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  keyboardType='numeric'
-                  // dataDetectorTypes={'phoneNumber'}
-                  placeholder="No. Handphone"
-                  style={styles.textInput}
-                  // onChangeText={handleChange('no_hp')}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                keyboardType='numeric'
+                // dataDetectorTypes={'phoneNumber'}
+                placeholder="No. Handphone"
+                style={styles.textInput}
+                // onChangeText={handleChange('no_hp')}
               />
-              </View>
+            </View>
+            {(errors.no_hp && touched.no_hp) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.no_hp}</Text>
+            }
           </View>
           <View>
             <View style={styles.form}>
               <Text style={{ marginLeft:24, marginTop:4 }}>Kontak Darurat:</Text>
               <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  keyboardType='numeric'
-                  placeholder="Kontak Darurat"
-                  style={styles.textInput}
-                  // onChangeText={handleChange('kontak_darurat')}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                keyboardType='numeric'
+                placeholder="Kontak Darurat"
+                style={styles.textInput}
+                // onChangeText={handleChange('kontak_darurat')}
               />
-              </View>
+            </View>
+            {(errors.kontak_darurat && touched.kontak_darurat) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.kontak_darurat}</Text>
+            }
           </View>
           <View>
             <View style={styles.form}>
               <Text style={{ marginLeft:24, marginTop:4 }}>Alamat :</Text>
               <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  placeholder="Alamat"
-                  style={styles.textInput}
-                  // onChangeText={handleChange('alamat')}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                placeholder="Alamat"
+                style={styles.textInput}
+                // onChangeText={handleChange('alamat')}
               />
-              </View>
+            </View>
+            {(errors.alamat && touched.alamat) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.alamat}</Text>
+            }
           </View>
           <View style={styles.border}></View>
           <View>
             <View style={styles.form}>
               <Text style={{ marginLeft:24, marginTop:4 }}>Nama Kegiatan :</Text>
               <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  returnKeyType="next"
-                  placeholder="Nama Kegiatan"
-                  style={styles.textInput}
-                  // onChangeText={handleChange('nama_kegiatan')}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                placeholder="Nama Kegiatan"
+                style={styles.textInput}
+                // onChangeText={handleChange('nama_kegiatan')}
               />
             </View>
-        <View>
-          <View style={styles.form}>
-            <Text style={{ marginLeft:24, marginTop:4 }}>Status Kegiatan :</Text>
-            <TextInput
+            {(errors.nama_kegiatan && touched.nama_kegiatan) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.nama_kegiatan}</Text>
+            }
+          <View>
+            <View style={styles.form}>
+              <Text style={{ marginLeft:24, marginTop:4 }}>Status Kegiatan :</Text>
+              <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="next"
                 placeholder="Status Kegiatan"
                 style={styles.textInput}
                 // onChangeText={handleChange('status_kegiatan')}
-            />
+              />
+              </View>
             </View>
-        </View>
+            {(errors.status_kegiatan && touched.status_kegiatan) &&
+              <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.status_kegiatan}</Text>
+            }
           </View>
           <View>
-            <TouchableOpacity onPress={this.nextStep}>
+            <TouchableOpacity>
               <View style={styles.button}>
                   <Text style={styles.buttonTitle}>LANJUTKAN</Text>
               </View>
@@ -174,7 +193,7 @@ class FormFirstStep extends Component {
               <ActivityIndicatorExample/>
               </View>
           } */}
-        </View>
+      </View>
         {/* <View style={styles.btnContainer}>
           <TouchableOpacity onPress={this.nextStep} style={styles.btnStyle}>
             <Image

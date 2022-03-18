@@ -1,74 +1,131 @@
-import React, { Component } from "react";
-import { Image, View, TouchableOpacity, TextInput, Text, StyleSheet } from "react-native";
+import React, {useContext} from 'react';
+import { StyleSheet, Text, View, Image, SafeAreaView, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { useState, useEffect } from "react";
 
-class FormSecondStep extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      totalSteps: "",
-      currentStep: ""
-    };
-  }
+import { ScrollView } from "react-native-gesture-handler";
+import { Asset } from 'expo-asset';
+import { AntDesign } from '@expo/vector-icons'
+import ActivityIndicatorExample  from "../../components/ActivityIndicatorExample";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CredentialsContext } from '../../components/CredentialsContext';
+import { Formik, useFormik, Form } from 'formik';
+// import Step1 from "./forms/FormFirstStep";
+// import Step2 from "./forms/FormSecondStep";
+import AnimatedMultistep from "react-native-animated-multistep";
 
-  static getDerivedStateFromProps = props => {
-    const { getTotalSteps, getCurrentStep } = props;
-    return {
-      totalSteps: getTotalSteps(),
-      currentStep: getCurrentStep(),
-    };
+// import { FormSuccess } from "./forms/FormSuccess";
+import * as yup from 'yup';
+import { makeStyles } from "@material-ui/core/styles";
+
+const win = Dimensions.get("window");
+
+export default function FormulirOrder({navigation, route}) {
+  const {value} = route.params;
+  const [data, setData] = useState([]);
+  const [text, setText] = useState('');
+  const [cari, setCari] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+  const {nama, email} = storedCredentials;
+
+  onNext = () => {
+    console.log("Next");
   };
 
+  /* define the method to be called when you go on back step */
 
-  // nextStep = () => {
-  //   const { next, saveState } = this.props;
-  //   // Save state for use in other steps
-  //   saveState({ name: "samad" });
+  onBack = () => {
+    console.log("Back");
+  };
 
-  //   // Go to next step
-  //   next();
-  // };
-// console.log(nextStep);
+/* define the method to be called when the wizard is finished */
 
-  goBack() {
-    const { back } = this.props;
-    // Go to previous step
-    back();
-  }
+  finish = finalState => {
+    console.log(finalState);
+  };
 
-  render() {
-    const { currentStep, totalSteps } = this.state;
-    // console.log(this.props.nextStep.nama)
-    return(
-      <View style={styles.root}>
-        <View>
-          <View style={{ justifyContent:'center', alignItems:'center' }}>
-            <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
-            </Text>
-          </View>
-          <Image
-            source={require("../../assets/image/2-2.png")}
-            style={{ marginBottom: 8, width: '100%' }}
-            resizeMode="cover"
-          />
-          <View>
-            <View style={styles.form}>
-            <Text style={{ marginLeft:24, marginTop:4 }}>Metode Pembayaran :</Text>
-            <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                placeholder="Metode Pembayaran"
-                style={styles.textInput}
-                // onChangeText={handleChange('nama')}
-                // onBlur={handleBlur('nama')}
-                editable={true}
-            />
+  const handleSubmit = () => setStep(step => step + 1);
+
+  const editProfilValidationSchema = yup.object().shape({
+    nama: yup
+      .string()
+      .required('Nama wajib diisi!'),
+    email: yup
+      .string()
+      .email("Harap masukkan email yang valid!")
+      .required('Alamat email wajib diisi!'),
+    no_hp: yup
+      .number()
+      .required('No. Handphone wajib diisi!'),
+    kontak_darurat: yup
+      .number()
+      .required('Kontak Darurat wajib diisi!'),
+    alamat: yup
+      .string()
+      .required('Alamat wajib diisi!'),
+    nama_kegiatan: yup
+      .number()
+      .required('Nama Kegiatan wajib diisi!'),
+    status_kegiatan: yup
+      .string()
+      .required('Status Kegiatan wajib diisi!'),
+    metode_pembayaran: yup
+      .string()
+      .required('Metode Pembayaran Kegiatan wajib diisi!'),
+  })
+
+  console.log(value)
+
+  return (
+    <View style={styles.root}>
+      <View style={{ justifyContent:'center', alignItems:'center' }}>
+        <Text style={{ fontWeight: 'bold', margin: 16 }}>Isi Formulir Pengajuan</Text>
+      </View>
+      <Formik
+        validationSchema={editProfilValidationSchema}
+        enableReinitialize={true}
+        initialValues={{  nama_penyewa: value.nama_penyewa, email: value.email, nama_instansi: value.nama_instansi, jabatan: value.jabatan, no_hp: value.no_hp, kontak_darurat: value.kontak_darurat, alamat: value.alamat, nama_kegiatan: value.nama_kegiatan, status_kegiatan: value.status_kegiatan, metode_pembayaran:''}}
+        // initialValues={data}
+        onSubmit={(values, {setSubmitting})  => {
+          handleEditProfil(values, setSubmitting);
+        }}
+        // onSubmit={async (values) => alert(JSON.stringify(values, null, 2))}
+      >
+        {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
+          <View style={styles.root}>
+            <View>
+              {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
+                <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
+                </Text>
+              </View> */}
+              {/* <Image
+                source={require("../../assets/image/2-2.png")}
+                style={{ marginBottom: 8, width: '100%' }}
+                resizeMode="cover"
+              /> */}
+              <View>
+                <View style={styles.form}>
+                  <Text style={{ marginLeft:24, marginTop:4 }}>Metode Pembayaran :</Text>
+                  <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      placeholder="Nama"
+                      style={styles.textInput}
+                      onChangeText={handleChange('metode_pembayaran')}
+                      onBlur={handleBlur('metode_pembayaran')}
+                      editable={true}
+                  />
+                {(errors.metode_pembayaran && touched.metode_pembayaran) &&
+                  <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.metode_pembayaran}</Text>
+                }
+              </View>
             </View>
-          </View>
-          <View>
-            <TouchableOpacity>
+            <View>
+            <TouchableOpacity onPress={handleSubmit}>
               <View style={styles.button}>
-                <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                  <Text style={styles.buttonTitle}>LANJUTKAN</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -111,9 +168,12 @@ class FormSecondStep extends Component {
             </View>
         } */}
       </View>
-    )
-  }
+        )}
+      </Formik>
+    </View>
+  );
 }
+
 const styles = StyleSheet.create({
   item: {
     alignItems: "center",
@@ -187,4 +247,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-export default FormSecondStep;
