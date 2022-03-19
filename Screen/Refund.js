@@ -32,7 +32,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://5b4d-180-242-234-204.ngrok.io/api/refunds')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -46,7 +46,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://5b4d-180-242-234-204.ngrok.io/api/detail-refunds')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);

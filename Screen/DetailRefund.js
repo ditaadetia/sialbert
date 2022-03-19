@@ -49,7 +49,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://5b4d-180-242-234-204.ngrok.io/api/detail-refunds')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -96,7 +96,7 @@ export default function DetaiRefund({ navigation, route }) {
                   <Text>{item.metode_refund}</Text>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://5b4d-180-242-234-204.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>

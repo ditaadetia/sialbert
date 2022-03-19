@@ -55,7 +55,7 @@ export default function LoginPage({ navigation, item }) {
 
   const handleLogin = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://8b06-2001-448a-6060-f025-9d82-a133-3805-e5be.ngrok.io/api/login';
+    const url = 'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/login';
 
     axios
       .post(url, credentials)

@@ -176,7 +176,7 @@ export default function MenuUtama({navigation}) {
                     </TouchableOpacity>
                     <TouchableOpacity>
                     {/* <TouchableOpacity onPress={async () => {
-                      await downloadToFolder('http://74d6-2001-448a-6060-f025-4436-aa10-3308-85b4.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                      await downloadToFolder('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
                     }}> */}
                       <View style={styles.btn}>
                         <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>

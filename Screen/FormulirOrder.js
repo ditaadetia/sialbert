@@ -94,7 +94,7 @@ export default function FormulirOrder({navigation, route}) {
         initialValues={{  nama_penyewa: nama, email: email, nama_instansi: '', jabatan:'', no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, nama_kegiatan: '', status_kegiatan:'', metode_pembayaran:''}}
         onSubmit={values  => console.log(values)}
       >
-        {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
+        {({ handleChange, handleBlur, handleSubmit, validateForm, touched, values, isSubmitting, errors }) => (
           <View style={styles.root}>
             <View>
             <View style={{ margin:16, flexDirection: 'row' }}>
@@ -306,18 +306,36 @@ export default function FormulirOrder({navigation, route}) {
                     <Text style={styles.buttonTitle}>LANJUTKAN</Text>
                 </View>
               </TouchableOpacity> */}
-              {!isSubmitting &&
-                <TouchableOpacity onPress={handleSubmit}>
+              {!isSubmitting && (
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log("validate dulu");
+                    {
+                      values.nama_instansi == '' || values.email == '' || values.jabatan == '' || values.repassword == '' &&
+                      (
+                        <View style={styles.button}>
+                          <Text style={styles.buttonTitle}>isi dulu</Text>
+                        </View>
+                      );
+                      console.log('isi dulu')}
+                    // validateForm().then(() => {
+                    //   console.log("let submit");
+                    //   navigation.navigate("FormSecondStep", {
+                    //     value: values,
+                    //   });
+                    // });
+                  }}
+                >
                   <View style={styles.button}>
-                      <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                    <Text style={styles.buttonTitle}>LANJUTKAN</Text>
                   </View>
                 </TouchableOpacity>
-              }
-              {isSubmitting &&
+              )}
+              {isSubmitting && (
                 <View style={styles.button}>
-                <ActivityIndicatorExample/>
+                  <ActivityIndicatorExample />
                 </View>
-              }
+              )}
             </View>
         </View>
       </View>
