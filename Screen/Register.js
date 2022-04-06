@@ -64,7 +64,7 @@ export default function RegisterPage({ navigation }) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/register';
+    const url = 'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -78,7 +78,7 @@ export default function RegisterPage({ navigation }) {
           Alert.alert("Register", "Anda berhasil registrasi!", [
             {
               text:"OK",
-              onPress: () => {},
+              onPress: () => navigation.navigate('Edit Profil'),
             },
           ]);
           persistLogin({...data}, message, status);
@@ -98,7 +98,7 @@ export default function RegisterPage({ navigation }) {
       //   setSubmitting(false);
       //   handleMessage("An error occured. Check your internet and try again!");
       // });
-    };
+  };
 
     const handleMessage = (message, type = 'failed') => {
       setMessage(message);
@@ -167,6 +167,10 @@ export default function RegisterPage({ navigation }) {
                 onSubmit={(values, {setSubmitting})  => {
                   handleRegister(values, setSubmitting);
                 }}
+                // onSubmit={(values, {setSubmitting})  => {
+                //   navigation.navigate('Register2', {value: values})
+                //   setSubmitting(false);
+                // }}
               >
                 {({ handleChange, handleSubmit, touched, values, isSubmitting, errors }) => (
                   <View>
@@ -340,7 +344,7 @@ export default function RegisterPage({ navigation }) {
                     <View>
                       <TouchableOpacity onPress={handleSubmit}>
                         <View style={styles.button}>
-                          <Text style={styles.buttonTitle}>REGISTER</Text>
+                          <Text style={styles.buttonTitle}>LANJUT</Text>
                         </View>
                       </TouchableOpacity>
                     </View>
@@ -405,7 +409,8 @@ const styles = {
     },
     root: {
       flex: 1,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      marginBottom: 16
     },
     safeAreaView: {
       flex: 1,

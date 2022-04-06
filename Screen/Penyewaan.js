@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, ToastAndroid, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -14,8 +14,33 @@ import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from '../components/CredentialsContext';
 import { StatusBar } from 'expo-status-bar';
+import * as FileSystem from 'expo-file-system';
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+import * as MediaLibrary from 'expo-media-library';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 import Rent from "../assets/image/rent-active.png";
+
+import {
+  AndroidImportance,
+  AndroidNotificationVisibility,
+  NotificationChannel,
+  NotificationChannelInput,
+  NotificationContentInput,
+} from "expo-notifications";
+import { downloadToFolder } from "expo-file-dl";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const channelId = "DownloadInfo";
 
 const win = Dimensions.get("window");
 
@@ -29,12 +54,51 @@ export default function MenuUtama({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-  const {nama, email} = storedCredentials;
+  const {nama, email, id} = storedCredentials;
 
+  // const [downloadProgress, setDownloadProgress] = useState(0);
+  const [document, setDocument] = useState(null);
+  const [downloadProgress, setDownloadProgress] = useState("0%");
+
+  async function setNotificationChannel() {
+    const loadingChannel = await Notifications.getNotificationChannelAsync(
+      channelId
+    );
+
+    // if we didn't find a notification channel set how we like it, then we create one
+    if (loadingChannel == null) {
+      const channelOptions = {
+        name: channelId,
+        importance: AndroidImportance.HIGH,
+        lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+        sound: "default",
+        vibrationPattern: [250],
+        enableVibrate: true,
+      };
+      await Notifications.setNotificationChannelAsync(
+        channelId,
+        channelOptions
+      );
+    }
+  }
+
+  useEffect(async () => {
+    await MediaLibrary.requestPermissionsAsync();
+    await Notifications.requestPermissionsAsync();
+    setNotificationChannel();
+  }, []);
+
+  const downloadProgressUpdater = ({
+    totalBytesWritten,
+    totalBytesExpectedToWrite,
+  }) => {
+    const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
+    setDownloadProgress(`${pctg.toFixed(0)}%`);
+  };
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/orders/')
+    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -48,7 +112,7 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-orders')
+    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -71,6 +135,7 @@ export default function MenuUtama({navigation}) {
     const harga_perjam = alat?.[0]?.harga_sewa_perjam * total_jam
     const sum = harga_perhari + harga_perjam
     const nama = alat?.[0]?.nama
+    const order_id = alat?.[0]?.id
     const total_harga = alat.reduce((total,item)=>{
       const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
       const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
@@ -82,8 +147,12 @@ export default function MenuUtama({navigation}) {
     //   inisialValue
     // )
     var idLocale=require('moment/locale/id');
-    Moment.locale('id', idLocale);
+    Moment.locale('id');
     var dt = item.created_at
+    var id_order =item.id
+    var nama_instansi =item.nama_instansi
+
+
     return (
       <>
         <View>
@@ -97,7 +166,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16, flexDirection:'row', justifyContent: "space-between"}}>
                     <View style={{ flexDirection: 'row' }}>
                       <Image source={Rent} style={{ width:24, height:24, marginRight:8 }} />
-                      <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('d MMMM YYYY')}</Text>
+                      <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
                     </View>
                     {(() => {
                     if(item.ket_persetujuan_kepala_dinas === 'setuju'){
@@ -137,7 +206,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <Text>{item.nama_instansi}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <View>
                         <Text>{nama}</Text>
                         <Text>x1</Text>
@@ -174,14 +243,22 @@ export default function MenuUtama({navigation}) {
                         <Text style={styles.buttonTitle}>Download Bukti Bayar</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity>
-                    {/* <TouchableOpacity onPress={async () => {
-                      await downloadToFolder('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
-                    }}> */}
-                      <View style={styles.btn}>
-                        <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
-                      </View>
-                    </TouchableOpacity>
+                    {item.ket_persetujuan_kepala_dinas == 'setuju' &&
+                      <TouchableOpacity onPress={async () => {
+                        await downloadToFolder(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
+                          downloadProgressCallback: downloadProgressUpdater,
+                          downloadProgressCallback: ToastAndroid.show(`Sedang Mendownload, Mohon Menunggu!`, ToastAndroid.SHORT)
+                          // ToastAndroid.show(`Sedang Mendownload ${downloadProgress}`, ToastAndroid.SHORT)
+                        })
+                      }}>
+                        {/* <TouchableOpacity onPress={async () => {
+                          await downloadToFolder('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                        }}> */}
+                        <View style={styles.btn}>
+                          <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
+                        </View>
+                      </TouchableOpacity>
+                    }
                   </View>
                   {/* <Text>{item.alat}</Text> */}
                   {/* {alat.map((item)=>
@@ -219,12 +296,13 @@ export default function MenuUtama({navigation}) {
   return (
     <>
       <View>
-        <TouchableOpacity onPress={() => navigation.navigate('Formulir Order')}>
-          <View style={{ borderWidth:2, margin: 16, width:'50%', borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
+        <TouchableOpacity  style={{ width:'50%' }} onPress={() => navigation.navigate('Formulir Order Step 1')}>
+          <View style={{ borderWidth:2, margin: 8, borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
             <Ionicons name="add" size={32} color="#25185A" />
             <Text style={styles.buttonTitle}>Ajukan Penyewaan</Text>
           </View>
         </TouchableOpacity>
+        <StatusBar style="auto" />
         <View style={styles.container}>
           <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
@@ -434,5 +512,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     width: '100%',
     height: 300,
+    borderColor:'green',
+    borderWidth:2,
   }
 });

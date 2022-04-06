@@ -14,12 +14,16 @@ import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
 import Alat from "./Screen/Alat";
 import Penyewaan from "./Screen/Penyewaan";
+import pdfFormulirOrder from "./Screen/pdfFormulirOrder";
+import formPembayaran from "./Screen/formPembayaran";
 import FormulirOrder from "./Screen/FormulirOrder";
 import FormSecondStep from "./Screen/forms/FormSecondStep";
 import DetailOrder from "./Screen/DetailOrder";
+import FormReschedule from "./Screen/FormReschedule";
+import FormRefund from "./Screen/FormReschedule";
 import DetailRefund from "./Screen/DetailRefund";
 import DetailReschedule from "./Screen/DetailReschedule";
-import Refund from "./Screen/Refund";
+import Pembatalan from "./Screen/Refund";
 import Reschedule from "./Screen/Reschedule";
 
 import AppLoading from 'expo-app-loading';
@@ -84,14 +88,14 @@ function nav() {
             activeIcon = focused
             ? require("./assets/image/rent-active.png")
             : require("./assets/image/rent-inactive.png")
-          } else if (route.name === 'Refund') {
-            activeIcon = focused
-            ? require("./assets/image/refund-active.png")
-            : require("./assets/image/refund-inactive.png")
           } else if (route.name === 'Reschedule') {
             activeIcon = focused
             ? require("./assets/image/reschedule-active.png")
             : require("./assets/image/reschedule-inactive.png")
+          } else if (route.name === 'Pembatalan') {
+            activeIcon = focused
+            ? require("./assets/image/cancel-active.png")
+            : require("./assets/image/cancel-inactive.png")
           } else if (route.name === 'Setting') {
             activeIcon = focused
             ? require("./assets/image/setting-active.png")
@@ -109,8 +113,8 @@ function nav() {
     >
       <Tab.Screen name='Home' component={MenuUtama} options={{ headerShown: false }}/>
       <Tab.Screen name='Penyewaan' component={Penyewaan} options={{ headerShown: false }}/>
-      <Tab.Screen name='Refund' component={Refund} options={{ headerShown: false }}/>
       <Tab.Screen name='Reschedule' component={Reschedule} options={{ headerShown: false }}/>
+      <Tab.Screen name='Pembatalan' component={Pembatalan} options={{ headerShown: false }}/>
       <Tab.Screen name='Setting' component={Setting} options={{ headerShown: false }}/>
       {/* <Tab.Screen
         name='Setting'
@@ -129,6 +133,7 @@ function nav() {
     </>
   );
 }
+
 export default function App() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
@@ -177,6 +182,11 @@ export default function App() {
                     options={{ headerShown: false }}
                     />
                     <Stack.Screen
+                    name="Edit Profil"
+                    component={EditProfil}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
                     name="MenuUtama"
                     component={MenuUtama}
                     options={{ headerShown: false }}
@@ -192,22 +202,37 @@ export default function App() {
                     options={{ headerShown: false }}
                     />
                     <Stack.Screen
-                    name="Edit Profil"
-                    component={EditProfil}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
                     name="Detail Order"
                     component={DetailOrder}
                     options={{ headerShown: true }}
                     />
                     <Stack.Screen
-                    name="Formulir Order"
-                    component={FormulirOrder}
+                    name="Pembayaran"
+                    component={formPembayaran}
                     options={{ headerShown: true }}
                     />
                     <Stack.Screen
-                    name="FormSecondStep"
+                    name="Pengajuan Perubahan Jadwal"
+                    component={FormReschedule}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="pdfFormulirOrder"
+                    component={pdfFormulirOrder}
+                    options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                    name="Pengajuan Pembatalan"
+                    component={FormRefund}
+                    options={{ headerShown: true }}
+                    />
+                    <Stack.Screen
+                    name="Formulir Order Step 1"
+                    component={FormulirOrder}
+                    options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                    name="Formulir Order Step 2"
                     component={FormSecondStep}
                     options={{ headerShown: false }}
                     />
@@ -232,6 +257,11 @@ export default function App() {
                       <Stack.Screen
                       name="Register"
                       component={Register}
+                      options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                      name="Edit Profil"
+                      component={EditProfil}
                       options={{ headerShown: false }}
                       />
                       <Stack.Screen

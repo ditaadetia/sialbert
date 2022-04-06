@@ -35,7 +35,7 @@ export default function DetaiReschedule({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/reschedules')
+    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/reschedules')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -66,7 +66,7 @@ export default function DetaiReschedule({ navigation, route }) {
             </View>
             <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
               <Text>Tanggal Pengajuan:</Text>
-              <Text>{Moment(reschedule.created_at).format('dddd, d MMMM YYYY')}</Text>
+              <Text>{Moment(reschedule.created_at).format('dddd, DD MMMM YYYY')}</Text>
             </View>
           </Card>
           <Card style={styles.card}>
@@ -78,14 +78,14 @@ export default function DetaiReschedule({ navigation, route }) {
                 <View style={{ margin:16 }}>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>
                       <Text style={{ opacity: 0.4, fontSize:12 }}>Tanggal Mulai</Text>
-                      <Text style={{ fontWeight:'bold', marginBottom:8, fontSize:12 }}>{Moment(alat?.[0]?.waktu_mulai).format('dddd, d MMMM YYYY')}</Text>
+                      <Text style={{ fontWeight:'bold', marginBottom:8, fontSize:12 }}>{Moment(alat?.[0]?.waktu_mulai).format('dddd, DD MMMM YYYY')}</Text>
                       <Text style={{ opacity: 0.4, fontSize:12 }}>Tanggal Selesai</Text>
-                      <Text style={{ fontWeight:'bold', marginBottom:4, fontSize:12 }}>{Moment(alat?.[0]?.waktu_selesai).format('dddd, d MMMM YYYY')}</Text>
+                      <Text style={{ fontWeight:'bold', marginBottom:4, fontSize:12 }}>{Moment(alat?.[0]?.waktu_selesai).format('dddd, DD MMMM YYYY')}</Text>
                     </View>
                     <View>
                       <Text style={{ opacity: 0.4, fontSize:12 }}>Jam Mulai</Text>
@@ -247,6 +247,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius:15,
     borderTopRightRadius:15,
     marginTop:16,
+    borderColor:'green',
+    borderWidth:2
   },
   icon: {
     width: 32,

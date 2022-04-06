@@ -27,29 +27,15 @@ export default function MenuUtama({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-  const {nama, email} = storedCredentials;
+  const {nama, email, id} = storedCredentials;
 
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/reschedules')
+    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/reschedules/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
-        setCari(hasil);
-        setIsLoading(false);
-      })
-      // .finally(() => setLoading(false));
-      .catch(error => { console.log; });
-
-  }, []);
-
-  useEffect(async() => {
-    setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-reschedules')
-      .then((response) => response.json())
-      .then((hasil) => {
-        setEquipments(hasil);
         setCari(hasil);
         setIsLoading(false);
       })
@@ -65,7 +51,7 @@ export default function MenuUtama({navigation}) {
     //   inisialValue
     // )
     var idLocale=require('moment/locale/id');
-    Moment.locale('id', idLocale);
+    Moment.locale('id');
     var dt = item.created_at
     return (
       <>
@@ -80,7 +66,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16, flexDirection:'row', justifyContent: "space-between"}}>
                     <View style={{ flexDirection: 'row' }}>
                       <Image source={Rent} style={{ width:24, height:24, marginRight:8 }} />
-                      <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('d MMMM YYYY')}</Text>
+                      <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
                     </View>
                     {(() => {
                     if(item.ket_persetujuan_kepala_dinas === 'setuju'){
@@ -120,14 +106,14 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                       <View>
-                        <Image source={{ uri:'http://5b4d-180-242-234-204.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                        <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                         <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{alat?.[0]?.nama}</Text>
                       </View>
                       <View>
                         <Text style={{ opacity: 0.4, fontSize:12 }}>Tanggal Mulai</Text>
-                        <Text style={{ fontWeight:'bold', marginBottom:8, fontSize:12 }}>{Moment(alat?.[0]?.waktu_mulai).format('dddd, d MMMM YYYY')}</Text>
+                        <Text style={{ fontWeight:'bold', marginBottom:8, fontSize:12 }}>{Moment(alat?.[0]?.waktu_mulai).format('dddd, DD MMMM YYYY')}</Text>
                         <Text style={{ opacity: 0.4, fontSize:12 }}>Tanggal Selesai</Text>
-                        <Text style={{ fontWeight:'bold', marginBottom:4, fontSize:12 }}>{Moment(alat?.[0]?.waktu_selesai).format('dddd, d MMMM YYYY')}</Text>
+                        <Text style={{ fontWeight:'bold', marginBottom:4, fontSize:12 }}>{Moment(alat?.[0]?.waktu_selesai).format('dddd, DD MMMM YYYY')}</Text>
                       </View>
                       <View>
                         <Text style={{ opacity: 0.4, fontSize:12 }}>Jam Mulai</Text>
@@ -406,6 +392,8 @@ const styles = StyleSheet.create({
     shadowOffset: {width:0, height:2},
     shadowOpacity: 0.5,
     width: '100%',
-    height: 340,
+    height: 280,
+    borderColor:'green',
+    borderWidth:2
   }
 });

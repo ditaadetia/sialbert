@@ -29,6 +29,7 @@ import picture_account from "../assets/image/acount-inactive.png";
   // }
   export default function EditProfil({route, navigation, props}) {
     const [image, setImage] = useState(null);
+    const [avatar, setAvatar] = useState([]);
     const [data, setData] = useState([]);
     const [text, setText] = useState('');
     const [cari, setCari] = useState([]);
@@ -59,7 +60,8 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleUploadPhoto = () => {
     handleMessage(null);
-    // const url = `http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/updatePicture/${id}`;
+    setIsLoading(true);
+    // const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/updatePicture/${id}`;
     const datas = new FormData();
 
     datas.append('foto', {
@@ -73,7 +75,7 @@ import picture_account from "../assets/image/acount-inactive.png";
     console.log(datas);
     if (image != null) {
       axios({
-        url:`http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/updatePicture/${id}`,
+        url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/updatePicture/${id}`,
         method:"POST",
         data:datas
       })
@@ -97,9 +99,11 @@ import picture_account from "../assets/image/acount-inactive.png";
         else {
           handleMessage("Email atau password salah, silahkan coba kembali!");
         }
+        setIsLoading(false);
       })
     } else {
       alert('Please Select File first');
+      setIsLoading(false);
     }
 
       // .catch((error)=> {
@@ -127,7 +131,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleEditProfil = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/editProfil/${id}`;
+    const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/editProfil/${id}`;
 
     axios
       .post(url, credentials)
@@ -193,6 +197,21 @@ import picture_account from "../assets/image/acount-inactive.png";
       .required('Alamat wajib diisi!'),
   })
 
+  useEffect(async() => {
+    setIsLoading(true);
+    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/cekUser/${id}`)
+      .then((response) => response.json())
+      .then((hasil) => {
+        setAvatar(hasil);
+        setIsLoading(false);
+      })
+      // .finally(() => setLoading(false));
+      .catch(error => { console.log; });
+
+  }, []);
+
+  console.log(avatar.status)
+
   return (
     <>
       <SafeAreaView style={styles.safeAreaView}>
@@ -217,11 +236,13 @@ import picture_account from "../assets/image/acount-inactive.png";
                   {image ?
                     <Image source={{ uri: image, width: 90, height: 90 }} style={{ borderRadius: 70 }} /> :
                       <>
-                        {{foto}==='' &&
+                        {avatar.data =='http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/tenant/no-pict.png' &&
                           <Image source={picture_account} style={picture_account}></Image>
                         }
-                        {{foto}!='' &&
-                          <Image source={{uri: foto, width: 90, height: 90}} style={{borderRadius: 70}}></Image>
+                        {avatar.data!='http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/tenant/no-pict.png' &&
+                          <>
+                          <Image source={{uri: avatar.data, width: 90, height: 90}} style={{borderRadius: 70}}></Image>
+                          </>
                         }
                       </>
                   }
@@ -229,11 +250,26 @@ import picture_account from "../assets/image/acount-inactive.png";
                 <Text style={{ fontWeight: "bold"}}>Ubah</Text>
                 <Text>Tekan untuk ubah</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleUploadPhoto}>
-                  <View style={styles.btn}>
-                    <Text style={styles.buttonTitle}>Upload Photo</Text>
-                  </View>
-              </TouchableOpacity>
+              {isLoading &&
+                <View style={{
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                  marginTop:0,
+                  textAlign: 'center',
+                  flex: 1,
+                  alignItems: 'center'
+                }}>
+                  <ActivityIndicatorExample style={ styles.progress }/>
+                </View>
+              }
+              {!isLoading &&
+                <TouchableOpacity onPress={handleUploadPhoto}>
+                    <View style={styles.btn}>
+                      <Text style={styles.buttonTitle}>Upload Photo</Text>
+                    </View>
+                </TouchableOpacity>
+              }
             </View>
             {/* <TouchableOpacity
               onPress={myfun}>
@@ -308,7 +344,7 @@ import picture_account from "../assets/image/acount-inactive.png";
                           placeholder="No. Handphone"
                           style={styles.textInput}
                           onChangeText={handleChange('no_hp')}
-                          defaultValue={no_hp}
+                          defaultValue={avatar.no_hp}
                         />
                       </View>
                       {(errors.no_hp && touched.no_hp) &&
@@ -326,7 +362,7 @@ import picture_account from "../assets/image/acount-inactive.png";
                           placeholder="Kontak Darurat"
                           style={styles.textInput}
                           onChangeText={handleChange('kontak_darurat')}
-                          defaultValue={kontak_darurat}
+                          defaultValue={avatar.kontak_darurat}
                         />
                       </View>
                       {(errors.kontak_darurat && touched.kontak_darurat) &&
@@ -343,7 +379,7 @@ import picture_account from "../assets/image/acount-inactive.png";
                           placeholder="Alamat"
                           style={styles.textInput}
                           onChangeText={handleChange('alamat')}
-                          defaultValue={alamat}
+                          defaultValue={avatar.alamat}
                         />
                       </View>
                       {(errors.alamat && touched.alamat) &&

@@ -35,7 +35,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://5b4d-180-242-234-204.ngrok.io/api/refunds')
+    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -49,7 +49,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-refunds')
+    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/detail-refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -61,7 +61,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   }, []);
   var idLocale=require('moment/locale/id');
-  Moment.locale('id', idLocale);
+  Moment.locale('id');
   var dtMulai = refund.tanggal_mulai
   var dtSelesai = refund.tanggal_selesai
 
@@ -79,7 +79,7 @@ export default function DetaiRefund({ navigation, route }) {
             </View>
             <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
               <Text>Tanggal Pengajuan:</Text>
-              <Text>{Moment(refund.created_at).format('dddd, d MMMM YYYY')}</Text>
+              <Text>{Moment(refund.created_at).format('dddd, DD MMMM YYYY')}</Text>
             </View>
             <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
               <Text>Metode Refund:</Text>
@@ -96,7 +96,7 @@ export default function DetaiRefund({ navigation, route }) {
                   <Text>{item.metode_refund}</Text>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>
@@ -288,6 +288,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius:15,
     borderTopRightRadius:15,
     marginTop:16,
+    borderColor:'green',
+    borderWidth:2
   },
   icon: {
     width: 32,

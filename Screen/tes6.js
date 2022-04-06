@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Text, View, StyleSheet, Image, Button, ImageBackground, FlatList, SafeAreaView, ScrollView, Dimensions, Picker, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, Button, ImageBackground, SafeAreaView, ScrollView, Dimensions, Picker, TouchableOpacity } from 'react-native';
 import Cart from "../assets/image/cart.png";
 import Notif from "../assets/image/notif.png";
 import { AntDesign } from '@expo/vector-icons'
@@ -7,25 +7,20 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Dropdown } from 'react-native-material-dropdown-v2-fixed';
 const win = Dimensions.get("window");
 import DatePicker from 'react-native-datepicker';
-import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Moment from 'moment';
+import moment from 'moment';
 // import DateRangePicker from "react-native-daterange-picker";
 // import * as Calendar from 'expo-calendar';
 // import EventCalendar from 'react-native-events-calendar';
-import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
-// import { Calendar } from 'react-native-calendario';
+// import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import { Calendar } from 'react-native-calendario';
 import DateRangePicker from "rnv-date-range-picker";
 let {width} = Dimensions.get('window');
-import { CartContext } from './CartContext';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 
 export default function Detail({ navigation, route }) {
     const {alat} = route.params
-    const [product, setProduct] = useState({});
-    const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [selectedRange, setRange] = useState({});
     const [date1, setDate] = useState(new Date());
     const [date2, setDate2] = useState(new Date());
@@ -35,33 +30,23 @@ export default function Detail({ navigation, route }) {
     const [show2, setShow2] = useState(false);
     const [currentDate, setCurrentDate] = useState();
 
-    useEffect(async() => {
-        setIsLoading(true);
-        fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/schedule/' + alat.id)
-          .then((response) => response.json())
-          .then((hasil) => {
-            setData(hasil);
-            setCari(hasil);
-            setIsLoading(false);
-          })
-          // .finally(() => setLoading(false));
-          .catch(error => { console.log; });
-
-    }, []);
-    const listOrders = ({item}) => {
-        const tanggal = [...item.tanggal_mulai]
-    }
 
     const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date1;
+        const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
         setDate(currentDate);
     };
 
-    const onChange2 = (event, selectedDate) => {
-        const currentDate = selectedDate || date2;
-        setShow2(Platform.OS === 'ios');
-        setDate2(currentDate);
+    const onChange2 = (event, selectedDate2) => {
+        const currentDate2 = selectedDate2 || date;
+        setShow(Platform.OS === 'ios');
+        setDate2(currentDate2);
+    };
+
+    const onChange3 = (event, selectedDate2) => {
+        const currentDate2 = selectedDate2 || date;
+        setShow(Platform.OS === 'ios');
+        setDate2(currentDate2);
     };
 
     const showMode = (currentMode) => {
@@ -88,109 +73,6 @@ export default function Detail({ navigation, route }) {
     const showTimepicker2 = () => {
         showMode2('time');
     };
-
-    console.log(date1)
-    console.log(date2)
-    // const data2= data.map((item, idx) => {
-    //     const tanggal_mulai = item.tanggal_mulai
-    //     const tanggal_selesai = item.tanggal_selesai
-    //     console.log(tanggal_mulai)
-    // })
-
-    // objectList.map((item, idx)=>{
-    //     const month = item.month
-    //     const range = [...month]
-    //     let anyString = 'tes'
-    //     range.map((item, idx)=>{
-    //         const rentang = item.substring(0,10)
-    //         // console.log(rentang)
-    //     })
-    // })
-
-    // let calenderItems = objectList.reduce((acc, leave) => {
-    //     let { tanggal_mulai, tanggal_selesai } = leave;
-    //     var fromDateObject = {
-    //         ...acc,
-    //         [tanggal_mulai]: {
-    //             startingDay: true,
-    //             endingDay: false,
-    //             color: '#ffd700'
-    //         },
-    //     }
-    //     return {
-    //       ...fromDateObject,
-    //       [tanggal_selesai]: {
-    //         startingDay: false,
-    //         endingDay: true,
-    //         color: '#ffd700'
-    //       },
-    //     };
-    // }, {});
-
-    const objectList = [...data]
-    let calenderItems = objectList.reduce((acc, leave) => {
-        let { tanggal_mulai, tanggal_selesai } = leave;
-        let start = Moment(tanggal_mulai).startOf('day').add(1, 'days');
-        let end = Moment(tanggal_selesai).startOf('day');
-        const dateRange = {
-            [tanggal_mulai]: { selected: true, startingDay: true, color: '#ffd700' },
-            [tanggal_selesai]: { selected: true, endingDay: true, color: '#ffd700' },
-        };
-        while (end.isAfter(start)) {
-            Object.assign(dateRange, { [start.format('YYYY-MM-DD')]: { selected: true, color: '#ffd700' } });
-            start = start.add(1, 'days');
-        }
-        return {...acc, ...dateRange};
-    }, {});
-    console.log(calenderItems)
-    // calenderItems = Object.keys(calenderItems)
-    // .sort()
-    // .reduce((obj, key) => {
-    //     obj[key] = calenderItems[key];
-    //     return obj;
-    // }, {});
-
-
-    let a = objectList.map((item, idx)=>{
-        const month = item.month
-        const range = [...month]
-        let anyString = 'tes'
-        const b = range.map((item, idx)=>{
-            const rentang = item.substring(0,10)
-            return rentang;
-            // const deliveryDates = [
-            //     {date:rentang, deliveryStatus:false, endingDay:false, startingDay:true},
-            // ];
-
-            // const markedDates = deliveryDates.reduce((acc, {date,endingDay,startingDay}) => {
-            //     acc[date] = {disabled: true, color: 'green', startingDay, endingDay};
-            //     return acc;
-            // },{});
-            // return markedDates;
-            // console.log(markedDates)
-        })
-        return b;
-    })
-    // const k = a.map((item, idx)=>{
-    //     const deliveryDates = [
-    //         {date:a, deliveryStatus:false, endingDay:false, startingDay:true},
-    //     ];
-    //     const markedDates = deliveryDates.reduce((acc, {date,endingDay,startingDay}) => {
-    //         acc[date] = {disabled: true, color: 'green', startingDay, endingDay};
-    //         return acc;
-    //     },{});
-    //     return markedDates;
-    // })
-
-    let newDaysObject = {};
-    const i =a.forEach((day) => {
-        newDaysObject[day] = {
-            selected: true,
-            marked: true
-        }
-        return newDaysObject[day]
-    });
-
 
     return (
         <ScrollView>
@@ -236,12 +118,12 @@ export default function Detail({ navigation, route }) {
                             <View style={styles.pickedDateContainer}>
                                 <Text style={styles.pickedDate}>{date2.toLocaleString()}</Text>
                             </View>
-                            <TouchableOpacity onPress={showDatepicker2}>
+                            <TouchableOpacity onPress={showDatepicker}>
                                 <View style={styles.pickButton}>
                                     <Text style={styles.buttonTitle}>Atur Tanggal Kembali!</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={showTimepicker2}>
+                            <TouchableOpacity onPress={showTimepicker}>
                                 <View style={styles.pickButton}>
                                     <Text style={styles.buttonTitle}>Atur Jam Kembali!</Text>
                                 </View>
@@ -264,8 +146,9 @@ export default function Detail({ navigation, route }) {
                         <DateTimePicker
                         testID="dateTimePicker2"
                         value={date2}
-                        mode={mode2}
+                        mode={showMode}
                         is24Hour={true}
+                        display="default"
                         onChange={onChange2}
                         minimumDate={new Date()}
                         locale='id'
@@ -275,17 +158,81 @@ export default function Detail({ navigation, route }) {
             </View>
             <SafeAreaView>
                 <View>
-                    <Calendar
-                        markingType={'period'}
+                    {/* <DateRangePicker
+                    onSelectDateRange={(range) => {
+                        setRange(range);
+                    }}
+                    startDate={'2022-02-10'}
+                    // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
+                    endDate={'2022-02-30'}
+                    responseFormat="YYYY-MM-DD"
+                    // maxDate={moment()}
+                    // minDate={moment().subtract(100, "days")}
+                    />
+                    <View style={styles.container}>
+                        <Text>first date: {selectedRange.firstDate}</Text>
+                        <Text>second date: {selectedRange.secondDate}</Text>
+                    </View> */}
+                    {/* <Calendar
+                    markingType={'period'}
                         onDayPress={day => {
                             console.log('selected day', day);
                         }}
-                        markedDates={calenderItems}
-                        // disabledDaysIndexes={[0, 6]}
-                        theme={{
-                            selectedColor: 'blue'
+                        markedDates={{
+                            '2022-03-20': {textColor: 'green'},
+                            '2022-03-22': {startingDay: true, color: 'green'},
+                            '2022-03-25': {selected: true, endingDay: true, color: 'green', textColor: 'gray'},
+                            '2022-04-04': {disabled: true, startingDay: true, color: 'green', endingDay: true}
                         }}
                     />
+                <Calendar
+                    onChange={(range) => console.log(range)}
+                    startDate={new Date(2022, 3, 1)}
+                    endDate={new Date(2022, 3, 5)}
+                    theme={{
+                        activeDayColor: {},
+                        monthTitleTextStyle: {
+                        color: '#6d95da',
+                        fontWeight: '300',
+                        fontSize: 16,
+                        },
+                        emptyMonthContainerStyle: {},
+                        emptyMonthTextStyle: {
+                        fontWeight: '200',
+                        },
+                        weekColumnsContainerStyle: {},
+                        weekColumnStyle: {
+                        paddingVertical: 10,
+                        },
+                        weekColumnTextStyle: {
+                        color: '#b6c1cd',
+                        fontSize: 13,
+                        },
+                        nonTouchableDayContainerStyle: {},
+                        nonTouchableDayTextStyle: {},
+                        startDateContainerStyle: {},
+                        endDateContainerStyle: {},
+                        dayContainerStyle: {},
+                        dayTextStyle: {
+                        color: '#2d4150',
+                        fontWeight: '200',
+                        fontSize: 15,
+                        },
+                        dayOutOfRangeContainerStyle: {},
+                        dayOutOfRangeTextStyle: {},
+                        todayContainerStyle: {},
+                        todayTextStyle: {
+                        color: '#6d95da',
+                        },
+                        activeDayContainerStyle: {
+                        backgroundColor: '#6d95da',
+                        },
+                        activeDayTextStyle: {
+                        color: 'white',
+                        },
+                        nonTouchableLastMonthDayTextStyle: {},
+                    }}
+                /> */}
                 </View>
             </SafeAreaView>
         </ScrollView>

@@ -37,7 +37,8 @@ import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import * as yup from 'yup'
 import { ScrollView } from "react-native-gesture-handler";
 
-export default function RegisterPage({ navigation }) {
+export default function RegisterPage({ navigation, route }) {
+  const {value} = route.params;
   const [hidePassword, setHidePassword] = useState(true);
   const [hideRePassword, setHideRePassword] = useState(true);
   const [message, setMessage] = useState();
@@ -59,7 +60,7 @@ export default function RegisterPage({ navigation }) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/register';
+    const url = 'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -80,6 +81,7 @@ export default function RegisterPage({ navigation }) {
         }
         else {
           handleMessage("Email telah terdaftar!");
+          setSubmitting(false);
         }
         setSubmitting(false);
       })
@@ -158,7 +160,7 @@ export default function RegisterPage({ navigation }) {
                 //   }
                 // }}
                 validationSchema={regisValidationSchema}
-                initialValues={{  no_hp: '', kontak_darurat: '', alamat: ''}}
+                initialValues={{  nama: value.nama, email: value.email, password: value.password, no_hp: '', kontak_darurat: '', alamat: ''}}
                 onSubmit={(values, {setSubmitting})  => {
                   handleRegister(values, setSubmitting);
                 }}
@@ -217,6 +219,32 @@ export default function RegisterPage({ navigation }) {
                       {(errors.alamat && touched.alamat) &&
                         <Text style={{ fontSize: 10, color: 'red' }}>{errors.alamat}</Text>
                       }
+                    </View>
+                    <View style={{ flexDirection: 'row' }}>
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="next"
+                        onChangeText={handleChange('nama')}
+                        editable={false}
+                        type="hidden"
+                      />
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="next"
+                        onChangeText={handleChange('email')}
+                        editable={false}
+                        type="hidden"
+                      />
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="next"
+                        onChangeText={handleChange('password')}
+                        editable={false}
+                        type="hidden"
+                      />
                     </View>
                     {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
                     <Text type ={messageType} style={styles.message}>{message}</Text>
