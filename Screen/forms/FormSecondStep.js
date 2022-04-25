@@ -16,6 +16,8 @@ import * as ImagePicker from 'expo-image-picker';
 // import Step2 from "./forms/FormSecondStep";
 import AnimatedMultistep from "react-native-animated-multistep";
 import ScrollViewIndicator from 'react-native-scroll-indicator';
+import {Picker} from '@react-native-picker/picker';
+import { CartContext } from '../../components/CartContext';
 
 import Add from "../../assets/image/plus.png";
 
@@ -69,6 +71,8 @@ export default function FormulirOrder({navigation, route}) {
   const [visible, setVisible] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [selectedPrinter, setSelectedPrinter] = useState();
+  const [selectedValue, setFieldValue] = useState('1');
+  const {items, setItems, itemCount, setItemCount} = useContext(CartContext);
 
   const print = async () => {
     // On iOS/android prints the given html. On web prints the HTML from the current page.
@@ -216,124 +220,146 @@ export default function FormulirOrder({navigation, route}) {
   const handleAjukanSewa = (credentials, isSubmitting) => {
     handleMessage(null);
 
-    if (ktp != null) {
-      axios({
-        url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/post/${id}`,
-        method:"POST",
-        data:
-        {
-          category_order_id:value.category_order_id,
-          nama_kegiatan: value.nama_kegiatan,
-          tenant_id:value.tenant_id,
-          nama_instansi: value.nama_instansi,
-          jabatan:value.jabatan,
-          alamat_instansi:value.alamat_instansi,
-          tanggal_mulai:tanggalMulai,
-          tanggal_selesai: tanggalSelesai,
-        },
-      })
-      .then((response) => {
-        const result = response.data;
-        const { message, success, status, data } = result;
-        console.log(response.data);
-        Alert.alert("Berhasil", "Pengajuan Pemesanan Berhasil!", [
+    if(hoursDiff > 0){
+      if (ktp != null) {
+        axios({
+          url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/${id}`,
+          method:"POST",
+          data:
           {
-            text:"OK",
-            onPress: () => navigation.navigate('pdfFormulirOrder'),
+            category_order_id:value.category_order_id,
+            nama_kegiatan: value.nama_kegiatan,
+            tenant_id:value.tenant_id,
+            nama_instansi: value.nama_instansi,
+            jabatan:value.jabatan,
+            alamat_instansi:value.alamat_instansi,
+            tanggal_mulai:tanggalMulai,
+            tanggal_selesai: tanggalSelesai,
           },
-        ]);
-
-        const datasKtp = new FormData();
-
-        datasKtp.append('ktp', {
-          name: 'ktp.jpg',
-          type: 'image/jpeg',
-          uri:  ktp,
-        });
-
-        if (ktp != null) {
-          axios({
-            url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/post/ktp/${id}`,
-            method:"POST",
-            data: datasKtp
-          })
-          .then((response) => {
-            const result = response.data;
-            const { message, success, status, data } = result;
-            console.log(response.data);
-          })
-          .catch((error)=> {
-            // console.error('error', error);
-            console.log(error.response)
-            handleMessage("Format KTP haru dalam bentuk jpg, jpeg, png, pdf!");
+        })
+        .then((response) => {
+          // const result = response.data;
+          // const { message, success, status, data } = result;
+          console.log(response.data);
+          const datasKtp = new FormData();
+          datasKtp.append('ktp', {
+            name: 'ktp.jpg',
+            type: 'image/jpeg',
+            uri:  ktp,
           });
-        } else {
-          alert('KTP tidak boleh kosong!');
-        }
 
-        const datasAktaNotaris = new FormData();
-
-        datasAktaNotaris.append('akta_notaris', {
-          name: 'akta_notaris.jpg',
-          type: 'image/jpeg',
-          uri:  aktaN,
-        });
-
-        if (ktp != null) {
-          axios({
-            url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/post/aktaNotaris/${id}`,
-            method:"POST",
-            data: datasAktaNotaris
-          })
-          .then((response) => {
-            const result = response.data;
-            const { message, success, status, data } = result;
-            console.log(response.data);
-          })
-          .catch((error)=> {
-            // console.error('error', error);
-            console.log(error.response)
-            handleMessage("Format Akta Notaris haru dalam bentuk jpg, jpeg, png, pdf!");
+          if (ktp != null) {
+            axios({
+              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/ktp/${id}`,
+              method:"POST",
+              data: datasKtp
+            })
+            .then((response) => {
+              const result = response.data;
+              const { message, success, status, hasil } = result;
+              items.map((item)=> {
+                axios({
+                  url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders/post/${id}`,
+                  method:"POST",
+                  data:
+                  {
+                    order_id:hasil,
+                    equipment_id: item.product.id,
+                  },
+                })
+                .then((response) => {
+                  const result = response.data;
+                  const { message, success, status } = result;
+                  console.log(response.data);
+                })
+                .catch((error)=> {
+                  // console.error('error', error);
+                  console.log(error.response)
+                  handleMessage("Gagal!");
+                });
+              })
+              Alert.alert("Berhasil", "Pengajuan Pemesanan Berhasil!", [
+                {
+                  text:"OK",
+                  onPress: () => navigation.navigate('pdfFormulirOrder'),
+                },
+              ]);
+              console.log(response.data);
+            })
+            .catch((error)=> {
+              // console.error('error', error);
+              console.log(error.response)
+              handleMessage("Format KTP haru dalam bentuk jpg, jpeg, png, pdf!");
+            });
+          } else {
+            alert('KTP tidak boleh kosong!');
+          }
+  
+          const datasAktaNotaris = new FormData();
+  
+          datasAktaNotaris.append('akta_notaris', {
+            name: 'akta_notaris.jpg',
+            type: 'image/jpeg',
+            uri:  aktaN,
           });
-        } else {
-          alert('KTP tidak boleh kosong!');
-        }
-
-        const datasSuratPengantar = new FormData();
-        datasSuratPengantar.append('surat_ket', {
-          name: 'surat_ket.jpg',
-          type: 'image/jpeg',
-          uri:  suratP,
-        });
-
-        if (ktp != null) {
-          axios({
-            url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/post/suratPengantar/${id}`,
-            method:"POST",
-            data: datasSuratPengantar
-          })
-          .then((response) => {
-            const result = response.data;
-            const { message, success, status, data } = result;
-            console.log(response.data);
-          })
-          .catch((error)=> {
-            // console.error('error', error);
-            console.log(error.response)
-            handleMessage("Format Surat Pengantar dari RT/RW/Lurah harus dalam bentuk jpg, jpeg, png, pdf!");
+  
+          if (ktp != null) {
+            axios({
+              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/aktaNotaris/${id}`,
+              method:"POST",
+              data: datasAktaNotaris
+            })
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error)=> {
+              // console.error('error', error);
+              console.log(error.response)
+              handleMessage("Format Akta Notaris haru dalam bentuk jpg, jpeg, png, pdf!");
+            });
+          } else {
+            alert('KTP tidak boleh kosong!');
+          }
+  
+          const datasSuratPengantar = new FormData();
+          datasSuratPengantar.append('surat_ket', {
+            name: 'surat_ket.jpg',
+            type: 'image/jpeg',
+            uri:  suratP,
           });
-        } else {
-          alert('KTP tidak boleh kosong!');
-        }
-        console.log(response.data);
-      })
-      .catch((error)=> {
-        // console.error('error', error);
-        console.log(error.response)
-        handleMessage("Tidak ada koneksi internet!");
-      });
-    } else {
-      alert('KTP tidak boleh kosong!');
+  
+          if (ktp != null) {
+            axios({
+              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/suratPengantar/${id}`,
+              method:"POST",
+              data: datasSuratPengantar
+            })
+            .then((response) => {
+              console.log(response.data);
+            })
+            .catch((error)=> {
+              // console.error('error', error);
+              console.log(error.response)
+              handleMessage("Format Surat Pengantar dari RT/RW/Lurah harus dalam bentuk jpg, jpeg, png, pdf!");
+            });
+          } else {
+            alert('KTP tidak boleh kosong!');
+          }
+          console.log(response.data);
+        })
+        .catch((error)=> {
+          // console.error('error', error);
+          console.log(error.response)
+          handleMessage("Tidak ada koneksi internet!");
+        });
+      } else {
+        alert('KTP tidak boleh kosong!');
+        setVisible(false);
+        setIsDisabled(false);
+      }
+    }
+    else {
+      alert('Jangka waktu penyewaan tidak boleh 0. Harap masukkan jangka waktu penyewaan!');
       setVisible(false);
       setIsDisabled(false);
     }
@@ -370,286 +396,298 @@ export default function FormulirOrder({navigation, route}) {
       >
         {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
           <View style={styles.root}>
-            <View style={{ margin:16, flexDirection: 'row' }}>
-              <TouchableOpacity onPress={() => navigation.navigate('Formulir Order Step 1', {value: values})}>
-                <View style={{justifyContent:'center', alignItems:'center' }}>
-                  <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                    <Text style={{textAlign: 'center' }}>1</Text>
+              <View style={{ margin:16, flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Formulir Order Step 1', {value: values})}>
+                  <View style={{justifyContent:'center', alignItems:'center' }}>
+                    <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                      <Text style={{textAlign: 'center' }}>1</Text>
+                    </View>
+                    <Text style={{textAlign: 'center' }}>Step 1</Text>
                   </View>
-                  <Text style={{textAlign: 'center' }}>Step 1</Text>
+                  </TouchableOpacity>
+                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+                <View style={{ justifyContent:'center', alignItems:'center' }}>
+                  <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                    <Text style={{textAlign: 'center' }}>2</Text>
+                  </View>
+                  <Text style={{textAlign: 'center' }}>Step 2</Text>
+                </View>
+                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+                <View style={{ justifyContent:'center', alignItems:'center' }}>
+                  <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                    <Text style={{textAlign: 'center' }}>3</Text>
+                  </View>
+                  <Text style={{textAlign: 'center' }}>Step 3</Text>
+                </View>
+              </View>
+              <View>
+                {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
+                  <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
+                  </Text>
+                </View> */}
+                {/* <Image
+                  source={require("../../assets/image/2-2.png")}
+                  style={{ marginBottom: 8, width: '100%' }}
+                  resizeMode="cover"
+                /> */}
+                {/* <Button title='Print to PDF file' onPress={printToFile}/>
+                {Platform.OS === 'ios' &&
+                  <>
+                    <View style={styles.spacer} />
+                    <Button title='Select printer' onPress={selectPrinter}/>
+                    <View style={styles.spacer} />
+                    {selectedPrinter ? <Text style={styles.printer}>{`Selected printer: ${selectedPrinter.name}`}</Text> : undefined}
+                  </>
+                } */}
+                <View style={{ padding: 8 }}>
+                  <Card style={styles.card}>
+                    <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+                      <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
+                    </View>
+                    {/* <Picker
+                      style={styles.pickerCustomeStyle}
+                      mode='dropdown'
+                      style={{ color: 'white'}}
+                      value={values.category_order_id}
+                      selectedValue={selectedValue}
+                      onValueChange={(itemValue, itemIndex) =>
+                        setFieldValue(itemValue)
+                      }
+                      >
+                      <Picker.Item label="Perhari" value="1" key={1}/>
+                      <Picker.Item label="Perjam" value="2" key={2}/>
+                    </Picker> */}
+                    <View style={styles.container}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8, paddingVertical: 16 }}>
+                        <View>
+                            <Text style={{ fontWeight:"bold", textAlign:"center", marginBottom:4 }}>Tanggal Mulai</Text>
+                            <View style={styles.pickedDateContainer}>
+                                <Text style={styles.pickedDate}>{Moment(date1).format('DD MMMM YYYY HH:mm')}</Text>
+                            </View>
+                            <TouchableOpacity onPress={showDatepicker}>
+                                <View style={styles.pickButton}>
+                                    <Text style={styles.buttonTitle}>Atur Tanggal Ambil!</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={showTimepicker}>
+                                <View style={styles.pickButton}>
+                                    <Text style={styles.buttonTitle}>Atur Jam Ambil!</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View>
+                            <Text style={{ fontWeight:"bold", alignItems:'center', textAlign:"center", marginBottom:4 }}>Tanggal Selesai</Text>
+                            <View style={styles.pickedDateContainer}>
+                                <Text style={styles.pickedDate}>{Moment(date2).format('DD MMMM YYYY HH:mm')}</Text>
+                            </View>
+                            <TouchableOpacity onPress={showDatepicker2}>
+                                <View style={styles.pickButton}>
+                                    <Text style={styles.buttonTitle}>Atur Tanggal Kembali!</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={showTimepicker2}>
+                                <View style={styles.pickButton}>
+                                    <Text style={styles.buttonTitle}>Atur Jam Kembali!</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    {show && (
+                        <DateTimePicker
+                        testID="dateTimePicker"
+                        value={date1}
+                        mode={mode}
+                        is24Hour={true}
+                        onChange={onChange}
+                        minimumDate={new Date()}
+                        locale='id'
+                        display="spinner"
+                        />
+                    )}
+                    {show2 && (
+                        <DateTimePicker
+                        testID="dateTimePicker2"
+                        value={date2}
+                        mode={mode2}
+                        is24Hour={true}
+                        onChange={onChange2}
+                        minimumDate={date1}
+                        locale='id'
+                        />
+                    )}
+                    </View>
+                    {(dayDiff >=1) &&
+                      <Text style={{ margin: 16, fontWeight:'bold' }}> Total Hari : {dayDiff} hari</Text>
+                    }
+                    {(dayDiff < 1 && hoursDiff>=1) &&
+                      <Text style={{ margin: 16, fontWeight:'bold' }}> Total Jam : {hoursDiff} jam</Text>
+                    }
+                  </Card>
+                </View>
+              </View>
+              <View>
+                {/* <View style={styles.form}>
+                  <Text style={{ marginLeft:24, marginTop:16 }}>Metode Pembayaran :</Text>
+                  <TextInput
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="next"
+                      placeholder="Nama"
+                      style={styles.textInput}
+                      onChangeText={handleChange('metode_pembayaran')}
+                      onBlur={handleBlur('metode_pembayaran')}
+                      editable={true}
+                  />
+                  {(errors.metode_pembayaran && touched.metode_pembayaran) &&
+                    <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.metode_pembayaran}</Text>
+                  }
+                </View> */}
+              <TouchableOpacity onPress={pickKtp}>
+                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                      <Image source={Add} style={{ width: 45, height: 45 }}/>
+                      {/* {ktp &&
+                      <Text>{ktp, datasKtp}</Text>
+                      } */}
+                      <View style={{ width:'80%' }}>
+                        <Text style={{ fontSize:18, fontWeight: 'bold', marginLeft: 16 }}>Kartu Tanda Penduduk (KTP)</Text>
+                        <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
+                        <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
+                      </View>
+                    </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={pickAktaNotaris}>
+                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                      <Image source={Add} style={{ width: 45, height: 45 }}/>
+                      <View style={{ width:'80%' }}>
+                        <Text style={{ fontSize:18, fontWeight: 'bold', marginLeft: 16 }}>Akta Notaris (Opsional)</Text>
+                        <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
+                        <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
+                      </View>
+                    </View>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={pickSuratPengantar}>
+                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                      <Image source={Add} style={{ width: 45, height: 45 }}/>
+                      <View  style={{ width:'80%' }}>
+                        <Text style={{ fontSize:16, fontWeight: 'bold', marginLeft: 16}}>Surat Pengantar dari RT/RW/Lurah (Opsional)</Text>
+                        <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
+                        <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
+                      </View>
+                    </View>
+                </View>
+              </TouchableOpacity>
+              <View>
+            </View>
+            {/* {!isSubmitting &&
+            <View>
+                <TouchableOpacity onPress={handleSubmit}>
+                <View style={styles.button}>
+                    <Text style={styles.buttonTitle}>LANJUTKAN</Text>
                 </View>
                 </TouchableOpacity>
-              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-              <View style={{ justifyContent:'center', alignItems:'center' }}>
-                <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                  <Text style={{textAlign: 'center' }}>2</Text>
-                </View>
-                <Text style={{textAlign: 'center' }}>Step 2</Text>
-              </View>
-              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-              <View style={{ justifyContent:'center', alignItems:'center' }}>
-                <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                  <Text style={{textAlign: 'center' }}>3</Text>
-                </View>
-                <Text style={{textAlign: 'center' }}>Step 3</Text>
-              </View>
             </View>
-            <View>
-              {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
-                <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
-                </Text>
-              </View> */}
-              {/* <Image
-                source={require("../../assets/image/2-2.png")}
-                style={{ marginBottom: 8, width: '100%' }}
-                resizeMode="cover"
-              /> */}
-              {/* <Button title='Print to PDF file' onPress={printToFile}/>
-              {Platform.OS === 'ios' &&
-                <>
-                  <View style={styles.spacer} />
-                  <Button title='Select printer' onPress={selectPrinter}/>
-                  <View style={styles.spacer} />
-                  {selectedPrinter ? <Text style={styles.printer}>{`Selected printer: ${selectedPrinter.name}`}</Text> : undefined}
-                </>
-              } */}
-              <View style={{ padding: 8 }}>
-                <Card style={styles.card}>
-                  <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
-                    <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
-                  </View>
-                  <View style={styles.container}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8, paddingVertical: 16 }}>
-                      <View>
-                          <Text style={{ fontWeight:"bold", textAlign:"center", marginBottom:4 }}>Tanggal Mulai</Text>
-                          <View style={styles.pickedDateContainer}>
-                              <Text style={styles.pickedDate}>{Moment(date1).format('DD MMMM YYYY HH:mm')}</Text>
-                          </View>
-                          <TouchableOpacity onPress={showDatepicker}>
-                              <View style={styles.pickButton}>
-                                  <Text style={styles.buttonTitle}>Atur Tanggal Ambil!</Text>
-                              </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={showTimepicker}>
-                              <View style={styles.pickButton}>
-                                  <Text style={styles.buttonTitle}>Atur Jam Ambil!</Text>
-                              </View>
-                          </TouchableOpacity>
-                      </View>
-                      <View>
-                          <Text style={{ fontWeight:"bold", alignItems:'center', textAlign:"center", marginBottom:4 }}>Tanggal Selesai</Text>
-                          <View style={styles.pickedDateContainer}>
-                              <Text style={styles.pickedDate}>{Moment(date2).format('DD MMMM YYYY HH:mm')}</Text>
-                          </View>
-                          <TouchableOpacity onPress={showDatepicker2}>
-                              <View style={styles.pickButton}>
-                                  <Text style={styles.buttonTitle}>Atur Tanggal Kembali!</Text>
-                              </View>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={showTimepicker2}>
-                              <View style={styles.pickButton}>
-                                  <Text style={styles.buttonTitle}>Atur Jam Kembali!</Text>
-                              </View>
-                          </TouchableOpacity>
-                      </View>
-                  </View>
-                  {show && (
-                      <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date1}
-                      mode={mode}
-                      is24Hour={true}
-                      onChange={onChange}
-                      minimumDate={new Date()}
-                      locale='id'
-                      display="spinner"
-                      />
-                  )}
-                  {show2 && (
-                      <DateTimePicker
-                      testID="dateTimePicker2"
-                      value={date2}
-                      mode={mode2}
-                      is24Hour={true}
-                      onChange={onChange2}
-                      minimumDate={date1}
-                      locale='id'
-                      />
-                  )}
-                  </View>
-                  {(dayDiff >=1) &&
-                    <Text style={{ margin: 16, fontWeight:'bold' }}> Total Hari : {dayDiff} hari</Text>
-                  }
-                  {(dayDiff < 1 && hoursDiff>=1) &&
-                    <Text style={{ margin: 16, fontWeight:'bold' }}> Total Jam : {hoursDiff} jam</Text>
-                  }
-                </Card>
-              </View>
-            </View>
-            <View>
-              {/* <View style={styles.form}>
-                <Text style={{ marginLeft:24, marginTop:16 }}>Metode Pembayaran :</Text>
-                <TextInput
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType="next"
-                    placeholder="Nama"
-                    style={styles.textInput}
-                    onChangeText={handleChange('metode_pembayaran')}
-                    onBlur={handleBlur('metode_pembayaran')}
-                    editable={true}
-                />
-                {(errors.metode_pembayaran && touched.metode_pembayaran) &&
-                  <Text style={{ fontSize: 10, color: 'red', marginLeft:24 }}>{errors.metode_pembayaran}</Text>
-                }
-              </View> */}
-            <TouchableOpacity onPress={pickKtp}>
-              <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                  <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
-                    <Image source={Add} style={{ width: 45, height: 45 }}/>
-                    {/* {ktp &&
-                    <Text>{ktp, datasKtp}</Text>
-                    } */}
-                    <View style={{ width:'80%' }}>
-                      <Text style={{ fontSize:18, fontWeight: 'bold', marginLeft: 16 }}>Kartu Tanda Penduduk (KTP)</Text>
-                      <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
-                      <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
-                    </View>
-                  </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={pickAktaNotaris}>
-              <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                  <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
-                    <Image source={Add} style={{ width: 45, height: 45 }}/>
-                    <View style={{ width:'80%' }}>
-                      <Text style={{ fontSize:18, fontWeight: 'bold', marginLeft: 16 }}>Akta Notaris (Opsional)</Text>
-                      <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
-                      <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
-                    </View>
-                  </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={pickSuratPengantar}>
-              <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                  <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
-                    <Image source={Add} style={{ width: 45, height: 45 }}/>
-                    <View  style={{ width:'80%' }}>
-                      <Text style={{ fontSize:16, fontWeight: 'bold', marginLeft: 16}}>Surat Pengantar dari RT/RW/Lurah (Opsional)</Text>
-                      <Text style={{ marginLeft: 16, fontSize: 14, fontWeight: 'bold' }}>Tap disini pilih file dari perangkat Anda</Text>
-                      <Text style={{ marginLeft: 16, fontSize:11 }}>Pastikan format file dalam bentuk png/jpg/jpeg/pdf !</Text>
-                    </View>
-                  </View>
-              </View>
-            </TouchableOpacity>
-            <View>
-          </View>
-          {/* {!isSubmitting &&
-          <View>
-              <TouchableOpacity onPress={handleSubmit}>
-              <View style={styles.button}>
-                  <Text style={styles.buttonTitle}>LANJUTKAN</Text>
-              </View>
-              </TouchableOpacity>
-          </View>
-          }
-          {isSubmitting &&
-              <View style={styles.button}>
-              <ActivityIndicatorExample/>
-              </View>
-          } */}
-          <View style={{ flexDirection: 'row' }}>
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('category_order_id')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('nama_kegiatan')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('tenant_id')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('nama_instansi')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('jabatan')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('alamat_instansi')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('tanggal_mulai')}
-              editable={false}
-              type="hidden"
-            />
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="next"
-              onChangeText={handleChange('tanggal_selesai')}
-              editable={false}
-              type="hidden"
-            />
-          </View>
-          <View>
-            <TouchableOpacity onPress={(e) =>
-              {
-                letHide(e),
-                doYourTask(e),
-                handleAjukanSewa(e)
-              }
             }
-            disabled={isDisabled}>
-              {visible == true &&
-                <ActivityIndicator
-                  size="large"
-                  color="#00B8D4"
-                  animating={visible}
-                  style={{ marginBottom: 20 }}
-                />
-              }
-              {visible == false &&
+            {isSubmitting &&
                 <View style={styles.button}>
-                  <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                <ActivityIndicatorExample/>
                 </View>
+            } */}
+            <View style={{ flexDirection: 'row' }}>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('category_order_id')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('nama_kegiatan')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('tenant_id')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('nama_instansi')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('jabatan')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('alamat_instansi')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('tanggal_mulai')}
+                editable={false}
+                type="hidden"
+              />
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                onChangeText={handleChange('tanggal_selesai')}
+                editable={false}
+                type="hidden"
+              />
+            </View>
+            <View>
+              <TouchableOpacity onPress={(e) =>
+                {
+                  letHide(e),
+                  doYourTask(e),
+                  handleAjukanSewa(e)
+                }
               }
-            </TouchableOpacity>
+              disabled={isDisabled}>
+                <View style={styles.button}>
+                  {visible == true &&
+                    <ActivityIndicator
+                      size="large"
+                      color="#00B8D4"
+                      animating={visible}
+                    />
+                  }
+                  {visible == false &&
+                    <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                  }
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </View>
+          </View>
         )}
       </Formik>
       {/* <TouchableOpacity onPress={(e) =>
@@ -706,7 +744,7 @@ const styles = StyleSheet.create({
     padding: 4,
     paddingHorizontal: 4,
     borderRadius: 20,
-    borderColor: '#364878'
+    borderColor: '#ffcd04'
   },
   button: {
     alignItems: 'center',

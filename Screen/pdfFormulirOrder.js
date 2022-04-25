@@ -63,7 +63,7 @@ export default function pdfFormulirOrder({ text, onOK }) {
         });
 
         axios({
-            url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders/post/ttdPemohon/1`,
+            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/ttdPemohon/1`,
             method:"POST",
             data:
             {
@@ -108,37 +108,37 @@ export default function pdfFormulirOrder({ text, onOK }) {
                 <Text style={{ fontWeight: 'bold', margin: 16 }}>Tanda Tangan Formulir Pengajuan</Text>
             </View>
             <View style={{ margin:16, flexDirection: 'row' }}>
-              <TouchableOpacity onPress={() => navigation.navigate('Formulir Order Step 1', {value: values})}>
-                <View style={{justifyContent:'center', alignItems:'center' }}>
-                  <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                    <Text style={{textAlign: 'center' }}>1</Text>
-                  </View>
-                  <Text style={{textAlign: 'center' }}>Step 1</Text>
+                <View>
+                    <View style={{justifyContent:'center', alignItems:'center' }}>
+                    <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                        <Text style={{textAlign: 'center' }}>1</Text>
+                    </View>
+                    <Text style={{textAlign: 'center' }}>Step 1</Text>
+                    </View>
                 </View>
-                </TouchableOpacity>
-              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-              <TouchableOpacity onPress={() => navigation.navigate('FormulirOrder', {value: values})}>
-                <View style={{ justifyContent:'center', alignItems:'center' }}>
-                  <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                    <Text style={{textAlign: 'center' }}>2</Text>
-                  </View>
-                  <Text style={{textAlign: 'center' }}>Step 2</Text>
+                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+                <View>
+                    <View style={{ justifyContent:'center', alignItems:'center' }}>
+                    <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                        <Text style={{textAlign: 'center' }}>2</Text>
+                    </View>
+                    <Text style={{textAlign: 'center' }}>Step 2</Text>
+                    </View>
                 </View>
-              </TouchableOpacity>
-              <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-              <TouchableOpacity onPress={() => navigation.navigate('FormSecondStep', {value: values})}>
-                <View style={{ justifyContent:'center', alignItems:'center' }}>
-                  <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                    <Text style={{textAlign: 'center' }}>3</Text>
-                  </View>
-                  <Text style={{textAlign: 'center' }}>Step 3</Text>
+                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
+                <View>
+                    <View style={{ justifyContent:'center', alignItems:'center' }}>
+                        <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                            <Text style={{textAlign: 'center' }}>3</Text>
+                        </View>
+                        <Text style={{textAlign: 'center' }}>Step 3</Text>
+                    </View>
                 </View>
-              </TouchableOpacity>
             </View>
             <View style={{ height: '60%'}}>
                 <PDFReader
                     source={{
-                    uri: `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/lihat-formulir-order/${id}`,
+                    uri: `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/lihat-formulir-order/${id}`,
                     }}
                 />
             </View>

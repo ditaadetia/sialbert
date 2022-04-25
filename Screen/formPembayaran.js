@@ -9,6 +9,7 @@ import { Card } from 'react-native-paper';
 import FormData from 'form-data';
 import Moment from 'moment';
 import * as DocumentPicker from 'expo-document-picker';
+import { DataTable } from 'react-native-paper';
 
 import Add from "../assets/image/plus.png";
 
@@ -16,12 +17,14 @@ export default function formPembayaran({ navigation, route }) {
     const {id_order} = route.params
     const {skr} = route.params
     const {dateSkr} = route.params
+    const {total_harga} = route.params
     const [message, setMessage] = useState();
     const [messageType, setMessageType] = useState();
     const [buktiPembayaran, setBuktiPembayaran] = useState(null);
     const [data, setData] = useState([]);
     const [visible, setVisible] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
+    const [detail, setDetail] = useState([]);
     const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
     const {nama, email, id} = storedCredentials;
 
@@ -42,7 +45,7 @@ export default function formPembayaran({ navigation, route }) {
         handleMessage(null);
         if (buktiPembayaran != null) {
           axios({
-            url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/payments`,
+            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/payments`,
             method:"POST",
             data:
             {
@@ -63,7 +66,7 @@ export default function formPembayaran({ navigation, route }) {
 
             if (buktiPembayaran != null) {
             axios({
-                url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/bukti-pembayaran/${id_order}`,
+                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/bukti-pembayaran/${id_order}`,
                 method:"POST",
                 data: datasBuktiPembayaran
             })
@@ -94,7 +97,7 @@ export default function formPembayaran({ navigation, route }) {
             handleMessage("Tidak ada koneksi internet!");
         });
         } else {
-        alert('KTP tidak boleh kosong!');
+        alert('Bukti pembayaran tidak boleh kosong!');
         setVisible(false);
         setIsDisabled(false);
         }
@@ -120,19 +123,64 @@ export default function formPembayaran({ navigation, route }) {
     const doYourTask = () => {
     setIsDisabled(true);
     }
+
+    var date = Moment()
+    const denda = 0.02 * total_harga
+
+    const dt= Moment(dateSkr)
+    const range = Moment.range(dt, tenggat);
+    const umurSkr = range.diff('days')
+    const teng = Moment(tenggat)
+
+    const total_bayar = total_harga+denda
+
     return (
         <>
             <View style={{ height: '60%'}}>
                 <PDFReader
                     source={{
-                    uri: `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/skrPdf/${id_order}`,
+                    uri: `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/skrPdf/${id_order}`,
                     }}
                 />
             </View>
             <ScrollView style={{ paddingBottom: 16 }}>
                 <Card style={styles.card}>
                     <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
-                        <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
+                        <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Rincian Pembayaran</Text>
+                    </View>
+                    <DataTable>
+                        <DataTable.Header>
+                        <DataTable.Title>No.</DataTable.Title>
+                        <DataTable.Title>Biaya</DataTable.Title>
+                        <DataTable.Title numeric>Total</DataTable.Title>
+                        </DataTable.Header>
+
+                        <DataTable.Row>
+                        <DataTable.Cell>1</DataTable.Cell>
+                        <DataTable.Cell>Penyewaan</DataTable.Cell>
+                        <DataTable.Cell numeric>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</DataTable.Cell>
+                        </DataTable.Row>
+
+                        <DataTable.Row>
+                        <DataTable.Cell>2</DataTable.Cell>
+                        <DataTable.Cell>Denda</DataTable.Cell>
+                        {Moment(date) <= Moment(teng) &&
+                            <DataTable.Cell numeric>Rp.0,-</DataTable.Cell>
+                        }
+                        {Moment(date) > Moment(teng) &&
+                            <DataTable.Cell numeric>Rp.{denda.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</DataTable.Cell>
+                        }
+                        </DataTable.Row>
+                    </DataTable>
+                    <View style={styles.border2}/>
+                    <View style={{ justifyContent:'space-between', padding: 8, flexDirection: 'row' }}>
+                        <Text>Total</Text>
+                        <Text>Rp.{total_bayar.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                    </View>
+                </Card>
+                <Card style={styles.card}>
+                    <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+                        <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Rincian Pembayaran</Text>
                     </View>
                     <View style={{ margin: 16 }}>
                         <Text style={{ fontWeight: 'bold' }}>Selesaikan pembayaran sebelum:</Text>
@@ -143,6 +191,12 @@ export default function formPembayaran({ navigation, route }) {
                         <View style={{ justifyContent: 'space-between' }}>
                             <Text style={{ fontWeight:'bold', fontSize: 18 }}>Rekening Bank Kalbar</Text>
                             <Text style={{ fontWeight:'bold', fontSize: 32 }}>1001013358</Text>
+                        </View>
+                    </View>
+                    <View style={{ margin: 16 }}>
+                        <Text style={{ fontWeight: 'bold' }}>Jumlah Transfer:</Text>
+                        <View style={{ justifyContent: 'space-between' }}>
+                            <Text style={{ fontWeight:'bold', fontSize: 32 }}>{total_harga}</Text>
                         </View>
                     </View>
                     <View style={styles.border2}/>
@@ -238,7 +292,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius:15,
         margin:16,
         marginBottom: 16,
-        borderColor:'green',
+        borderColor:'#2196F3',
         borderWidth:2
     },
     border2: {

@@ -24,6 +24,7 @@ import { AxiosResponse, AxiosError } from "axios";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './../components/CredentialsContext';
+import { CartContext } from './../components/CartContext';
 
 import SVGImg from '../assets/wave.svg';
 import svg from '../assets/image/wave.png';
@@ -55,7 +56,7 @@ export default function LoginPage({ navigation, item }) {
 
   const handleLogin = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/login';
+    const url = 'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/login';
 
     axios
       .post(url, credentials)
@@ -83,24 +84,24 @@ export default function LoginPage({ navigation, item }) {
         setSubmitting(false);
         handleMessage("Tidak ada koneksi internet!");
       });
-    };
+  };
 
-    const handleMessage = (message, type = 'failed') => {
-      setMessage(message);
-      setMessageType(type);
-    }
+  const handleMessage = (message, type = 'failed') => {
+    setMessage(message);
+    setMessageType(type);
+  }
 
-    const persistLogin = (credentials, message, status) => {
-      AsyncStorage.setItem('sialbertCredentials', JSON.stringify(credentials))
-      .then(() => {
-        handleMessage(message, status);
-        setStoredCredentials(credentials);
-      })
-      .catch((error) => {
-        console.log(error);
-        handleMessage('Persisting login failed');
-      })
-    }
+  const persistLogin = (credentials, message, status) => {
+    AsyncStorage.setItem('sialbertCredentials', JSON.stringify(credentials))
+    .then(() => {
+      handleMessage(message, status);
+      setStoredCredentials(credentials);
+    })
+    .catch((error) => {
+      console.log(error);
+      handleMessage('Persisting login failed');
+    })
+  }
 
     return (
       <View style={styles.root}>

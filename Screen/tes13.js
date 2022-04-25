@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, ToastAndroid, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -18,8 +18,6 @@ import * as FileSystem from 'expo-file-system';
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 import * as MediaLibrary from 'expo-media-library';
-import * as Print from 'expo-print';
-import { shareAsync } from 'expo-sharing';
 
 import Rent from "../assets/image/rent-active.png";
 
@@ -60,6 +58,27 @@ export default function MenuUtama({navigation}) {
   const [document, setDocument] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState("0%");
 
+  // async function handleDownload(){
+  //   const callback = downloadProgress => {
+  //     const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+  //     setDownloadProgress(progress * 100);
+  //   };
+  //   const downloadResumable = FileSystem.createDownloadResumable(
+  //     'https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf',
+  //     FileSystem.documentDirectory + 'boleto.pdf',
+  //     {},
+  //     callback
+  //   );
+
+  //   try {
+  //     const { uri } = await downloadResumable.downloadAsync();
+  //     console.log('Finished downloading to ', uri);
+  //     setDocument(uri);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
+
   async function setNotificationChannel() {
     const loadingChannel = await Notifications.getNotificationChannelAsync(
       channelId
@@ -86,7 +105,6 @@ export default function MenuUtama({navigation}) {
     await MediaLibrary.requestPermissionsAsync();
     await Notifications.requestPermissionsAsync();
     setNotificationChannel();
-    let isMounted = true
   }, []);
 
   const downloadProgressUpdater = ({
@@ -97,9 +115,62 @@ export default function MenuUtama({navigation}) {
     setDownloadProgress(`${pctg.toFixed(0)}%`);
   };
 
+  const uri = `http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/downloadDokumenSewa/1`
+  const filename ='dokumen_sewa.pdf'
+
+
+  async function handleDownload(id_order){
+    const uri = `http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/downloadDokumenSewa/${id_order}`
+    console.log(uri)
+    let fileUri = FileSystem.documentDirectory + "small.pdf";
+    FileSystem.downloadAsync(uri, fileUri)
+    .then(({ uri }) => {
+      saveFile(uri);
+    })
+    .catch(error => {
+      console.error(error);
+    })
+  }
+
+  async function saveFile(){
+    saveFile = async (fileUri: string) => {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status === "granted") {
+        // const asset = await MediaLibrary.createAssetAsync(fileUri)
+        // await MediaLibrary.createAlbumAsync("Download", asset, false)
+        try{
+          const asset =  await MediaLibrary.createAssetAsync(fileUri);
+          const album = await MediaLibrary.getAlbumAsync('Download');
+          if (album == null) {
+              await MediaLibrary.createAlbumAsync('Download', asset, false);
+          } else {
+              await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+          }
+          console.log(fileUri)
+          alert("Success, file was successfully downloaded!", fileUri);
+      }catch(err){
+          console.log("Save err: ", err)
+      }
+      }
+  }
+  }
+
+
+  // useEffect(()=>{
+
+  //   console.log(downloadProgress);
+
+  // }, [downloadProgress]);
+
+  // useEffect(()=>{
+
+  //   handleDownload()
+
+  // },[]);
+
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/${id}`)
+    fetch(`http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/orders/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -108,12 +179,12 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
+
   }, []);
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders')
+    fetch('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -122,7 +193,7 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
+
   }, []);
 
   const listOrders = ({item}) => {
@@ -151,12 +222,9 @@ export default function MenuUtama({navigation}) {
     Moment.locale('id');
     var dt = item.created_at
     var id_order =item.id
-    var nama_instansi =item.nama_instansi
-
-
     return (
       <>
-        <ScrollView>
+        <View>
           <TouchableOpacity
             onPress={() => navigation.navigate('Detail Order', {order: item})}
           >
@@ -207,7 +275,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <Text>{item.nama_instansi}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <View>
                         <Text>{nama}</Text>
                         <Text>x1</Text>
@@ -244,22 +312,15 @@ export default function MenuUtama({navigation}) {
                         <Text style={styles.buttonTitle}>Download Bukti Bayar</Text>
                       </View>
                     </TouchableOpacity>
-                    {item.ket_persetujuan_kepala_dinas == 'setuju' &&
-                      <TouchableOpacity onPress={async () => {
-                        await downloadToFolder(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
-                          downloadProgressCallback: downloadProgressUpdater,
-                          downloadProgressCallback: ToastAndroid.show(`Sedang Mendownload, Mohon Menunggu!`, ToastAndroid.SHORT)
-                          // ToastAndroid.show(`Sedang Mendownload ${downloadProgress}`, ToastAndroid.SHORT)
-                        })
-                      }}>
-                        {/* <TouchableOpacity onPress={async () => {
-                          await downloadToFolder('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
-                        }}> */}
-                        <View style={styles.btn}>
-                          <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
-                        </View>
-                      </TouchableOpacity>
-                    }
+                    <TouchableOpacity onPress={()=> handleDownload(id_order)}>
+                    {/* <TouchableOpacity onPress={async () => {
+                      await downloadToFolder('http://c526-2001-448a-6060-f025-94ac-422e-54f9-5ed6.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                    }}> */}
+                      <Text>{downloadProgress}</Text>
+                      <View style={styles.btn}>
+                        <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                   {/* <Text>{item.alat}</Text> */}
                   {/* {alat.map((item)=>
@@ -289,7 +350,7 @@ export default function MenuUtama({navigation}) {
               </View>
             </View>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
       </>
     );
   }
@@ -297,13 +358,59 @@ export default function MenuUtama({navigation}) {
   return (
     <>
       <View>
-        <TouchableOpacity  style={{ width:'50%' }} onPress={() => navigation.navigate('Cart')}>
-          <View style={{ borderWidth:2, margin: 8, borderRadius:20, borderColor: '#ffd700', alignItems:'center', padding: 8, flexDirection:'row' }}>
-            <Ionicons name="add" size={32} color="#ffd700" />
-            <Text style={{ color: '#ffd700' }}>Ajukan Penyewaan</Text>
+        <TouchableOpacity  style={{ width:'50%' }} onPress={() => navigation.navigate('Formulir Order Step 1')}>
+          <View style={{ borderWidth:2, margin: 16, borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
+            <Ionicons name="add" size={32} color="#25185A" />
+            <Text style={styles.buttonTitle}>Ajukan Penyewaan</Text>
           </View>
         </TouchableOpacity>
         <StatusBar style="auto" />
+        {/* <TextInput
+          value={uri}
+          placeholder="http://www.example.com/image.jpg"
+          onChangeText={(uri) => setUri(uri)}
+          style={{ width: "80%" }}
+        />
+        <TextInput
+          value={filename}
+          placeholder="image.jpg"
+          onChangeText={(filename) => setFilename(filename)}
+          style={{ width: "80%" }}
+        /> */}
+      <Button
+        title="Download"
+        onPress={async () => {
+          // You can also call downloadToFolder with custom notification content, or without any notifications sent at all
+
+          // ***************************
+          // custom notification content
+          // ***************************
+          // const customNotifInput: {downloading: NotificationContentInput, finished: NotificationContentInput, error: NotificationContentInput} = {
+          //   downloading: { title: "Custom title 1", body: 'Custom body 1', color: '#06004a' },
+          //   finished: { title: "Custom title 2", body: 'Custom body 2', color: '#004a00' },
+          //   error: { title: "Custom title 3", body: 'Custom body 3', color: '#810002' }
+          // };
+          // await downloadToFolder(uri, filename, "Download", channelId, { notificationType: { notification: "custom" }, notificationContent: customNotifInput });
+
+          // ****************
+          // no notifications
+          // ****************
+          // await downloadToFolder(uri, filename, "Download", channelId, { notificationType: { notification: "none" }});
+
+          // *******
+          // default
+          // *******
+          await downloadToFolder(uri, filename, "Download", channelId, {
+            downloadProgressCallback: downloadProgressUpdater,
+          });
+        }}
+      />
+
+      <Text style={styles.topMargin}>{downloadProgress}</Text>
+      <Button
+        title="Reset Progress"
+        onPress={() => setDownloadProgress("0%")}
+      />
         <View style={styles.container}>
           <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
@@ -318,31 +425,20 @@ export default function MenuUtama({navigation}) {
               }}>
                 <ActivityIndicatorExample style={ styles.progress }/>
               </View> : (
-              <View>
-                {data.length <= 0 &&
-                  <View style={{ margin: 16 }}>
-                      <Text>Anda belum pernah melakukan penyewaan</Text>
-                  </View>
-                }
-                {data.length > 0 &&
-                  <View>
-                    <FlatList
-                      style={{ margin:0 }}
-                      data={data}
-                      vertical
-                      key={1}
-                      numColumns={1}
-                      nestedScrollEnabled
-                      // fadingEdgeLength={10}
-                      keyExtractor={item=>item.id}
-                      renderItem={listOrders}
-                      onEndReachedThreshold={0.5}
-                      // getItemCount={getItemCount}
-                      // getItem={getItem}
-                    />
-                  </View>
-                }
-              </View>
+              <FlatList
+                style={{ margin:0 }}
+                data={data}
+                vertical
+                key={1}
+                numColumns={1}
+                nestedScrollEnabled
+                // fadingEdgeLength={10}
+                keyExtractor={item=>item.id}
+                renderItem={listOrders}
+                onEndReachedThreshold={0.5}
+                // getItemCount={getItemCount}
+                // getItem={getItem}
+              />
             )}
           </SafeAreaView>
         </View>
@@ -491,7 +587,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     margin:4,
-    backgroundColor: '#ffd700',
+    backgroundColor: '#25185A',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
@@ -502,6 +598,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     marginTop: 0,
+    color: 'green',
     fontWeight: '600',
     lineHeight: 22,
   },
@@ -520,10 +617,10 @@ const styles = StyleSheet.create({
   },
   card: {
     shadowOffset: {width:0, height:2},
-    shadowOpacity: 1,
+    shadowOpacity: 0.5,
     width: '100%',
     height: 300,
-    borderColor:'#2196F3',
+    borderColor:'green',
     borderWidth:2,
   }
 });

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Image, style } from "react-native";
+import { StyleSheet, Text, View, Image, style, TouchableOpacity } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -25,16 +25,21 @@ import DetailRefund from "./Screen/DetailRefund";
 import DetailReschedule from "./Screen/DetailReschedule";
 import Pembatalan from "./Screen/Refund";
 import Reschedule from "./Screen/Reschedule";
+import Cart from "./Screen/Cart";
+import { CartIcon } from './components/CartIcon.js';
 
 import AppLoading from 'expo-app-loading';
+import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './components/CredentialsContext';
+import { CartContext } from './components/CartContext';
+import { CartProvider } from './components/CartContext.js';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FloatingTabBar from './components/FloatingTabBar';
-import Icon from 'react-native-vector-icons/AntDesign';
+// import Icon from 'react-native-vector-icons/AntDesign';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from 'react-native-paper';
-
+// import { CartProvider } from './Screen/CartContext.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +54,8 @@ const Tab = createBottomTabNavigator();
 function nav() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
+  const [storedCart, setStoredCart] = useState([]);
+  const [items, setItems] = useState([]);
 
   const checkLoginCredentials = () => {
     AsyncStorage
@@ -58,6 +65,40 @@ function nav() {
           setStoredCredentials(JSON.parse(result));
         } else {
           setStoredCredentials(null);
+        }
+      })
+      .catch(error => console.log(error))
+  }
+
+  const addItemToCart = (itemData, id, harga) => {
+    AsyncStorage
+      .getItem('cartCredentials')
+      .then((alat) => {
+        if (alat !== null) {
+          const product = alat;
+          setItems((prevItems, id, harga) => {
+            const item = prevItems.find((item) => (item.id == id));
+            if(!item) {
+                return [...prevItems, {
+                    id,
+                    qty: 1,
+                    product,
+                    totalPrice: harga
+                }];
+            }
+            else {
+                return prevItems.map((item) => {
+                    if(item.id == id) {
+                    item.qty++;
+                    item.totalPrice += harga;
+                    }
+                    return item;
+                });
+            }
+          })
+          setItemCount(items.reduce((sum, item) => (sum + item.qty), 0))
+        } else {
+          setItems(null);
         }
       })
       .catch(error => console.log(error))
@@ -134,9 +175,11 @@ function nav() {
   );
 }
 
-export default function App() {
+export default function App({navigation}) {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
+  const [storedCart, setStoredCart] = useState([]);
+  const [items, setItems] = useState([]);
 
   const checkLoginCredentials = () => {
     AsyncStorage
@@ -146,6 +189,39 @@ export default function App() {
           setStoredCredentials(JSON.parse(result));
         } else {
           setStoredCredentials(null);
+        }
+      })
+      .catch(error => console.log(error))
+  }
+  const addItemToCart = (id, harga) => {
+    AsyncStorage
+      .getItem('cartCredentials')
+      .then((alat) => {
+        if (alat !== null) {
+          const product = alat;
+          setItems((prevItems, id, harga) => {
+            const item = prevItems.find((item) => (item.id == id));
+            if(!item) {
+                return [...prevItems, {
+                    id,
+                    qty: 1,
+                    product,
+                    totalPrice: harga
+                }];
+            }
+            else {
+                return prevItems.map((item) => {
+                    if(item.id == id) {
+                    item.qty++;
+                    item.totalPrice += harga;
+                    }
+                    return item;
+                });
+            }
+          })
+          setItemCount(items.reduce((sum, item) => (sum + item.qty), 0))
+        } else {
+          setItems(null);
         }
       })
       .catch(error => console.log(error))
@@ -161,122 +237,147 @@ export default function App() {
     )
   }
 
+
   return (
     <>
     <CredentialsContext.Provider value={{ storedCredentials, setStoredCredentials }}>
-      <CredentialsContext.Consumer>
-            {({storedCredentials}) => (
-            <>
-              <NavigationContainer>
-                  <Stack.Navigator initialRouteName="nav">
-                  {storedCredentials ? (
-                  <>
-                    {/* <Stack.Screen
-                    name="EditProfil"
-                    component={EditProfil}
-                    options={{ headerShown: false }}
-                    /> */}
+      <CartContext.Provider value={{ items, setItems }}>
+        <CredentialsContext.Consumer>
+          {({storedCredentials}) => (
+          <>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="nav">
+                {storedCredentials ? (
+                <>
+                  {/* <Stack.Screen
+                  name="EditProfil"
+                  component={EditProfil}
+                  options={{ headerShown: false }}
+                  /> */}
+                  <Stack.Screen
+                  name="nav"
+                  component={nav}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Edit Profil"
+                  component={EditProfil}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="MenuUtama"
+                  component={MenuUtama}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Detail"
+                  component={Detail}
+                  options={{ headerShown: true, headerBackTitleVisible: false,
+                    headerRight: () =>
+                      // <View style={{ flexDirection:'row' }}>
+                      //   <TouchableOpacity style={{ padding: 5 }} onPress={() => {navigation.navigate('Cart')}}>
+                      //     <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', right: 18, bottom: 18, alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
+                      //         <Text>{items.reduce((sum, item) => (sum + item.qty), 0)}</Text>
+                      //     </View>
+                      //     {/* <Text>{nama}</Text> */}
+                      //     {/* <Text>{items.reduce((sum, item) => (sum + item.totalPrice), 0)}</Text> */}
+                      //     <Icon name="ios-cart" size={28} color='#ffd700'/>
+                      //   </TouchableOpacity>
+                      //   <TouchableOpacity style={{ padding: 5 }}>
+                      //     <Icon name="notifications" size={28} color='#ffd700'/>
+                      //   </TouchableOpacity>
+                      // </View>
+                      <CartIcon navigation={navigation}/>
+                    // headerLeft: () => <Icon name="notifications" size={28} color='#ffd700'/>
+                  }}
+                  />
+                  <Stack.Screen
+                  name="Alat"
+                  component={Alat}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Cart"
+                  component={Cart}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Detail Order"
+                  component={DetailOrder}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="Pembayaran"
+                  component={formPembayaran}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="Pengajuan Perubahan Jadwal"
+                  component={FormReschedule}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="pdfFormulirOrder"
+                  component={pdfFormulirOrder}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Pengajuan Pembatalan"
+                  component={FormRefund}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="Formulir Order Step 1"
+                  component={FormulirOrder}
+                  options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                  name="Formulir Order Step 2"
+                  component={FormSecondStep}
+                  options={{ headerShown: false }}
+                  />
                     <Stack.Screen
-                    name="nav"
-                    component={nav}
+                  name="Detail Refund"
+                  component={DetailRefund}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="Detail Reschedule"
+                  component={DetailReschedule}
+                  options={{ headerShown: true }}
+                  />
+                </>
+                ) : (
+                <>
+                    <Stack.Screen
+                    name="Login"
+                    component={Login}
+                    options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                    name="Register"
+                    component={Register}
                     options={{ headerShown: false }}
                     />
                     <Stack.Screen
                     name="Edit Profil"
                     component={EditProfil}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="MenuUtama"
-                    component={MenuUtama}
                     options={{ headerShown: false }}
                     />
                     <Stack.Screen
-                    name="Detail"
-                    component={Detail}
+                    name="Register2"
+                    component={Register2}
                     options={{ headerShown: false }}
                     />
-                    <Stack.Screen
-                    name="Alat"
-                    component={Alat}
-                    options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                    name="Detail Order"
-                    component={DetailOrder}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="Pembayaran"
-                    component={formPembayaran}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="Pengajuan Perubahan Jadwal"
-                    component={FormReschedule}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="pdfFormulirOrder"
-                    component={pdfFormulirOrder}
-                    options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                    name="Pengajuan Pembatalan"
-                    component={FormRefund}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="Formulir Order Step 1"
-                    component={FormulirOrder}
-                    options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                    name="Formulir Order Step 2"
-                    component={FormSecondStep}
-                    options={{ headerShown: false }}
-                    />
-                     <Stack.Screen
-                    name="Detail Refund"
-                    component={DetailRefund}
-                    options={{ headerShown: true }}
-                    />
-                    <Stack.Screen
-                    name="Detail Reschedule"
-                    component={DetailReschedule}
-                    options={{ headerShown: true }}
-                    />
-                  </>
-                  ) : (
-                  <>
-                      <Stack.Screen
-                      name="Login"
-                      component={Login}
-                      options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                      name="Register"
-                      component={Register}
-                      options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                      name="Edit Profil"
-                      component={EditProfil}
-                      options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                      name="Register2"
-                      component={Register2}
-                      options={{ headerShown: false }}
-                      />
-                  </>
-                  )}
-                  </Stack.Navigator>
-              </NavigationContainer>
-              <StatusBar hidden />
-            </>
-            )}
+                </>
+                )}
+                </Stack.Navigator>
+            </NavigationContainer>
+            <StatusBar hidden />
+          </>
+          )}
         </CredentialsContext.Consumer>
+      </CartContext.Provider>
     </CredentialsContext.Provider>
     {/* <NavigationContainer>
         <FloatingTabBar/>

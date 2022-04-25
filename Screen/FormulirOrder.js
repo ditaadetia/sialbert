@@ -61,7 +61,7 @@ export default function FormulirOrder({navigation, route}) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://d92d-2001-448a-6060-f025-7419-7c1b-2239-e4f5.ngrok.io/api/register';
+    const url = 'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -105,7 +105,7 @@ export default function FormulirOrder({navigation, route}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/cekUser/${id}`)
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekUser/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setAvatar(hasil);
@@ -183,7 +183,7 @@ export default function FormulirOrder({navigation, route}) {
                     <Image source={from1} style={{ marginBottom: 8, width: '100%' }} resizeMode="cover"/> */}
                     <View>
                       <Text style={{ marginLeft:16, marginTop:4 }}>Status Kegiatan :</Text>
-                      <View style={{ margin: 8, backgroundColor: '#ffd700', borderRadius: 20, borderColor: '#ffcd04', borderWidth:2 }}>
+                      <View style={{ margin: 8, backgroundColor: '#ffd700', borderRadius: 20, borderColor: '#ffd700', borderWidth:2 }}>
                         <Picker
                           style={styles.pickerCustomeStyle}
                           mode='dropdown'
@@ -470,5 +470,12 @@ const styles = StyleSheet.create({
   },
   pickerCustomeStyle: {
     color: "red",
+  },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#ffd700',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
   },
 });

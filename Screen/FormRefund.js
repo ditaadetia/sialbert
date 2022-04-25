@@ -49,7 +49,7 @@ export default function FormRefund({ navigation, route }) {
 
   const handleReschedule = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/reschedules/post`;
+    const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/reschedules/post`;
 
     axios
       .post(url, credentials)
@@ -165,7 +165,7 @@ export default function FormRefund({ navigation, route }) {
             <View style={{ margin:16 }}>
               <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                 <View>
-                  <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                  <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
                   <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{reschedule.nama}</Text>
                 </View>
                 <View>
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 20,
-    borderColor: '#364878'
+    borderColor: '#ffcd04'
   },
   btnSearch: {
     width: 18,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius:15,
     marginTop:16,
     borderWidth: 2,
-    borderColor:'green'
+    borderColor:'#2196F3'
   },
   icon: {
     width: 32,
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   pickedDateContainer: {
     padding: 8,
     backgroundColor: '#fff',
-    borderColor: '#ffd700',
+    borderColor: '#ffcd04',
     borderWidth: 3,
     borderRadius: 10,
   },

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Text, View, Image, FlatList, Alert, SafeAreaView, TextInput, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, Alert, Pressable, ActivityIndicator, SafeAreaView, TextInput, Modal, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import FloatingTabBar from "../components/FloatingTabBar";
@@ -15,18 +15,26 @@ import { CredentialsContext } from './../components/CredentialsContext';
 const win = Dimensions.get("window");
 import logo from "../assets/icon.png";
 import axios from 'axios';
+import { Formik, form } from 'formik';
+import * as yup from 'yup';
 
 export default function DetailOrder({ navigation, route }) {
   const {order} = route.params;
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
   const [data, setData] = useState([]);
+  const [skr, setSkr] = useState({});
   const [payment, setPayment] = useState([]);
   const [equipments, setEquipments] = useState([]);
   const [page, setPage] = useState(1);
   const [text, setText] = useState('');
+  const [alasan, setAlasan] = useState('');
+  const [detail_order_id, setDetailOrderId] = useState();
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const alat = [...order.alat]
@@ -47,7 +55,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/orders')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -61,7 +69,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/detail-orders')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -80,7 +88,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/cekPayments/${order_id}`)
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekPayments/${order_id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setPayment(hasil);
@@ -94,7 +102,7 @@ export default function DetailOrder({ navigation, route }) {
   console.log(payment.data)
 
   const cekSkr = (credentials) => {
-    const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/cekSkr/${id_order}`;
+    const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekSkr/${id_order}`;
     handleMessage(null);
 
     axios
@@ -116,7 +124,7 @@ export default function DetailOrder({ navigation, route }) {
           ]);
         }
         else if (success == true) {
-          navigation.navigate('Pembayaran', {id_order: id_order, skr: data.skr, dateSkr: data.created_at})
+          navigation.navigate('Pembayaran', {id_order: id_order, skr: data.skr, dateSkr: data.created_at, total_harga: total_harga})
         }
     })
 
@@ -125,13 +133,95 @@ export default function DetailOrder({ navigation, route }) {
     });
   };
 
+  // const tes = [...payment.data]
+  // console.log(tes.konfirmasi_pembayaran)
+
+  const batalValidationSchema = yup.object().shape({
+    alasan: yup
+      .string()
+      .required('Alasan wajib diisi!'),
+  })
+
+  const detail_id = order.id
+  console.log(detail_id)
+
+  const handleAjukanPembatalan = (detail_order_id) => {
+    handleMessage(null);
+    setAlasan(alasan)
+    console.log(detail_order_id)
+
+    if(alasan !== ''){
+      axios({
+        url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/pembatalan/${detail_order_id}`,
+        method:"POST",
+        data:
+        {
+          alasan:alasan,
+        },
+      })
+      .then((response) => {
+        const result = response.data;
+        const { message, status, success } = result;
+        if (message == 'Pengajuan Pembatalan Berhasil!') {
+          // navigation.navigate('MenuUtama', {...data[0]});
+          Alert.alert("Berhasil", "Pembatalan Berhasil!", [
+            {
+              text:"OK",
+              onPress: () => navigation.navigate('Pembatalan'),
+            },
+          ]);
+        }
+        else if (message == 'Masa penyewaan telah berakhir') {
+          Alert.alert("Anda tidak dapat melakukan pembatalan.", "Masa penyewaan telah berakhir.");
+        }
+        else if (message == 'Kembalikan alat terlebih dahulu!') {
+          Alert.alert("Tidak dapat melakukan pembatalan jika sedang memakai alat.", "Kembalikan alat terlebih dahulu untuk melakukan pembatalan dan mengajukan pegembalian dana!");
+        }
+      })
+      .catch((error)=> {
+        handleMessage("Tidak ada koneksi internet!");
+        console.error('error', error);
+        console.log(error.response)
+      });
+    }else{
+      Alert.alert('Harap isi kolom alasan!', "Kolom alasan tidak boleh kosong!");
+    }
+  }
+
+  useEffect(async() => {
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekSkr/${id_order}`)
+      .then((response) => response.json())
+      .then((hasil) => {
+        setSkr(hasil);
+      })
+      // .finally(() => setLoading(false));
+      .catch(error => { console.log; });
+      let isMounted = true
+  }, []);
+
   const handleMessage = (message, type = 'failed') => {
     setMessage(message);
     setMessageType(type);
   }
 
-  // const tes = [...payment.data]
-  // console.log(tes.konfirmasi_pembayaran)
+  const openSettingModal = (detail_order_id) => {
+    setDetailOrderId(detail_order_id);
+    setModalVisible(!modalVisible);
+  }
+
+  const letHide = () => {
+    if (visible === true) {
+      setVisible(false)
+    } else {
+      setVisible(true)
+    }
+  }
+
+  const doYourTask = () => {
+    setIsDisabled(true);
+  }
+
+  console.log(skr)
 
   return (
     <SafeAreaView style={{ justifyContent: 'center', flexDirection: "row", flex:1}}>
@@ -149,134 +239,196 @@ export default function DetailOrder({ navigation, route }) {
       }
       {!isLoading &&
         <ScrollView style={{ paddingBottom:8}}>
-          <Card style={{ backgroundColor: '#fff' }}>
-            <View style={{ flexDirection:'row', justifyContent: "space-between", height: 48, backgroundColor: '#25185A'}}>
-              <Image style={styles.icon} source={logo} />
-              <Text style={{ marginRight:16, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Kode Pemesanan ALB-{order.id}</Text>
-            </View>
-            <View style={{ padding:16 }}>
-              {payment.status == '1' &&
-                <Badge style={{ backgroundColor:'#ffd700' }}>{payment.message}</Badge>
-              }
-              {payment.status == '2' &&
-                <Badge style={{ backgroundColor:'green' }}>{payment.message}</Badge>
-              }
-              {payment.status == '3' &&
-                <Badge>{payment.message}</Badge>
-              }
-              {payment.status == '4' &&
-                <Badge>{payment.message}</Badge>
-              }
-              <Card style={styles.card}>
-                <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
-                  <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
-                </View>
-                <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
-                  <Text>Tanggal Mulai:</Text>
-                  <Text>{Moment(dtMulai).format('dddd, DD MMMM YYYY HH:mm')}</Text>
-                </View>
-                <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
-                  <Text>Tanggal Selesai:</Text>
-                  <Text>{Moment(dtSelesai).format('dddd, DD MMMM YYYY HH:mm')}</Text>
-                </View>
-                {order.total_hari > 0 ?
-                  <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
-                    <Text>Total Hari:</Text>
-                    <Text>{order.total_hari} Hari</Text>
-                  </View>:
-                  <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
-                    <Text>Total Jam:</Text>
-                    <Text>{order.total_jam} Jam</Text>
-                  </View>
+          <SafeAreaView>
+            <Card style={{ backgroundColor: '#fff', paddingBottom:32}}>
+              <View style={{ flexDirection:'row', justifyContent: "space-between", height: 48, backgroundColor: '#25185A'}}>
+                <Image style={styles.icon} source={logo} />
+                <Text style={{ marginRight:16, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Kode Pemesanan ALB-{order.id}</Text>
+              </View>
+              <View style={{ padding:16 }}>
+                {payment.status == '1' &&
+                  <Badge style={{ backgroundColor:'#ffd700' }}>{payment.message}</Badge>
                 }
-              </Card>
-              <Card style={styles.card2}>
-                <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
-                  <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Detail Orderan</Text>
-                </View>
-                {alat.map((item)=>
-                  <Card key={item.id} {...item} >
-                    <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
-                      <View style={{ flexDirection:'row' }}>
-                        <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
-                        <View style={{ justifyContent:'center', textAlignVertical:'center' }}>
-                          <Text>{item.nama}</Text>
-                          <Text>x1</Text>
-                        </View>
-                      </View>
-                    </View>
-                    {order.total_hari > 0 ?
-                      <View style={{ flexDirection:'row', margin: 16, justifyContent:'space-between' }}>
-                        <View style={{ flexDirection:'row' }}>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center' }}>Rp.{item.harga_sewa_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center', fontWeight:'bold' }}> X</Text>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center' }}> {total_hari} Hari</Text>
-                        </View>
-                        <Text style={{ margin: 16 }}>Rp.{(item.harga_sewa_perhari * total_hari).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                      </View>:
-                      <View style={{ flexDirection:'row', margin: 16, justifyContent:'space-between' }}>
-                        <View style={{ flexDirection:'row' }}>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center' }}>Rp.{item.harga_sewa_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center', fontWeight:'bold' }}> X</Text>
-                          <Text style={{ justifyContent:'center', textAlignVertical:'center' }}> {total_jam} Jam</Text>
-                        </View>
-                        <Text style={{ margin: 16 }}>Rp.{(item.harga_sewa_perjam * total_jam).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                      </View>
-                    }
-                    <View style={styles.border2}/>
-                    <View style={{ paddingHorizontal:16, width: '100%' }}>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('Pengajuan Perubahan Jadwal', {dtMulai: dtMulai, dtSelesai: dtSelesai, reschedule: item, order_id: order.id})}
-                      >
-                        <View>
-                          <View style={{flexDirection:'row', justifyContent: "space-between"}}>
-                            <Text>Ajukan Perubahan Jadwal</Text>
-                            <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.border2}/>
-                    <View style={{ paddingHorizontal:16, width: '100%' }}>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('Pengajuan Pembatalan', {alat: item.id})}
-                      >
-                        <View>
-                          <View style={{flexDirection:'row', justifyContent: "space-between"}}>
-                            <Text>Ajukan Pembatalan</Text>
-                            <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.border2}/>
-                  </Card>
-                )}
-                <View style={{ flexDirection:'row', justifyContent:'space-between' }}>
-                  <Text style={{ fontWeight:'bold', fontSize:16, fontWeight:'bold', margin:16 }}> Total :</Text>
-                  <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                </View>
+                {payment.status == '2' &&
+                  <Badge style={{ backgroundColor:'green' }}>{payment.message}</Badge>
+                }
                 {payment.status == '3' &&
-                  <TouchableOpacity style={{ marginHorizontal: 16 }}
-                  // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
-                  onPress={cekSkr}>
-                    <View style={styles.btn}>
-                      <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <Badge>{payment.message}</Badge>
                 }
                 {payment.status == '4' &&
-                  <TouchableOpacity style={{ marginHorizontal: 16 }}
-                  // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
-                  onPress={cekSkr}>
-                    <View style={styles.btn}>
-                      <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <Badge>{payment.message}</Badge>
                 }
-              </Card>
-            </View>
-          </Card>
+                <Card style={styles.card}>
+                  <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+                    <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
+                  </View>
+                  <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
+                    <Text>Tanggal Mulai:</Text>
+                    <Text>{Moment(dtMulai).format('dddd, DD MMMM YYYY HH:mm')}</Text>
+                  </View>
+                  <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
+                    <Text>Tanggal Selesai:</Text>
+                    <Text>{Moment(dtSelesai).format('dddd, DD MMMM YYYY HH:mm')}</Text>
+                  </View>
+                  {order.total_hari > 0 ?
+                    <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
+                      <Text>Total Hari:</Text>
+                      <Text>{order.total_hari} Hari</Text>
+                    </View>:
+                    <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
+                      <Text>Total Jam:</Text>
+                      <Text>{order.total_jam} Jam</Text>
+                    </View>
+                  }
+                </Card>
+                <Card style={styles.card2}>
+                  <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+                    <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Detail Orderan</Text>
+                  </View>
+                  {alat.map((item)=>
+                    <Card key={item.id} {...item} style={styles.card3}>
+                      {(() => {
+                        const detail_order_id = item.id
+                        console.log(detail_order_id)
+                        return(
+                          <View>
+                            <View style={{ flexDirection:'row', justifyContent: "space-between", paddingHorizontal:8}}>
+                              <View style={{ flexDirection:'row' }}>
+                                <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                                <View style={{ justifyContent:'center', textAlignVertical:'center' }}>
+                                  <Text>{item.nama}</Text>
+                                  <Text>x1</Text>
+                                </View>
+                              </View>
+                            </View>
+                            {order.total_hari > 0 ?
+                              <View style={{ flexDirection:'row', marginHorizontal: 16, justifyContent:'space-between' }}>
+                                <View style={{ flexDirection:'row' }}>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center' }}>Rp.{item.harga_sewa_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center', fontWeight:'bold' }}> X</Text>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center' }}> {total_hari} Hari</Text>
+                                </View>
+                                <Text style={{ margin: 16 }}>Rp.{(item.harga_sewa_perhari * total_hari).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                              </View>:
+                              <View style={{ flexDirection:'row', marginHorizontal: 16, justifyContent:'space-between' }}>
+                                <View style={{ flexDirection:'row' }}>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center' }}>Rp.{item.harga_sewa_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center', fontWeight:'bold' }}> X</Text>
+                                  <Text style={{ justifyContent:'center', textAlignVertical:'center' }}> {total_jam} Jam</Text>
+                                </View>
+                                <Text style={{ margin: 16 }}>Rp.{(item.harga_sewa_perjam * total_jam).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                              </View>
+                            }
+                            <View style={styles.border2}/>
+                            <View style={{ paddingHorizontal:16, width: '100%' }}>
+                              <TouchableOpacity
+                                onPress={() => navigation.navigate('Pengajuan Perubahan Jadwal', {dtMulai: dtMulai, dtSelesai: dtSelesai, reschedule: item, order_id: order.id})}
+                              >
+                                <View>
+                                  <View style={{flexDirection:'row', justifyContent: "space-between"}}>
+                                    <Text>Ajukan Perubahan Jadwal</Text>
+                                    <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
+                                  </View>
+                                </View>
+                              </TouchableOpacity>
+                            </View>
+                            <View style={styles.border2}/>
+                            <View style={{ paddingHorizontal:16, width: '100%' }}>
+                              <TouchableOpacity
+                                onPress={() => openSettingModal(detail_order_id)}
+                              >
+                                <View>
+                                  <View style={{flexDirection:'row', justifyContent: "space-between"}}>
+                                    <Text>Ajukan Pembatalan</Text>
+                                    <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
+                                  </View>
+                                </View>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        )
+                      })()}
+                    </Card>
+                  )}
+                  <View style={{ flexDirection:'row', justifyContent:'space-between' }}>
+                    <Text style={{ fontWeight:'bold', fontSize:16, fontWeight:'bold', margin:16 }}> Total :</Text>
+                    <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                  </View>
+                  {payment.status == '3' &&
+                    <TouchableOpacity style={{ marginHorizontal: 16 }}
+                    // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
+                    onPress={cekSkr}>
+                      <View style={styles.btnLanjut}>
+                        <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
+                      </View>
+                    </TouchableOpacity>
+                  }
+                  {payment.status == '4' &&
+                    <TouchableOpacity style={{ marginHorizontal: 16 }}
+                    // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
+                    onPress={cekSkr}>
+                      <View style={styles.btnLanjut}>
+                        <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
+                      </View>
+                    </TouchableOpacity>
+                  }
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                      // Alert.alert("Modal has been closed.");
+                      setModalVisible(!modalVisible);
+                    }}
+                  >
+                    <View style={styles.centeredView}>
+                      <View style={styles.modalView}>
+                      <View style={{ width: '100%' }}>
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Alasan"
+                          style={styles.textInput}
+                          onChangeText={setAlasan}
+                          value={alasan}
+                          editable={true}
+                        />
+                        <TouchableOpacity onPress={(e) =>
+                          {
+                            letHide(e),
+                            doYourTask(e),
+                            handleAjukanPembatalan(detail_order_id, e)
+                          }
+                        }
+                        disabled={isDisabled}>
+                          <View style={styles.btn}>
+                            {visible == true &&
+                              <ActivityIndicator
+                                size="large"
+                                color="#00B8D4"
+                                animating={visible}
+                              />
+                            }
+                            {visible == false &&
+                              <Text style={styles.textStyle}>KIRIM</Text>
+                            }
+                          </View>
+                        </TouchableOpacity>
+                        <Pressable
+                          style={[styles.button, styles.buttonClose]}
+                          onPress={() => setModalVisible(!modalVisible)}
+                        >
+                          <Text style={styles.textStyle}>BATALKAN</Text>
+                        </Pressable>
+                      </View>
+                      </View>
+                    </View>
+                  </Modal>
+                </Card>
+              </View>
+            </Card>
+          </SafeAreaView>
         </ScrollView>
       }
     </SafeAreaView>
@@ -297,20 +449,9 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: '#ffd700',
-    borderRadius: 8,
-    height: 48,
-    justifyContent: 'center',
-    textAlign: 'center',
-    margin: 16
-  },
-  btn: {
-    backgroundColor: '#25185A',
-    borderRadius: 8,
-    height: 48,
-    justifyContent: 'center',
-    textAlign: 'center',
-    marginTop:16,
-    padding:8,
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
   },
   buttonTitle: {
     alignItems: 'center',
@@ -416,20 +557,19 @@ const styles = StyleSheet.create({
   textInput: {
     elevation: 12,
     flexDirection: "row",
-    marginHorizontal: 16,
     backgroundColor: '#fff',
     padding: 10,
     marginVertical: 16,
-    paddingHorizontal: 16,
     borderRadius: 20,
-    borderColor: '#364878'
+    borderColor: '#ffcd04',
+    borderWidth: 1
   },
   btnSearch: {
     width: 18,
     height: 18,
     marginEnd: 8,
     marginVertical: 8,
-  }, 
+  },
   card: {
     shadowOffset: {width:0, height:2},
     shadowOpacity: 0.5,
@@ -437,8 +577,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius:15,
     borderTopRightRadius:15,
     marginTop:16,
-    marginBottom: 16,
-    borderColor:'green',
+    borderColor:'#2196F3',
     borderWidth:2
   },
   card2: {
@@ -449,13 +588,74 @@ const styles = StyleSheet.create({
     borderTopRightRadius:15,
     marginTop:16,
     marginBottom: 40,
-    borderColor:'green',
+    borderColor:'#2196F3',
     borderWidth:2
+  },
+  card3: {
+    shadowOffset: {width:0, height:2},
+    shadowOpacity: 0.5,
+    width: '100%',
+    borderColor:'#2196F3',
+    borderWidth:1
   },
   icon: {
     width: 32,
     height:32,
     marginLeft:16,
     marginTop:8,
-  }
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 8,
+    width: '80%',
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 16,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "red",
+    marginTop: 4
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  },
+  btn: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  btnLanjut: {
+    backgroundColor: '#25185A',
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop:16,
+    marginBottom:8,
+    padding:8,
+  },
 });
