@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, ActivityIndicator, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -28,11 +28,12 @@ export default function MenuUtama({navigation}) {
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email, id} = storedCredentials;
+  const [refreshing, setRefreshing] = useState(true);
 
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/reschedules/${id}`)
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/reschedules/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -41,7 +42,7 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-
+      let isMounted = true
   }, []);
 
   const listOrders = ({item}) => {
@@ -55,7 +56,7 @@ export default function MenuUtama({navigation}) {
     var dt = item.created_at
     return (
       <>
-        <View>
+        <ScrollView>
           <TouchableOpacity
             onPress={() => navigation.navigate('Detail Reschedule', {reschedule: item})}
           >
@@ -69,7 +70,7 @@ export default function MenuUtama({navigation}) {
                       <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
                     </View>
                     {(() => {
-                    if(item.ket_persetujuan_kepala_dinas === 'setuju'){
+                    if(item.ket_persetujuan_kepala_uptd === 'setuju'){
                       return(
                         <View style={{ borderWidth:2, borderRadius:8, borderColor: '#11CF00', alignItems:'center', padding:2}}>
                           <Text style={{ textAlign:'right', color:'#11CF00', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan telah disetujui</Text>
@@ -77,14 +78,14 @@ export default function MenuUtama({navigation}) {
                       )
                     }
                     if(item.ket_persetujuan_kepala_uptd !== 'tolak' && item.ket_verif_admin !== 'tolak'){
-                      if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'verif'){
+                      if(item.ket_persetujuan_kepala_uptd === 'belum' && item.ket_verif_admin === 'verif'){
                         return(
                           <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
                             <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu persetujuan</Text>
                           </View>
                         )
                       }
-                      else if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'belum'){
+                      else if(item.ket_persetujuan_kepala_uptd === 'belum' && item.ket_verif_admin === 'belum'){
                         return(
                           <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
                             <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu verifikasi</Text>
@@ -92,7 +93,7 @@ export default function MenuUtama({navigation}) {
                         )
                       }
                     }
-                    if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak' || item.ket_persetujuan_kepala_dinas === 'tolak'){
+                    if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak'){
                       return(
                         <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FB1313', alignItems:'center', padding:2}}>
                           <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan Ditolak</Text>
@@ -106,7 +107,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                       <View>
-                        <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                        <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                         <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{alat?.[0]?.nama}</Text>
                       </View>
                       <View>
@@ -166,7 +167,7 @@ export default function MenuUtama({navigation}) {
               </View>
             </View>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </>
     );
   }
@@ -174,12 +175,12 @@ export default function MenuUtama({navigation}) {
   return (
     <>
       <View>
-        <View style={{ borderWidth:2, margin: 16, width:'50%', borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
-          <Ionicons name="add" size={32} color="#25185A" />
-          <Text style={{ fontWeight: 'bold' }}>Ajukan Reschedule</Text>
-        </View>
+      <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+        <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Perubahan Jadwal</Text>
+      </View>
+      {refreshing ? <ActivityIndicator /> : null}
         <View style={styles.container}>
-          <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
+          <SafeAreaView style={{ justifyContent: 'center', flexDirection: "row", flex:1, marginBottom:32}}>
             {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -192,20 +193,22 @@ export default function MenuUtama({navigation}) {
               }}>
                 <ActivityIndicatorExample style={ styles.progress }/>
               </View> : (
-              <FlatList
-                style={{ margin:0 }}
-                data={data}
-                vertical
-                key={1}
-                numColumns={1}
-                nestedScrollEnabled
-                // fadingEdgeLength={10}
-                keyExtractor={item=>item.id}
-                renderItem={listOrders}
-                onEndReachedThreshold={0.5}
-                // getItemCount={getItemCount}
-                // getItem={getItem}
-              />
+              <View>
+                <FlatList
+                  style={{ margin:0 }}
+                  data={data}
+                  vertical
+                  key={1}
+                  numColumns={1}
+                  nestedScrollEnabled
+                  // fadingEdgeLength={10}
+                  keyExtractor={item=>item.id}
+                  renderItem={listOrders}
+                  onEndReachedThreshold={0.5}
+                  // getItemCount={getItemCount}
+                  // getItem={getItem}
+                />
+              </View>
             )}
           </SafeAreaView>
         </View>
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     margin:4,
-    backgroundColor: '#25185A',
+    backgroundColor: '#ffd700',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
@@ -393,7 +396,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     width: '100%',
     height: 280,
-    borderColor:'green',
+    borderColor:'#2196F3',
     borderWidth:2
   }
 });

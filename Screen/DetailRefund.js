@@ -35,7 +35,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/refunds')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -49,7 +49,7 @@ export default function DetaiRefund({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/detail-refunds')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-refunds')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -96,7 +96,7 @@ export default function DetaiRefund({ navigation, route }) {
                   <Text>{item.metode_refund}</Text>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 20,
-    borderColor: '#364878'
+    borderColor: '#ffcd04'
   },
   btnSearch: {
     width: 18,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius:15,
     borderTopRightRadius:15,
     marginTop:16,
-    borderColor:'green',
+    borderColor:'#2196F3',
     borderWidth:2
   },
   icon: {

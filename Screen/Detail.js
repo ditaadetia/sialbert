@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import { Text, View, StyleSheet, Image, Button, ImageBackground, FlatList, SafeAreaView, ScrollView, Dimensions, Picker, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState, useContext} from 'react';
+import { Text, View, StyleSheet, Image, Button, ImageBackground, FlatList, Alert, SafeAreaView, ScrollView, Dimensions, Picker, TouchableOpacity } from 'react-native';
 import Cart from "../assets/image/cart.png";
 import Notif from "../assets/image/notif.png";
 import { AntDesign } from '@expo/vector-icons'
@@ -10,22 +10,24 @@ import DatePicker from 'react-native-datepicker';
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import DateRangePicker from "react-native-daterange-picker";
 // import * as Calendar from 'expo-calendar';
 // import EventCalendar from 'react-native-events-calendar';
+import { CartContext } from './../components/CartContext';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 // import { Calendar } from 'react-native-calendario';
 import DateRangePicker from "rnv-date-range-picker";
 let {width} = Dimensions.get('window');
-import { CartContext } from './CartContext';
+// import { CartContext } from './CartContext';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
-
 
 export default function Detail({ navigation, route }) {
     const {alat} = route.params
     const [product, setProduct] = useState({});
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isAdd, setIsAdd] = useState(false);
     const [selectedRange, setRange] = useState({});
     const [date1, setDate] = useState(new Date());
     const [date2, setDate2] = useState(new Date());
@@ -35,9 +37,58 @@ export default function Detail({ navigation, route }) {
     const [show2, setShow2] = useState(false);
     const [currentDate, setCurrentDate] = useState();
 
+    // const { addItemToCart } = useContext(CartContext);
+    // const [items, setItems] = useState([]);
+    const {storedCart, setStoredCart} = useContext(CartContext);
+    const {itemCount} = useContext(CartContext);
+    const {items, setItems} = useContext(CartContext);
+    // const {nama} = storedCart;
+
+    const id= alat.id
+    const harga=alat.harga_sewa_perhari
+    const nama_alat=alat.nama
+
+
+    const addCart = (alat) => {
+        persistCart(alat);
+        setIsAdd(true);
+    };
+
+    const persistCart = (cart) => {
+        AsyncStorage.setItem('cartCredentials', JSON.stringify(alat))
+        .then(() => {
+            // setStoredCart(alat);
+            const product = alat;
+            setItems((prevItems) => {
+                const alat = prevItems.find((alat) => (alat.id == id));
+                if(!alat) {
+                    return [...prevItems, {
+                        id,
+                        qty: 1,
+                        product,
+                        totalPrice: product.harga_sewa_perjam,
+                    }];
+                    alat.qty++
+                }
+                else {
+                    Alert.alert("Cart", "Alat sudah ada di keranjang!", [
+                        {
+                          text:"OK",
+                          onPress: () => {},
+                        },
+                    ])
+                    return [...prevItems];
+                }
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+
     useEffect(async() => {
         setIsLoading(true);
-        fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/schedule/' + alat.id)
+        fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/schedule/' + alat.id)
           .then((response) => response.json())
           .then((hasil) => {
             setData(hasil);
@@ -46,7 +97,7 @@ export default function Detail({ navigation, route }) {
           })
           // .finally(() => setLoading(false));
           .catch(error => { console.log; });
-
+        let isMounted = true
     }, []);
     const listOrders = ({item}) => {
         const tanggal = [...item.tanggal_mulai]
@@ -89,8 +140,18 @@ export default function Detail({ navigation, route }) {
         showMode2('time');
     };
 
-    console.log(date1)
-    console.log(date2)
+    console.log(items, product)
+
+    const cekCart = () => {
+        Alert.alert("Cart", "Alat sudah ada di keranjang!", [
+            {
+              text:"OK",
+              onPress: () => {},
+            },
+        ]);
+    }
+    // console.log(date1)
+    // console.log(date2)
     // const data2= data.map((item, idx) => {
     //     const tanggal_mulai = item.tanggal_mulai
     //     const tanggal_selesai = item.tanggal_selesai
@@ -142,7 +203,7 @@ export default function Detail({ navigation, route }) {
         }
         return {...acc, ...dateRange};
     }, {});
-    console.log(calenderItems)
+    // console.log(calenderItems)
     // calenderItems = Object.keys(calenderItems)
     // .sort()
     // .reduce((obj, key) => {
@@ -193,13 +254,9 @@ export default function Detail({ navigation, route }) {
 
 
     return (
-        <ScrollView>
+        <ScrollView style={{ backgroundColor:'#fff' }}>
             <View style={{ backgroundColor:'#fff' }}>
-                <View style={styles.headerContainer}>
-                    <AntDesign name="leftcircle" size={36} color='#25185A'/>
-                    <MaterialCommunityIcons name="cart" size={36} color='#25185A'/>
-                </View>
-                <View style={{ height:300, width: '100%' }}>
+                <View style={{ height:250, width: '100%' }}>
                     <Image source={{uri: alat.foto}} style={styles.equipmentImage}/>
                 </View>
                 <View style= {{ flexDirection:'row', justifyContent: 'space-between' }}>
@@ -278,7 +335,7 @@ export default function Detail({ navigation, route }) {
                     <Calendar
                         markingType={'period'}
                         onDayPress={day => {
-                            console.log('selected day', day);
+                            // console.log('selected day', day);
                         }}
                         markedDates={calenderItems}
                         // disabledDaysIndexes={[0, 6]}
@@ -288,6 +345,11 @@ export default function Detail({ navigation, route }) {
                     />
                 </View>
             </SafeAreaView>
+            <TouchableOpacity onPress={addCart} style={{ margin: 16}}>
+                <View style={styles.pickButton}>
+                    <Text style={styles.buttonTitle}>Tambah ke keranjang</Text>
+                </View>
+            </TouchableOpacity>
         </ScrollView>
     );
 }
@@ -330,7 +392,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#ffd700',
         borderRadius: 8,
-        height: 36,
+        height: 48,
         justifyContent: 'center',
         textAlign: 'center',
         marginTop: 8,

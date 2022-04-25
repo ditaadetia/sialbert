@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Alert, Text, View, Image, FlatList, TextInput, Modal, ActivityIndicator, Pressable, ToastAndroid, SafeAreaView, TouchableOpacity, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import { ScrollView } from "react-native-gesture-handler";
@@ -8,12 +8,41 @@ import { AntDesign } from '@expo/vector-icons'
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from 'react-native-paper';
 import Moment from 'moment';
+import {Picker} from '@react-native-picker/picker';
+// import { downloadToFolder } from 'expo-file-dl';
+// import { Constants } from 'react-native-unimodules';
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from '../components/CredentialsContext';
 import { StatusBar } from 'expo-status-bar';
+import * as FileSystem from 'expo-file-system';
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+import * as MediaLibrary from 'expo-media-library';
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
+import axios from 'axios';
 
 import Rent from "../assets/image/rent-active.png";
+
+import {
+  AndroidImportance,
+  AndroidNotificationVisibility,
+  NotificationChannel,
+  NotificationChannelInput,
+  NotificationContentInput,
+} from "expo-notifications";
+import { downloadToFolder } from "expo-file-dl";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const channelId = "DownloadInfo";
 
 const win = Dimensions.get("window");
 
@@ -25,14 +54,64 @@ export default function MenuUtama({navigation}) {
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [message, setMessage] = useState();
+  const [messageType, setMessageType] = useState();
+  const [order_id, setOrderId] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [lainnya, setLainnya] = useState('');
+  const [nama_di_rekening, setNamaDiRekening] = useState('');
+  const [noRek, setNoRek] = useState('');
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
-  const {nama, email} = storedCredentials;
+  const {nama, email, id} = storedCredentials;
 
+  // const [downloadProgress, setDownloadProgress] = useState(0);
+  const [document, setDocument] = useState(null);
+  const [downloadProgress, setDownloadProgress] = useState("0%");
+  const [selectedValue, setFieldValue] = useState('1');
+
+  async function setNotificationChannel() {
+    const loadingChannel = await Notifications.getNotificationChannelAsync(
+      channelId
+    );
+
+    // if we didn't find a notification channel set how we like it, then we create one
+    if (loadingChannel == null) {
+      const channelOptions = {
+        name: channelId,
+        importance: AndroidImportance.HIGH,
+        lockscreenVisibility: AndroidNotificationVisibility.PUBLIC,
+        sound: "default",
+        vibrationPattern: [250],
+        enableVibrate: true,
+      };
+      await Notifications.setNotificationChannelAsync(
+        channelId,
+        channelOptions
+      );
+    }
+  }
+
+  useEffect(async () => {
+    await MediaLibrary.requestPermissionsAsync();
+    await Notifications.requestPermissionsAsync();
+    setNotificationChannel();
+    let isMounted = true
+  }, []);
+
+  const downloadProgressUpdater = ({
+    totalBytesWritten,
+    totalBytesExpectedToWrite,
+  }) => {
+    const pctg = 100 * (totalBytesWritten / totalBytesExpectedToWrite);
+    setDownloadProgress(`${pctg.toFixed(0)}%`);
+  };
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/refunds')
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/riwayat-pembatalan/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -41,12 +120,12 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-
+      let isMounted = true
   }, []);
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/detail-refunds')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -55,23 +134,29 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-
+      let isMounted = true
   }, []);
+
+  const openSettingModal = (order_id) => {
+    setOrderId(order_id);
+    setModalVisible(!modalVisible);
+  }
 
   const listOrders = ({item}) => {
     const alat = [...item.alat]
     const inisialValue = 0
     var i;
+    const total_hari = item.total_hari
+    const total_jam = item.total_jam
     const count = alat.length
-    const jumlah_refund_perhari = alat?.[0]?.harga_sewa_perhari * alat?.[0]?.jumlah_hari_refund
-    const jumlah_refund_perjam = alat?.[0]?.harga_sewa_perjam * alat?.[0]?.jumlah_hari_refund
-    const sum = jumlah_refund_perhari + jumlah_refund_perjam
+    const harga_perhari = alat?.[0]?.harga_sewa_perhari * total_hari
+    const harga_perjam = alat?.[0]?.harga_sewa_perjam * total_jam
+    const sum = harga_perhari + harga_perjam
     const nama = alat?.[0]?.nama
-    const jumlah_hari_refund = alat?.[0]?.jumlah_hari_refund
-    const jumlah_jam_refund = alat?.[0]?.jumlah_jam_refund
+    const order_id = alat?.[0]?.id
     const total_harga = alat.reduce((total,item)=>{
-      const harga_sewa_perhari = item.jumlah_hari_refund * item.harga_sewa_perhari
-      const harga_sewa_perjam = item.jumlah_jam_refund * item.harga_sewa_perjam
+      const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
+      const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
       const total_biaya = harga_sewa_perhari+harga_sewa_perjam
       return total + total_biaya;
     },0)
@@ -82,154 +167,395 @@ export default function MenuUtama({navigation}) {
     var idLocale=require('moment/locale/id');
     Moment.locale('id');
     var dt = item.created_at
+    var id_order =item.id
+    var nama_instansi =item.nama_instansi
+
+    const handleAjukanRefund = (order_id) => {
+      handleMessage(null);
+      setVisible(true)
+      setIsDisabled(true);
+      if(selectedValue != 'Pilih' && nama_di_rekening != ''){
+        if(selectedValue != 'Bank Lainnya'){
+          axios({
+            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/refunds/${order_id}`,
+            method:"POST",
+            data:
+            {
+              order_id:order_id,
+              tenant_id: id,
+              metode_refund: selectedValue,
+              no_rekening: noRek,
+              nama_penerima: nama_di_rekening,
+              detail_order_id: item.id,
+              ket_verif_admin: 'belum',
+              ket_persetujuan_kepala_uptd: 'belum',
+              ket_persetujuan_kepala_dinas: 'belum',
+            },
+          })
+          .then((response) => {
+            const result = response.data;
+            const { message, success, status } = result;
+            console.log(response.data);
+            alat.map((item)=> {
+              axios({
+                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-refunds/${item.id}`,
+                method:"POST",
+                data:
+                {
+                  order_id:order_id,
+                  detail_order_id: item.id,
+                },
+              })
+              .then((response) => {
+                const result = response.data;
+                const { message, success, status } = result;
+                console.log(response.data);
+                setVisible(false)
+                setIsDisabled(false);
+                setModalVisible(!modalVisible)
+              })
+              .catch((error)=> {
+                // console.error('error', error);
+                console.log(error.response)
+                handleMessage("Gagal!");
+              });
+            })
+            if(status == 'success'){
+              Alert.alert("Berhasil", "Pengajuan Refund Berhasil!", [
+                {
+                  text:"OK",
+                  onPress: () => navigation.navigate('Pembatalan'),
+                },
+              ]);
+            } else if(status == 'failed'){
+              Alert.alert("Tidak dapat mengajukan pengembalian dana!", "Anda telah mengajukan pengembalian dana untuk pesanan ini.");
+            }
+            setVisible(false)
+            setIsDisabled(false);
+            setModalVisible(!modalVisible)
+          })
+          .catch((error)=> {
+            // console.error('error', error);
+            console.log(error.response)
+            handleMessage("Gagal!");
+          });
+        } else {
+          axios({
+            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/refunds/${order_id}`,
+            method:"POST",
+            data:
+            {
+              order_id:order_id,
+              tenant_id: id,
+              metode_refund: selectedValue,
+              no_rekening: noRek,
+              nama_penerima: nama_di_rekening,
+              detail_order_id: item.id,
+              ket_verif_admin: 'belum',
+              ket_persetujuan_kepala_uptd: 'belum',
+              ket_persetujuan_kepala_dinas: 'belum',
+            },
+          })
+          .then((response) => {
+            const result = response.data;
+            const { message, success, status } = result;
+            console.log(response.data);
+            alat.map((item)=> {
+              axios({
+                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-refunds/${item.id}`,
+                method:"POST",
+                data:
+                {
+                  order_id:order_id,
+                  detail_order_id: item.id,
+                },
+              })
+              .then((response) => {
+                const result = response.data;
+                const { message, success, status } = result;
+                console.log(response.data);
+                setVisible(false)
+                setIsDisabled(false);
+                setModalVisible(!modalVisible)
+              })
+              .catch((error)=> {
+                // console.error('error', error);
+                console.log(error.response)
+                handleMessage("Gagal!");
+              });
+            })
+            if(status == 'success'){
+              Alert.alert("Berhasil", "Pengajuan Refund Berhasil!", [
+                {
+                  text:"OK",
+                  onPress: () => navigation.navigate('Pembatalan'),
+                },
+              ]);
+            } else if(status == 'failed'){
+              Alert.alert("Tidak dapat mengajukan pengembalian dana!", "Anda telah mengajukan pengembalian dana untuk pesanan ini.");
+            }
+            setVisible(false)
+            setIsDisabled(false);
+            setModalVisible(!modalVisible)
+          })
+          .catch((error)=> {
+            // console.error('error', error);
+            console.log(error.response)
+            handleMessage("Gagal!");
+          });
+        }
+      }else{
+        if(selectedValue == 'Pilih'){
+          Alert.alert('Harap isi metode pembayaran!')
+          setVisible(false)
+          setIsDisabled(false);
+        }
+        if(nama_di_rekening == ''){
+          Alert.alert('Harap isi nama di rekening!')
+          setVisible(false)
+          setIsDisabled(false);
+        }
+        if(noRek == ''){
+          Alert.alert('Harap isi nomor rekening!')
+          setVisible(false)
+          setIsDisabled(false);
+        }
+      }
+    };
+
+    const handleMessage = (message, type = 'failed') => {
+      setMessage(message);
+      setMessageType(type);
+    }
+
+    const letHide = () => {
+      if (visible === true) {
+        setVisible(false)
+      } else {
+        setVisible(true)
+      }
+    }
+
+    const doYourTask = () => {
+      setIsDisabled(true);
+    }
+
     return (
       <>
-        <View>
+        <ScrollView>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Detail Refund', {refund: item})}
+            onPress={() => navigation.navigate('Detail Order', {order: item})}
           >
             <View style={{ flexDirection:'row', textAlign:'center', textAlignVertical: 'center'}}>
               <View style={{ flexDirection:'row', margin:16, textAlign:'center', textAlignVertical: 'center',justifyContent: 'center' }}>
                 {/* <Image source={{uri: item.foto}} style={styles.myequipmentImage} /> */}
                 <Card style={styles.card}>
-                  <View style={{ margin:16, flexDirection:'row', justifyContent: "space-between"}}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Image source={Rent} style={{ width:24, height:24, marginRight:8 }} />
-                      <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
-                    </View>
-                    {(() => {
-                    if(item.ket_persetujuan_kepala_dinas === 'setuju'){
-                      return(
-                        <View style={{ borderWidth:2, borderRadius:8, borderColor: '#11CF00', alignItems:'center', padding:2}}>
-                          <Text style={{ textAlign:'right', color:'#11CF00', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan telah disetujui</Text>
-                        </View>
-                      )
-                    }
-                    if(item.ket_persetujuan_kepala_uptd !== 'tolak' && item.ket_verif_admin !== 'tolak'){
-                      if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'verif'){
-                        return(
-                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
-                            <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu persetujuan</Text>
+                  {(() => {
+                    const order_id = item.id
+                    console.log(order_id)
+                    return (
+                      <View>
+                        <View style={{ margin:16, flexDirection:'row', justifyContent: "space-between"}}>
+                          <View style={{ flexDirection: 'row' }}>
+                            <Image source={Rent} style={{ width:24, height:24, marginRight:8 }} />
+                            <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
                           </View>
-                        )
-                      }
-                      else if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'belum'){
-                        return(
-                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
-                            <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu verifikasi</Text>
-                          </View>
-                        )
-                      }
-                    }
-                    if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak' || item.ket_persetujuan_kepala_dinas === 'tolak'){
-                      return(
-                        <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FB1313', alignItems:'center', padding:2}}>
-                          <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan Ditolak</Text>
+                          {(() => {
+                          if(item.ket_persetujuan_kepala_dinas === 'setuju'){
+                            return(
+                              <View style={{ borderWidth:2, borderRadius:8, borderColor: '#11CF00', alignItems:'center', padding:2}}>
+                                <Text style={{ textAlign:'right', color:'#11CF00', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan telah disetujui</Text>
+                              </View>
+                            )
+                          }
+                          if(item.ket_persetujuan_kepala_uptd !== 'tolak' && item.ket_verif_admin !== 'tolak'){
+                            if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'verif'){
+                              return(
+                                <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
+                                  <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu persetujuan</Text>
+                                </View>
+                              )
+                            }
+                            else if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'belum'){
+                              return(
+                                <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
+                                  <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu verifikasi</Text>
+                                </View>
+                              )
+                            }
+                          }
+                          if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak' || item.ket_persetujuan_kepala_dinas === 'tolak'){
+                            return(
+                              <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FB1313', alignItems:'center', padding:2}}>
+                                <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan Ditolak</Text>
+                              </View>
+                            )
+                          }
+                          return null;
+                          })()}
                         </View>
-                      )
-                    }
-                    return null;
-                    })()}
-                  </View>
-                  <View style={styles.border2}/>
-                  <View style={{ margin:16 }}>
-                    <Text>{item.metode_refund}</Text>
-                    <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <View>
-                        <Image source={{ uri:'http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
-                        <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{nama}</Text>
-                      </View>
-                      <View>
-                        <Text style={{ opacity: 0.4, fontSize:12 }}>Jumlah hari refund</Text>
-                        <Text style={{ fontWeight:'bold', marginBottom:8, fontSize:12 }}>{jumlah_hari_refund} X Rp.{(alat?.[0]?.harga_sewa_perhari).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                        <Text style={{ opacity: 0.4, fontSize:12 }}>Jumlah jam refund</Text>
-                        <Text style={{ fontWeight:'bold', marginBottom:4, fontSize:12 }}>{jumlah_jam_refund} X Rp.{(alat?.[0]?.harga_sewa_perjam).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                      </View>
-                      <View>
-                        <Text style={{ fontSize:12 }}>x1</Text>
-                        <Text style={{ marginBottom:8, fontWeight:'bold', fontSize:12 }}>Rp.{jumlah_refund_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                        <Text style={{ fontSize:12 }}>x1</Text>
-                        <Text style={{ fontWeight:'bold', fontSize:12 }}>Rp.{jumlah_refund_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                      </View>
-                    </View>
-                    <View style={styles.border1}/>
-                    <View style={{ flexDirection:'row', justifyContent: "space-between", marginTop:8 }}>
-                      <Text>{count} Alat</Text>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text>Total Pesanan:</Text>
-                        <Text style={{ marginLeft:8, fontWeight: 'bold' }}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                      </View>
-                      {/* {alat &&
-                        alat.map((item, idx) => {
-                          const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
-                          const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
-                          const total = harga_sewa_perjam + harga_sewa_perhari
-                          return(
-                            <View key={idx}>
-                              <Text>{total}</Text>
+                        <View style={styles.border2}/>
+                        <View style={{ margin:16 }}>
+                          <Text>{item.nama_instansi}</Text>
+                          <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
+                            <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                            <View>
+                              <Text>{nama}</Text>
+                              <Text>x1</Text>
+                              <Text style={{ fontWeight:'bold' }}>Rp.{sum.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
                             </View>
-                          )
-                        })
-                      } */}
+                          </View>
+                          <View style={styles.border2}/>
+                          <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
+                            <Text>{count} Alat</Text>
+                            <View style={{ flexDirection: 'row', marginTop:4 }}>
+                              <Text>Total Pesanan:</Text>
+                              <Text style={{ marginLeft:8 , fontWeight:'bold'}}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                            </View>
+                            {/* {alat &&
+                              alat.map((item, idx) => {
+                                const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
+                                const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
+                                const total = harga_sewa_perjam + harga_sewa_perhari
+                                return(
+                                  <View key={idx}>
+                                    <Text>{total}</Text>
+                                  </View>
+                                )
+                              })
+                            } */}
+                          </View>
+                        </View>
+                        <View style={styles.border2}/>
+                        <Text style={{ textAlign:'center', margin: 4, color: "#C4C4C4"}}>Lihat Detail</Text>
+                        <View style={styles.border2}/>
+                        <View style={{ flexDirection:'row', margin:4 }}>
+                          <TouchableOpacity
+                            // onPress={(e) =>
+                            //   {
+                            //     onPress={() => openSettingModal(detail_order_id)}
+                            //     handleAjukanRefund(e, order_id)
+                            //   }
+                            // }
+                            onPress={() => openSettingModal(order_id)}>
+                            <View style={styles.button}>
+                              <Text style={styles.buttonTitle}>Ajukan Pengembalian Dana</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
                     </View>
-                  </View>
-                  <View style={styles.border2}/>
-                  <Text style={{ textAlign:'center', margin: 4, color: "#C4C4C4"}}>Lihat Detail</Text>
-                  <View style={styles.border2}/>
-                  <View style={{ flexDirection:'row', margin:4 }}>
-                    <TouchableOpacity>
-                      <View style={styles.btn}>
-                        <Text style={styles.buttonTitle}>Download Bukti Bayar</Text>
+                    )
+                  })()}
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => {
+                      // Alert.alert("Modal has been closed.");
+                      setModalVisible(!modalVisible);
+                    }}
+                  >
+                    <View style={styles.centeredView}>
+                      <View style={styles.modalView}>
+                      <View style={{ width: '100%' }}>
+                        <View style={{ margin: 8, backgroundColor: '#ffd700', borderRadius: 20, borderColor: '#ffd700', borderWidth:2 }}>
+                          <Picker
+                            style={styles.pickerCustomeStyle}
+                            mode='dropdown'
+                            style={{ color: 'white'}}
+                            // value={rekening}
+                            selectedValue={selectedValue}
+                            onValueChange={(itemValue, itemIndex) =>
+                              setFieldValue(itemValue)
+                            }
+                            >
+                            <Picker.Item label="--Pilih Bank--" value="Pilih" key={1}/>
+                            <Picker.Item label="Bank Kalbar" value="Bank Kalbar" key={2}/>
+                            <Picker.Item label="Bank BCA" value="Bank BCA" key={3}/>
+                            <Picker.Item label="Bank Mandiri" value="Bank Mandiri" key={4}/>
+                            <Picker.Item label="Bank BNI" value="Bank BNI" key={5}/>
+                            <Picker.Item label="Bank BRI" value="Bank BRI" key={6}/>
+                            <Picker.Item label="Bank Syariah Indonesia (BSI)" value="Bank Syariah Indonesia (BSI)" key={7}/>
+                            <Picker.Item label="Bank Permata" value="Bank Permata" key={8}/>
+                            <Picker.Item label="Bank lainnya" value="Bank Lainnya" key={9}/>
+                          </Picker>
+                        </View>
+                        {selectedValue == 'Bank Lainnya' &&
+                          <TextInput
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            returnKeyType="next"
+                            placeholder="Isi nama Bank"
+                            style={styles.textInput}
+                            onChangeText={setLainnya}
+                            value={lainnya}
+                            editable={true}
+                          />
+                        }
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          keyboardType='number-pad'
+                          placeholder="Nomor Rekening"
+                          style={styles.textInput}
+                          onChangeText={setNoRek}
+                          value={noRek}
+                          editable={true}
+                        />
+                        <TextInput
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          returnKeyType="next"
+                          placeholder="Nama di rekening"
+                          style={styles.textInput}
+                          onChangeText={setNamaDiRekening}
+                          value={nama_di_rekening}
+                          editable={true}
+                        />
+                        <TouchableOpacity onPress={() => handleAjukanRefund(order_id)}
+                        disabled={isDisabled}>
+                          <View style={styles.btn}>
+                            {visible == true &&
+                              <ActivityIndicator
+                                size="large"
+                                color="#00B8D4"
+                                animating={visible}
+                              />
+                            }
+                            {visible == false &&
+                              <Text style={styles.textStyle}>KIRIM</Text>
+                            }
+                          </View>
+                        </TouchableOpacity>
+                        <Pressable
+                          style={[styles.button, styles.buttonClose]}
+                          onPress={() => setModalVisible(!modalVisible)}
+                        >
+                          <Text style={styles.textStyle}>BATALKAN</Text>
+                        </Pressable>
                       </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity>
-                      <View style={styles.btn}>
-                        <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
                       </View>
-                    </TouchableOpacity>
-                  </View>
-                  {/* <Text>{item.alat}</Text> */}
-                  {/* {alat.map((item)=>
-                    <Card key={item.id} {...item} >
-                    <Text>{item.alat}</Text>
-                    </Card>
-                  )} */}
-                    {/* <View>
-                      <FlatList
-                        data={equipments}
-                        horizontal
-                        key={1}
-                        numColumns={1}
-                        nestedScrollEnabled
-                        // fadingEdgeLength={10}
-                        keyExtractor={item=>item.id}
-                        // {item.id === item.order_id
-
-                        // }
-                        renderItem={listEquipments}
-                        onEndReachedThreshold={0.5}
-                        // getItemCount={getItemCount}
-                        // getItem={getItem}
-                      />
-                    </View> */}
+                    </View>
+                  </Modal>
                 </Card>
               </View>
             </View>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </>
     );
   }
 
   return (
     <>
-      <View>
-        <View style={{ borderWidth:2, margin: 16, width:'50%', borderRadius:20, borderColor: '#C4C4C4', alignItems:'center', padding: 8, flexDirection:'row' }}>
-          <Ionicons name="add" size={32} color="#25185A" />
-          <Text style={{ fontWeight: 'bold' }}>Ajukan Refund</Text>
+      <View style={{ height: '100%', paddingBottom: 48 }}>
+        <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+          <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Pembatalan</Text>
         </View>
+        <StatusBar style="auto" />
         <View style={styles.container}>
-          <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
+          <View style={{ justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -242,22 +568,34 @@ export default function MenuUtama({navigation}) {
               }}>
                 <ActivityIndicatorExample style={ styles.progress }/>
               </View> : (
-              <FlatList
-                style={{ margin:0 }}
-                data={data}
-                vertical
-                key={1}
-                numColumns={1}
-                nestedScrollEnabled
-                // fadingEdgeLength={10}
-                keyExtractor={item=>item.id}
-                renderItem={listOrders}
-                onEndReachedThreshold={0.5}
-                // getItemCount={getItemCount}
-                // getItem={getItem}
-              />
+              <View>
+                {data.length <= 0 &&
+                  <View style={{ margin: 16 }}>
+                      <Text>Anda belum pernah melakukan pembatalan</Text>
+                  </View>
+                }
+                {data.length > 0 &&
+                  <View>
+                    <FlatList
+                      style={{ margin:0 }}
+                      data={data}
+                      vertical
+                      key={1}
+                      numColumns={1}
+                      nestedScrollEnabled
+                      // fadingEdgeLength={10}
+                      keyExtractor={item=>item.id}
+                      renderItem={listOrders}
+                      onEndReachedThreshold={0.5}
+                      extraData={data}
+                      // getItemCount={getItemCount}
+                      // getItem={getItem}
+                    />
+                  </View>
+                }
+              </View>
             )}
-          </SafeAreaView>
+          </View>
         </View>
       </View>
     </>
@@ -364,7 +702,6 @@ const styles = StyleSheet.create({
   textInput: {
     elevation: 12,
     flexDirection: "row",
-    marginHorizontal: 16,
     backgroundColor: '#e9e9e9',
     padding: 10,
     marginVertical: 16,
@@ -391,12 +728,6 @@ const styles = StyleSheet.create({
     marginLeft:-90,
     marginTop:196
   },
-  border1: {
-    backgroundColor: "#C4C4C4",
-    height: "1%",
-    opacity: 0.4,
-    marginTop:8
-  },
   border2: {
     backgroundColor: "#C4C4C4",
     height: "1%",
@@ -409,19 +740,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   btn: {
-    margin:4,
-    backgroundColor: '#25185A',
+    backgroundColor: '#2196F3',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
     textAlign: 'center',
-    padding:8
+    padding:8,
+    textAlign:'center'
+  },
+  buttonClose: {
+    backgroundColor: "red",
+    marginTop: 4
   },
   buttonTitle: {
     alignItems: 'center',
     textAlign: 'center',
     marginTop: 0,
-    color: '#FFFFFF',
     fontWeight: '600',
     lineHeight: 22,
   },
@@ -440,10 +774,47 @@ const styles = StyleSheet.create({
   },
   card: {
     shadowOffset: {width:0, height:2},
-    shadowOpacity: 0.5,
+    shadowOpacity: 1,
     width: '100%',
-    height: 340,
-    borderColor:'green',
-    borderWidth:2
-  }
+    height: 300,
+    borderColor:'#2196F3',
+    borderWidth:2,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 8,
+    width: '80%',
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 16,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    backgroundColor: '#25185A',
+    borderRadius: 8,
+    height: 48,
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop:4,
+    marginBottom:8,
+    padding:8,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
 });

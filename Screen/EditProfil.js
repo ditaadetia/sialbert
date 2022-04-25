@@ -61,7 +61,7 @@ import picture_account from "../assets/image/acount-inactive.png";
   const handleUploadPhoto = () => {
     handleMessage(null);
     setIsLoading(true);
-    // const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/updatePicture/${id}`;
+    // const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/updatePicture/${id}`;
     const datas = new FormData();
 
     datas.append('foto', {
@@ -75,7 +75,7 @@ import picture_account from "../assets/image/acount-inactive.png";
     console.log(datas);
     if (image != null) {
       axios({
-        url:`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/updatePicture/${id}`,
+        url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/updatePicture/${id}`,
         method:"POST",
         data:datas
       })
@@ -107,7 +107,8 @@ import picture_account from "../assets/image/acount-inactive.png";
     }
 
       // .catch((error)=> {
-      //   console.error('error', error);
+      //   
+      
       //   console.response(response.uri);
 
       //   handleMessage("Tidak ada koneksi internet!");
@@ -131,7 +132,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleEditProfil = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/editProfil/${id}`;
+    const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/editProfil/${id}`;
 
     axios
       .post(url, credentials)
@@ -199,7 +200,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/cekUser/${id}`)
+    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekUser/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setAvatar(hasil);
@@ -236,10 +237,10 @@ import picture_account from "../assets/image/acount-inactive.png";
                   {image ?
                     <Image source={{ uri: image, width: 90, height: 90 }} style={{ borderRadius: 70 }} /> :
                       <>
-                        {avatar.data =='http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/tenant/no-pict.png' &&
+                        {avatar.data =='http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/tenant/no-pict.png' &&
                           <Image source={picture_account} style={picture_account}></Image>
                         }
-                        {avatar.data!='http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/storage/tenant/no-pict.png' &&
+                        {avatar.data!='http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/tenant/no-pict.png' &&
                           <>
                           <Image source={{uri: avatar.data, width: 90, height: 90}} style={{borderRadius: 70}}></Image>
                           </>
@@ -339,7 +340,7 @@ import picture_account from "../assets/image/acount-inactive.png";
                           autoCapitalize="none"
                           autoCorrect={false}
                           returnKeyType="next"
-                          keyboardType='numeric'
+                          keyboardType='phone-pad'
                           // dataDetectorTypes={'phoneNumber'}
                           placeholder="No. Handphone"
                           style={styles.textInput}
@@ -358,7 +359,7 @@ import picture_account from "../assets/image/acount-inactive.png";
                           autoCapitalize="none"
                           autoCorrect={false}
                           returnKeyType="next"
-                          keyboardType='numeric'
+                          keyboardType='phone-pad'
                           placeholder="Kontak Darurat"
                           style={styles.textInput}
                           onChangeText={handleChange('kontak_darurat')}
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 16,
     borderRadius: 20,
-    borderColor: '#364878'
+    borderColor: '#ffcd04'
   },
   safeAreaView: {
     flex: 1,

@@ -8,6 +8,7 @@ import { AntDesign } from '@expo/vector-icons'
 import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from './../components/CredentialsContext';
+import { CartContext } from './../components/CartContext';
 import { StatusBar } from 'expo-status-bar';
 
 import Notif from "../assets/image/notif.png";
@@ -16,6 +17,7 @@ import Search from "../assets/image/search_icon.png";
 import illus from "../assets/image/illustrasi.png";
 import FloatingTabBar from "../components/FloatingTabBar";
 import More from "../assets/image/more.png";
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const win = Dimensions.get("window");
 
@@ -27,6 +29,8 @@ export default function MenuUtama({navigation}) {
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email} = storedCredentials;
+  // const {storedCart, setStoredCart} = useContext(CartContext);
+  const {items, setItems} = useContext(CartContext);
   const clearLogin = () => {
     AsyncStorage
     .removeItem('sialbertCredentials')
@@ -43,9 +47,10 @@ export default function MenuUtama({navigation}) {
     ]);
   }
 
+
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://d480-2001-448a-6060-f025-e101-75c0-9054-d867.ngrok.io/api/equipments')
+    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/equipments')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -55,13 +60,7 @@ export default function MenuUtama({navigation}) {
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-
   }, []);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   getEquipments();
-  // }, []);
 
   const cariData = (text) => {
     const newData = cari.filter((item) => {
@@ -99,10 +98,13 @@ export default function MenuUtama({navigation}) {
     <>
       <View style={{ backgroundColor: '#FFFFFF' }}>
         <View style={styles.headerContainer}>
-          <Image source={Notif} />
+          <Icon name="notifications" size={28} color='#ffd700'/>
           <Text style={styles.textHeader}>SI-ALBERT</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-            <Image source={Cart} />
+          <TouchableOpacity style={{ padding: 5 }} onPress={() => {navigation.navigate('Cart')}}>
+            <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', right: 18, bottom: 18, alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
+                <Text>{items.length}</Text>
+            </View>
+            <Icon name="ios-cart" size={28} color='#ffd700'/>
           </TouchableOpacity>
         </View>
         <View style={styles.container}>
