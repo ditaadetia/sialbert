@@ -223,7 +223,7 @@ export default function FormulirOrder({navigation, route}) {
     if(hoursDiff > 0){
       if (ktp != null) {
         axios({
-          url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/${id}`,
+          url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/${id}`,
           method:"POST",
           data:
           {
@@ -250,7 +250,7 @@ export default function FormulirOrder({navigation, route}) {
 
           if (ktp != null) {
             axios({
-              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/ktp/${id}`,
+              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/ktp/${id}`,
               method:"POST",
               data: datasKtp
             })
@@ -259,7 +259,7 @@ export default function FormulirOrder({navigation, route}) {
               const { message, success, status, hasil } = result;
               items.map((item)=> {
                 axios({
-                  url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders/post/${id}`,
+                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders/post/${id}`,
                   method:"POST",
                   data:
                   {
@@ -294,18 +294,18 @@ export default function FormulirOrder({navigation, route}) {
           } else {
             alert('KTP tidak boleh kosong!');
           }
-  
+
           const datasAktaNotaris = new FormData();
-  
+
           datasAktaNotaris.append('akta_notaris', {
             name: 'akta_notaris.jpg',
             type: 'image/jpeg',
             uri:  aktaN,
           });
-  
+
           if (ktp != null) {
             axios({
-              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/aktaNotaris/${id}`,
+              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/aktaNotaris/${id}`,
               method:"POST",
               data: datasAktaNotaris
             })
@@ -330,7 +330,7 @@ export default function FormulirOrder({navigation, route}) {
   
           if (ktp != null) {
             axios({
-              url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/suratPengantar/${id}`,
+              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/suratPengantar/${id}`,
               method:"POST",
               data: datasSuratPengantar
             })

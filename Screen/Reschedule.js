@@ -33,11 +33,11 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/reschedules/${id}`)
+    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData(hasil);
-        setCari(hasil);
+        setData([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -107,7 +107,7 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                       <View>
-                        <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                        <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                         <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{alat?.[0]?.nama}</Text>
                       </View>
                       <View>
@@ -127,7 +127,7 @@ export default function MenuUtama({navigation}) {
                   <View style={styles.border2}/>
                   <Text style={{ textAlign:'center', margin: 4, color: "#C4C4C4"}}>Lihat Detail</Text>
                   <View style={styles.border2}/>
-                  <View style={{ flexDirection:'row', margin:4 }}>
+                  {/* <View style={{ flexDirection:'row', margin:4 }}>
                     <TouchableOpacity>
                       <View style={styles.btn}>
                         <Text style={styles.buttonTitle}>Download Bukti Bayar</Text>
@@ -138,7 +138,7 @@ export default function MenuUtama({navigation}) {
                         <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
                       </View>
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
                   {/* <Text>{item.alat}</Text> */}
                   {/* {alat.map((item)=>
                     <Card key={item.id} {...item} >
@@ -180,7 +180,7 @@ export default function MenuUtama({navigation}) {
       </View>
       {refreshing ? <ActivityIndicator /> : null}
         <View style={styles.container}>
-          <SafeAreaView style={{ justifyContent: 'center', flexDirection: "row", flex:1, marginBottom:32}}>
+          <SafeAreaView style={{ marginBottom: 120, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -205,6 +205,7 @@ export default function MenuUtama({navigation}) {
                   keyExtractor={item=>item.id}
                   renderItem={listOrders}
                   onEndReachedThreshold={0.5}
+                  extraData={data}
                   // getItemCount={getItemCount}
                   // getItem={getItem}
                 />
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width:0, height:2},
     shadowOpacity: 0.5,
     width: '100%',
-    height: 280,
+    height: 220,
     borderColor:'#2196F3',
     borderWidth:2
   }

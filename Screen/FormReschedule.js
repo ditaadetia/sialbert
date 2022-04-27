@@ -49,7 +49,7 @@ export default function DetaiReschedule({ navigation, route }) {
 
   const handleReschedule = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/reschedules/post`;
+    const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/post`;
 
     if(dayDiffAwal != dayDiff || hoursDiffAwal != hoursDiff)
     {
@@ -59,6 +59,7 @@ export default function DetaiReschedule({ navigation, route }) {
           onPress: () => {},
         },
       ]);
+      setSubmitting(false);
     }
     else{
       axios
@@ -78,20 +79,15 @@ export default function DetaiReschedule({ navigation, route }) {
                 onPress: () => navigation.navigate("Reschedule"),
               },
             ]);
+            setSubmitting(false);
             console.log(response.data);
           }
           else {
             handleMessage("Gagal!");
+            setSubmitting(false);
           }
           // navigation.navigate('MenuUtama');
             // persistLogin({ ...data[0] }, message, status);
-            Alert.alert("Berhasil", "Pengajuan Reschedule Berhasil!", [
-              {
-                text:"OK",
-                onPress: () => navigation.navigate("Reschedule"),
-              },
-            ]);
-          setSubmitting(false);
       })
 
       .catch((error)=> {
@@ -178,7 +174,7 @@ export default function DetaiReschedule({ navigation, route }) {
             <View style={{ margin:16 }}>
               <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                 <View>
-                  <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                  <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
                   <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{reschedule.nama}</Text>
                 </View>
                 <View>

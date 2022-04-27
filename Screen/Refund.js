@@ -53,7 +53,7 @@ export default function MenuUtama({navigation}) {
   const [page, setPage] = useState(1);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [visible, setVisible] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [message, setMessage] = useState();
@@ -111,11 +111,11 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/riwayat-pembatalan/${id}`)
+    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/riwayat-pembatalan/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData(hasil);
-        setCari(hasil);
+        setData([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -125,11 +125,11 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders')
+    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setEquipments(hasil);
-        setCari(hasil);
+        setEquipments([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -166,7 +166,7 @@ export default function MenuUtama({navigation}) {
     // )
     var idLocale=require('moment/locale/id');
     Moment.locale('id');
-    var dt = item.created_at
+    var dt = item.updated_at
     var id_order =item.id
     var nama_instansi =item.nama_instansi
 
@@ -177,7 +177,7 @@ export default function MenuUtama({navigation}) {
       if(selectedValue != 'Pilih' && nama_di_rekening != ''){
         if(selectedValue != 'Bank Lainnya'){
           axios({
-            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/refunds/${order_id}`,
+            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/refunds/${order_id}`,
             method:"POST",
             data:
             {
@@ -198,7 +198,7 @@ export default function MenuUtama({navigation}) {
             console.log(response.data);
             alat.map((item)=> {
               axios({
-                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-refunds/${item.id}`,
+                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
                 method:"POST",
                 data:
                 {
@@ -241,7 +241,7 @@ export default function MenuUtama({navigation}) {
           });
         } else {
           axios({
-            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/refunds/${order_id}`,
+            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/refunds/${order_id}`,
             method:"POST",
             data:
             {
@@ -262,7 +262,7 @@ export default function MenuUtama({navigation}) {
             console.log(response.data);
             alat.map((item)=> {
               axios({
-                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-refunds/${item.id}`,
+                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
                 method:"POST",
                 data:
                 {
@@ -344,7 +344,7 @@ export default function MenuUtama({navigation}) {
       <>
         <ScrollView>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Detail Order', {order: item})}
+            onPress={() => navigation.navigate('Detail Pembatalan', {order: item})}
           >
             <View style={{ flexDirection:'row', textAlign:'center', textAlignVertical: 'center'}}>
               <View style={{ flexDirection:'row', margin:16, textAlign:'center', textAlignVertical: 'center',justifyContent: 'center' }}>
@@ -398,7 +398,7 @@ export default function MenuUtama({navigation}) {
                         <View style={{ margin:16 }}>
                           <Text>{item.nama_instansi}</Text>
                           <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                            <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                            <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                             <View>
                               <Text>{nama}</Text>
                               <Text>x1</Text>

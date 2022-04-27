@@ -45,7 +45,7 @@ export default function formPembayaran({ navigation, route }) {
         handleMessage(null);
         if (buktiPembayaran != null) {
           axios({
-            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/payments`,
+            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/payments`,
             method:"POST",
             data:
             {
@@ -66,7 +66,7 @@ export default function formPembayaran({ navigation, route }) {
 
             if (buktiPembayaran != null) {
             axios({
-                url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/bukti-pembayaran/${id_order}`,
+                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/bukti-pembayaran/${id_order}`,
                 method:"POST",
                 data: datasBuktiPembayaran
             })
@@ -139,7 +139,7 @@ export default function formPembayaran({ navigation, route }) {
             <View style={{ height: '60%'}}>
                 <PDFReader
                     source={{
-                    uri: `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/skrPdf/${id_order}`,
+                    uri: `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/skrPdf/${id_order}`,
                     }}
                 />
             </View>

@@ -103,38 +103,6 @@ export default function DetailOrder({ navigation, route }) {
 
   console.log(payment.data)
 
-  const cekSkr = (credentials) => {
-    const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekSkr/${id_order}`;
-    handleMessage(null);
-
-    axios
-      .get(url, credentials)
-      .then((response) => {
-        const result = response.data;
-        const { message, success, status, data } = result;
-        console.log(response.data);
-
-        if (success == false) {
-          // navigation.navigate('MenuUtama');
-          // navigation.navigate('MenuUtama');
-          // persistLogin({ ...data[0] }, message, status);
-          Alert.alert("Surat Ketetapan Retribusi (SKR) belum terbit!", "Lakukan pembayaran jika SKR telah terbit!", [
-            {
-              text:"OK",
-              onPress: () => {},
-            },
-          ]);
-        }
-        else if (success == true) {
-          navigation.navigate('Pembayaran', {id_order: id_order, skr: data.skr, dateSkr: data.created_at, total_harga: total_harga})
-        }
-    })
-
-    .catch((error)=> {
-      console.error('error', error);
-    });
-  };
-
   // const tes = [...payment.data]
   // console.log(tes.konfirmasi_pembayaran)
 
@@ -359,24 +327,6 @@ export default function DetailOrder({ navigation, route }) {
                       <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
                     }
                   </View>
-                  {payment.status == '3' &&
-                    <TouchableOpacity style={{ marginHorizontal: 16 }}
-                    // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
-                    onPress={cekSkr}>
-                      <View style={styles.btnLanjut}>
-                        <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
-                      </View>
-                    </TouchableOpacity>
-                  }
-                  {payment.status == '4' &&
-                    <TouchableOpacity style={{ marginHorizontal: 16 }}
-                    // onPress={() => navigation.navigate('Pembayaran', {id_order: id_order})}>
-                    onPress={cekSkr}>
-                      <View style={styles.btnLanjut}>
-                        <Text style={styles.buttonTitle}>Lanjutkan Pembayaran</Text>
-                      </View>
-                    </TouchableOpacity>
-                  }
                   <Modal
                     animationType="slide"
                     transparent={true}

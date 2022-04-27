@@ -61,7 +61,7 @@ import picture_account from "../assets/image/acount-inactive.png";
   const handleUploadPhoto = () => {
     handleMessage(null);
     setIsLoading(true);
-    // const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/updatePicture/${id}`;
+    // const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/updatePicture/${id}`;
     const datas = new FormData();
 
     datas.append('foto', {
@@ -75,7 +75,7 @@ import picture_account from "../assets/image/acount-inactive.png";
     console.log(datas);
     if (image != null) {
       axios({
-        url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/updatePicture/${id}`,
+        url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/updatePicture/${id}`,
         method:"POST",
         data:datas
       })
@@ -132,7 +132,7 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   const handleEditProfil = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/editProfil/${id}`;
+    const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/editProfil/${id}`;
 
     axios
       .post(url, credentials)
@@ -200,10 +200,10 @@ import picture_account from "../assets/image/acount-inactive.png";
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/cekUser/${id}`)
+    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekUser/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setAvatar(hasil);
+        setAvatar([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -237,10 +237,10 @@ import picture_account from "../assets/image/acount-inactive.png";
                   {image ?
                     <Image source={{ uri: image, width: 90, height: 90 }} style={{ borderRadius: 70 }} /> :
                       <>
-                        {avatar.data =='http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/tenant/no-pict.png' &&
+                        {avatar.data =='http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/tenant/no-pict.png' &&
                           <Image source={picture_account} style={picture_account}></Image>
                         }
-                        {avatar.data!='http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/tenant/no-pict.png' &&
+                        {avatar.data!='http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/tenant/no-pict.png' &&
                           <>
                           <Image source={{uri: avatar.data, width: 90, height: 90}} style={{borderRadius: 70}}></Image>
                           </>

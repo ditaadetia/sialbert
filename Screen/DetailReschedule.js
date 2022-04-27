@@ -35,11 +35,11 @@ export default function DetaiReschedule({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/reschedules')
+    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules')
       .then((response) => response.json())
       .then((hasil) => {
-        setData(hasil);
-        setCari(hasil);
+        setData([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -78,7 +78,7 @@ export default function DetaiReschedule({ navigation, route }) {
                 <View style={{ margin:16 }}>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>

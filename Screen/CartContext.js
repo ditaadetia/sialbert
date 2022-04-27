@@ -7,7 +7,7 @@ export function CartProvider(props) {
     
     useEffect(async() => {
         setIsLoading(true);
-        fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/equipments')
+        fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/equipments')
         .then((response) => response.json())
         .then((hasil) => {
             setData(hasil);

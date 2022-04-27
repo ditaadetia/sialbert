@@ -35,9 +35,54 @@ export default function pdfFormulirOrder({ text, onOK }) {
         console.log(data);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = (signature) => {
         console.log("end");
         ref.current.readSignature();
+
+        setSign(signature);
+        const path = FileSystem.cacheDirectory + "sign.png";
+        // FileSystem.writeAsStringAsync(
+        //   path,
+        //   signature.replace("data:image/png;base64,", ""),
+        //   { encoding: FileSystem.EncodingType.Base64 }
+        // )
+        // .then(() => {
+        //     FileSystem.getInfoAsync(path)
+        // })
+        // .then(console.log)
+        // .catch(console.error);
+        const datasTtdPemohon = new FormData();
+        console.log(path)
+
+        datasTtdPemohon.append('ttd_pemohon', {
+        name: 'ttd_pemohon.png',
+        type: 'image/png',
+        uri:  path,
+        });
+
+        console.log(datasTtdPemohon)
+        axios({
+            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/ttdPemohon/1`,
+            method:"POST",
+            data: datasTtdPemohon
+        })
+        .then((response) => {
+            const result = response.data;
+            const { message, success, status, data } = result;
+            console.log(response.data);
+            Alert.alert("Berhasil", "Pendatanganan formulir pengajuan berhasil!", [
+            {
+                text:"OK",
+                onPress: () => navigation.navigate('penyewaan'),
+            },
+            ]);
+            console.log(response.data);
+        })
+        .catch((error)=> {
+            // console.error('error', error);
+            console.log(error.response)
+            handleMessage("Tidak ada koneksi internet!");
+        });
     };
 
     const handleOK = (signature) => {
@@ -62,15 +107,12 @@ export default function pdfFormulirOrder({ text, onOK }) {
         uri:  path,
         });
 
+        console.log(datasTtdPemohon)
         axios({
-            url:`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/post/ttdPemohon/1`,
+            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/ttdPemohon/1`,
             method:"POST",
-            data:
-            {
-                ttd_pemohon: datasTtdPemohon
-            },
+            data: datasTtdPemohon
         })
-        // console.log(datasTtdPemohon)
         .then((response) => {
             const result = response.data;
             const { message, success, status, data } = result;
@@ -138,7 +180,7 @@ export default function pdfFormulirOrder({ text, onOK }) {
             <View style={{ height: '60%'}}>
                 <PDFReader
                     source={{
-                    uri: `http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/lihat-formulir-order/${id}`,
+                    uri: `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/lihat-formulir-order/${id}`,
                     }}
                 />
             </View>
@@ -146,7 +188,7 @@ export default function pdfFormulirOrder({ text, onOK }) {
                 <View style={{ marginBottom: 28, marginTop: 8, alignItems:'center' }}>
                     <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Tanda tangani Surat Permohonan!</Text>
                     <View style={{ width: imgWidth, height: imgHeight }}>
-                        <View style={styles.preview}>
+                        {/* <View style={styles.preview}>
                             {signature ? (
                             <Image
                                 resizeMode={"contain"}
@@ -154,7 +196,7 @@ export default function pdfFormulirOrder({ text, onOK }) {
                                 source={{ uri: signature }}
                             />
                             ) : null}
-                        </View>
+                        </View> */}
                         <SignatureScreen
                             ref={ref}
                             bgSrc="https://www.stokestiles.co.uk/images/ww/merlin/150x150_Plain_Grey_SWT6.jpg"

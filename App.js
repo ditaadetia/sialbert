@@ -19,6 +19,7 @@ import formPembayaran from "./Screen/formPembayaran";
 import FormulirOrder from "./Screen/FormulirOrder";
 import FormSecondStep from "./Screen/forms/FormSecondStep";
 import DetailOrder from "./Screen/DetailOrder";
+import DetailPembatalan from "./Screen/DetailPembatalan";
 import FormReschedule from "./Screen/FormReschedule";
 import FormRefund from "./Screen/FormReschedule";
 import DetailRefund from "./Screen/DetailRefund";
@@ -304,6 +305,11 @@ export default function App({navigation}) {
                   <Stack.Screen
                   name="Detail Order"
                   component={DetailOrder}
+                  options={{ headerShown: true }}
+                  />
+                  <Stack.Screen
+                  name="Detail Pembatalan"
+                  component={DetailPembatalan}
                   options={{ headerShown: true }}
                   />
                   <Stack.Screen

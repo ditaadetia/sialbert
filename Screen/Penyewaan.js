@@ -51,7 +51,7 @@ export default function MenuUtama({navigation}) {
   const [page, setPage] = useState(1);
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email, id} = storedCredentials;
@@ -99,11 +99,11 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/orders/${id}`)
+    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData(hasil);
-        setCari(hasil);
+        setData([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -113,11 +113,11 @@ export default function MenuUtama({navigation}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/detail-orders')
+    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setEquipments(hasil);
-        setCari(hasil);
+        setEquipments([...hasil]);
+        setCari([...hasil]);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
@@ -137,11 +137,13 @@ export default function MenuUtama({navigation}) {
     const sum = harga_perhari + harga_perjam
     const nama = alat?.[0]?.nama
     const order_id = alat?.[0]?.id
-    const total_harga = alat.reduce((total,item)=>{
+    const total_harga_perhari = alat.reduce((total,item)=>{
       const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
+      return total + harga_sewa_perhari;
+    },0)
+    const total_harga_perjam = alat.reduce((total,item)=>{
       const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
-      const total_biaya = harga_sewa_perhari+harga_sewa_perjam
-      return total + total_biaya;
+      return total + harga_sewa_perjam;
     },0)
     // const sum = total.reduce(
     //   (tot, jumlah) => tot +jumlah,
@@ -207,11 +209,14 @@ export default function MenuUtama({navigation}) {
                   <View style={{ margin:16 }}>
                     <Text>{item.nama_instansi}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <Image source={{ uri:'http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <View>
                         <Text>{nama}</Text>
                         <Text>x1</Text>
-                        <Text style={{ fontWeight:'bold' }}>Rp.{sum.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        {total_hari>0 ?
+                          <Text style={{ fontWeight:'bold' }}>Rp.{harga_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>:
+                          <Text style={{ fontWeight:'bold' }}>Rp.{harga_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        }
                       </View>
                     </View>
                     <View style={styles.border2}/>
@@ -219,7 +224,10 @@ export default function MenuUtama({navigation}) {
                       <Text>{count} Alat</Text>
                       <View style={{ flexDirection: 'row', marginTop:4 }}>
                         <Text>Total Pesanan:</Text>
-                        <Text style={{ marginLeft:8 , fontWeight:'bold'}}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        {total_hari>0 ?
+                          <Text style={{ marginLeft:8 , fontWeight:'bold'}}>Rp.{total_harga_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>:
+                          <Text style={{ marginLeft:8 , fontWeight:'bold'}}>Rp.{total_harga_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        }
                       </View>
                       {/* {alat &&
                         alat.map((item, idx) => {
@@ -246,14 +254,14 @@ export default function MenuUtama({navigation}) {
                     </TouchableOpacity>
                     {item.ket_persetujuan_kepala_dinas == 'setuju' &&
                       <TouchableOpacity onPress={async () => {
-                        await downloadToFolder(`http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
+                        await downloadToFolder(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
                           downloadProgressCallback: downloadProgressUpdater,
                           downloadProgressCallback: ToastAndroid.show(`Sedang Mendownload, Mohon Menunggu!`, ToastAndroid.SHORT)
                           // ToastAndroid.show(`Sedang Mendownload ${downloadProgress}`, ToastAndroid.SHORT)
                         })
                       }}>
                         {/* <TouchableOpacity onPress={async () => {
-                          await downloadToFolder('http://9e8b-2001-448a-6060-f025-917c-c7cc-a4cf-490e.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                          await downloadToFolder('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
                         }}> */}
                         <View style={styles.btn}>
                           <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
@@ -306,7 +314,7 @@ export default function MenuUtama({navigation}) {
         <StatusBar style="auto" />
         <View style={styles.container}>
           <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
-            {isLoading ?
+          {isLoading ?
               <View style={{
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -337,6 +345,7 @@ export default function MenuUtama({navigation}) {
                       keyExtractor={item=>item.id}
                       renderItem={listOrders}
                       onEndReachedThreshold={0.5}
+                      extraData={data}
                       // getItemCount={getItemCount}
                       // getItem={getItem}
                     />
