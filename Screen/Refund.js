@@ -144,6 +144,11 @@ export default function MenuUtama({navigation}) {
     setModalVisible(!modalVisible);
   }
 
+  const openSettingModal = (order_id) => {
+    setOrderId(order_id);
+    setModalVisible(!modalVisible);
+  }
+
   const listOrders = ({item}) => {
     const alat = [...item.alat]
     const inisialValue = 0

@@ -266,7 +266,6 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
                 <View style={styles.button}>
                   <Text style={styles.buttonTitle}>Confirm</Text>
                 </View>
-              </TouchableOpacity>
             </View>
           </View>
         </View>
