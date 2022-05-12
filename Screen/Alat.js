@@ -18,6 +18,7 @@ import FloatingTabBar from "../components/FloatingTabBar";
 import More from "../assets/image/more.png";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from './../components/CartContext';
+import { useIsFocused } from '@react-navigation/native';
 
 const win = Dimensions.get("window");
 
@@ -32,6 +33,7 @@ export default function MenuUtama({navigation}) {
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email} = storedCredentials;
   const {items, setItems} = useContext(CartContext);
+  const isFocused = useIsFocused();
 
   const handleLoadMore = () => {
       setPage(page+1)
@@ -51,7 +53,7 @@ export default function MenuUtama({navigation}) {
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
     let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   // useEffect(() => {
   //   setLoading(true);

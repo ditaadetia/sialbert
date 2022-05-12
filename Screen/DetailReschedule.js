@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from '../components/CredentialsContext';
 const win = Dimensions.get("window");
 import logo from "../assets/icon.png";
+import { useIsFocused } from '@react-navigation/native';
 
 export default function DetaiReschedule({ navigation, route }) {
   const {reschedule} = route.params
@@ -22,6 +23,7 @@ export default function DetaiReschedule({ navigation, route }) {
   const [text, setText] = useState('');
   const [cari, setCari] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const isFocused = useIsFocused();
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const alat = [...reschedule.alat]
@@ -38,14 +40,14 @@ export default function DetaiReschedule({ navigation, route }) {
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules')
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
 
   var idLocale=require('moment/locale/id');
   Moment.locale('id');

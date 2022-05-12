@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Alert, Dimensions, ImageBackground, Button } from "react-native";
+import { StyleSheet, Text, View, Image, FlatList, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions, ImageBackground, Button } from "react-native";
 import { useState, useEffect } from "react";
 
 import FloatingTabBar from "../components/FloatingTabBar";
@@ -38,6 +38,8 @@ export default function DetaiReschedule({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState();
   const [messageType, setMessageType] = useState();
+  const [visible, setVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   // const total_harga = alat.reduce((total,item)=>{
@@ -47,7 +49,19 @@ export default function DetaiReschedule({ navigation, route }) {
   //   return total + total_biaya;
   // },0)
 
-  const handleReschedule = (credentials, setSubmitting) => {
+  const letHide = (alasan_refund) => {
+    if (visible === true) {
+      setVisible(false)
+    } else {
+      setVisible(true)
+    }
+  }
+
+  const doYourTask = (alasan_refund) => {
+    setIsDisabled(true);
+  }
+
+  const handleReschedule = (credentials, isSubmitting, alasan_refund) => {
     handleMessage(null);
     const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/post`;
 
@@ -59,41 +73,48 @@ export default function DetaiReschedule({ navigation, route }) {
           onPress: () => {},
         },
       ]);
-      setSubmitting(false);
     }
     else{
-      axios
-        .post(url, credentials)
-        .then((response) => {
-          const result = response.data;
-          const { message, success, status, data } = result;
-          console.log(response.data);
+      axios({
+        url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/post`,
+        method:"POST",
+        data:
+        {
+          waktu_mulai: tanggalMulai,
+            waktu_selesai: tanggalSelesai,
+            // alasan_refund: alasan_refund,
+            detail_order_id: detail_reschedule,
+            order_id: order_id,
+            ket_verif_admin:'belum',
+            ket_persetujuan_kepala_uptd:'belum'
+        },
+      })
 
-          if (success == true) {
-            // navigation.navigate('MenuUtama');
-            // navigation.navigate('MenuUtama');
-            // persistLogin({ ...data[0] }, message, status);
-            Alert.alert("Berhasil", "Pengajuan Reschedule Berhasil!", [
-              {
-                text:"OK",
-                onPress: () => navigation.navigate("Reschedule"),
-              },
-            ]);
-            setSubmitting(false);
-            console.log(response.data);
-          }
-          else {
-            handleMessage("Gagal!");
-            setSubmitting(false);
-          }
+      .then((response) => {
+        const result = response.data;
+        const { message, success, status, data } = result;
+        console.log(response.data);
+
+        if (success == true) {
           // navigation.navigate('MenuUtama');
-            // persistLogin({ ...data[0] }, message, status);
+          // navigation.navigate('MenuUtama');
+          // persistLogin({ ...data[0] }, message, status);
+          Alert.alert("Berhasil", "Pengajuan Reschedule Berhasil!", [
+            {
+              text:"OK",
+              onPress: () => navigation.navigate("Reschedule"),
+            },
+          ]);
+          console.log(response.data);
+        }
+        else {
+          handleMessage("Gagal!");
+        }
       })
 
       .catch((error)=> {
         // console.error('error', error);
         console.log(error.response)
-        setSubmitting(false);
         handleMessage("Tidak ada koneksi internet!");
       });
     }
@@ -145,7 +166,7 @@ export default function DetaiReschedule({ navigation, route }) {
   };
 
   const rescheduleValidationSchema = yup.object().shape({
-    keterangan: yup
+    alasan_refund: yup
       .string()
       .required('Keterangan wajib diisi!'),
   })
@@ -160,8 +181,8 @@ export default function DetaiReschedule({ navigation, route }) {
   const hoursDiff = tSelesai.diff(tMulai, 'hours');
 
   const detail_reschedule = reschedule.id
-  const tanggal_mulai = Moment(date1).format('YYYY-MM-DD HH:mm:ss')
-  const tanggal_selesai = Moment(date2).format('YYYY-MM-DD HH:mm:ss')
+  const tanggalMulai = Moment(date1).format('YYYY-MM-DD HH:mm:ss')
+  const tanggalSelesai = Moment(date2).format('YYYY-MM-DD HH:mm:ss')
 
   return (
     <ScrollView style={{ padding:8, backgroundColor:'#fff', height: '100%' }}>
@@ -203,8 +224,17 @@ export default function DetaiReschedule({ navigation, route }) {
         </Card>
         <Formik
           validationSchema={rescheduleValidationSchema}
-          enableReinitialize={true}
-          initialValues={{ waktu_mulai: tanggal_mulai, waktu_selesai: tanggal_selesai, keterangan: '', detail_order_id: detail_reschedule, order_id: order_id, ket_verif_admin:'belum', ket_persetujuan_kepala_uptd:'belum'}}
+          // enableReinitialize={true}
+          initialValues={{
+            waktu_mulai: tanggalMulai,
+            waktu_selesai: tanggalSelesai,
+            // alasan_refund: '',
+            detail_order_id:
+            detail_reschedule,
+            order_id: order_id,
+            ket_verif_admin:'belum',
+            ket_persetujuan_kepala_uptd:'belum'
+          }}
           onSubmit={(values, {setSubmitting})  => {
             handleReschedule(values, setSubmitting);
             console.log(values)
@@ -280,7 +310,7 @@ export default function DetaiReschedule({ navigation, route }) {
               {(dayDiff < 1 && hoursDiff>=1) &&
                 <Text style={{ margin: 16, fontWeight:'bold' }}> Total Jam : {hoursDiff} jam</Text>
               }
-              <View>
+              {/* <View>
                 <View style={styles.form}>
                   <Text style={{ marginLeft:16, marginTop:4 }}>Keterangan :</Text>
                   <TextInput
@@ -289,19 +319,20 @@ export default function DetaiReschedule({ navigation, route }) {
                     returnKeyType="next"
                     placeholder="Keterangan"
                     style={styles.textInput}
-                    onChangeText={handleChange('keterangan')}
+                    onChangeText={handleChange('alasan_refund')}
+                    value={values.alasan_refund}
                   />
                 </View>
-                {(errors.keterangan && touched.keterangan) &&
-                  <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.keterangan}</Text>
+                {(errors.alasan_refund && touched.alasan_refund) &&
+                  <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.alasan_refund}</Text>
                 }
-              </View>
+              </View> */}
               <View style={{ flexDirection: 'row', width: '100%' }}>
-                <TextInput
+                {/* <TextInput
                   autoCapitalize="none"
                   autoCorrect={false}
                   returnKeyType="next"
-                  onChangeText={handleChange('tanggal_mulai')}
+                  onChangeText={handleChange('waktu_mulai')}
                   editable={false}
                   type="hidden"
                 />
@@ -309,10 +340,10 @@ export default function DetaiReschedule({ navigation, route }) {
                   autoCapitalize="none"
                   autoCorrect={false}
                   returnKeyType="next"
-                  onChangeText={handleChange('tanggal_selesai')}
+                  onChangeText={handleChange('waktu_selesai')}
                   editable={false}
                   type="hidden"
-                />
+                /> */}
                 <TextInput
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -345,14 +376,43 @@ export default function DetaiReschedule({ navigation, route }) {
                   editable={false}
                   type="hidden"
                 />
+                {/* <TextInput
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  onChangeText={handleChange('alasan_refund')}
+                  editable={false}
+                  type="hidden"
+                /> */}
               </View>
               {!isSubmitting &&
               <View>
-                <TouchableOpacity onPress={handleSubmit}>
-                  <View style={styles.button}>
-                    <Text style={styles.buttonTitle}>LANJUTKAN</Text>
-                  </View>
-                </TouchableOpacity>
+                {(() => {
+                  const alasan_refund = values.alasan_refund
+                  return(
+                    <TouchableOpacity onPress={(alasan_refund) =>
+                      {
+                        letHide(alasan_refund),
+                        doYourTask(alasan_refund),
+                        handleReschedule(alasan_refund)
+                      }
+                    }
+                    disabled={isDisabled}>
+                      <View style={styles.button}>
+                        {visible == true &&
+                          <ActivityIndicator
+                            size="large"
+                            color="#00B8D4"
+                            animating={visible}
+                          />
+                        }
+                        {visible == false &&
+                          <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                        }
+                      </View>
+                    </TouchableOpacity>
+                  )
+                })()}
               </View>
               }
               {isSubmitting &&

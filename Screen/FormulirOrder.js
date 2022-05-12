@@ -20,6 +20,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Input } from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
 
 // import { FormSuccess } from "./forms/FormSuccess";
 import * as yup from 'yup';
@@ -40,6 +41,7 @@ export default function FormulirOrder({navigation, route}) {
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email, no_hp, foto, kontak_darurat, alamat, id} = storedCredentials;
+  const isFocused = useIsFocused();
 
   const formOrderValidationSchema = yup.object().shape({
     nama_instansi: yup
@@ -114,7 +116,7 @@ export default function FormulirOrder({navigation, route}) {
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
 
 
   return (
@@ -138,7 +140,7 @@ export default function FormulirOrder({navigation, route}) {
             </View>
             <Formik
               validationSchema={formOrderValidationSchema}
-              enableReinitialize={true}
+              // enableReinitialize={true}
               // initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_penyewa: nama, email: email, no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, nama_instansi: '', jabatan:'', alamat_instansi:''}}
               initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_instansi: '', jabatan:'', alamat_instansi:''}}
               onSubmit={(values, {setSubmitting})  => {
@@ -287,7 +289,7 @@ export default function FormulirOrder({navigation, route}) {
                       </View>
                       <View style={{ width: '50%' }}>
                         <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Jabatan :</Text>
+                          <Text style={{ marginLeft:16, marginTop:4 }}>Jabatan Penyewa :</Text>
                           <TextInput
                             autoCapitalize="none"
                             autoCorrect={false}

@@ -19,6 +19,8 @@ import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 // import { Calendar } from 'react-native-calendario';
 import DateRangePicker from "rnv-date-range-picker";
 let {width} = Dimensions.get('window');
+import { useIsFocused } from '@react-navigation/native';
+import { CartIcon } from './../components/CartIcon.js';
 // import { CartContext } from './CartContext';
 // import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -42,6 +44,7 @@ export default function Detail({ navigation, route }) {
     const {storedCart, setStoredCart} = useContext(CartContext);
     const {itemCount} = useContext(CartContext);
     const {items, setItems} = useContext(CartContext);
+    const isFocused = useIsFocused();
     // const {nama} = storedCart;
 
     const id= alat.id
@@ -91,14 +94,14 @@ export default function Detail({ navigation, route }) {
         fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/schedule/' + alat.id)
           .then((response) => response.json())
           .then((hasil) => {
-            setData([...hasil]);
-            setCari([...hasil]);
+            setData(hasil);
+            setCari(hasil);
             setIsLoading(false);
           })
           // .finally(() => setLoading(false));
           .catch(error => { console.log; });
         let isMounted = true
-    }, []);
+    }, [isFocused]);
     const listOrders = ({item}) => {
         const tanggal = [...item.tanggal_mulai]
     }
@@ -270,65 +273,6 @@ export default function Detail({ navigation, route }) {
                     </View>
                 </View>
                 <View style={{ borderBotomColor:'yellow', borderBottomWidth: 2 }} opacity={0.5}/>
-                <View style={styles.container}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
-                        <View>
-                            <Text style={{ fontWeight:"bold", textAlign:"center", marginBottom:4 }}>Tanggal Mulai</Text>
-                            <View style={styles.pickedDateContainer}>
-                                <Text style={styles.pickedDate}>{date1.toLocaleString()}</Text>
-                            </View>
-                            <TouchableOpacity onPress={showDatepicker}>
-                                <View style={styles.pickButton}>
-                                    <Text style={styles.buttonTitle}>Atur Tanggal Ambil!</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={showTimepicker}>
-                                <View style={styles.pickButton}>
-                                    <Text style={styles.buttonTitle}>Atur Jam Ambil!</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                        <View>
-                            <Text style={{ fontWeight:"bold", alignItems:'center', textAlign:"center", marginBottom:4 }}>Tanggal Selesai</Text>
-                            <View style={styles.pickedDateContainer}>
-                                <Text style={styles.pickedDate}>{date2.toLocaleString()}</Text>
-                            </View>
-                            <TouchableOpacity onPress={showDatepicker2}>
-                                <View style={styles.pickButton}>
-                                    <Text style={styles.buttonTitle}>Atur Tanggal Kembali!</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={showTimepicker2}>
-                                <View style={styles.pickButton}>
-                                    <Text style={styles.buttonTitle}>Atur Jam Kembali!</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    {show && (
-                        <DateTimePicker
-                        testID="dateTimePicker"
-                        value={date1}
-                        mode={mode}
-                        is24Hour={true}
-                        onChange={onChange}
-                        minimumDate={new Date()}
-                        locale='id'
-                        display="spinner"
-                        />
-                    )}
-                    {show2 && (
-                        <DateTimePicker
-                        testID="dateTimePicker2"
-                        value={date2}
-                        mode={mode2}
-                        is24Hour={true}
-                        onChange={onChange2}
-                        minimumDate={new Date()}
-                        locale='id'
-                        />
-                    )}
-                </View>
             </View>
             <SafeAreaView>
                 <View>
@@ -345,11 +289,14 @@ export default function Detail({ navigation, route }) {
                     />
                 </View>
             </SafeAreaView>
-            <TouchableOpacity onPress={addCart} style={{ margin: 16}}>
-                <View style={styles.pickButton}>
-                    <Text style={styles.buttonTitle}>Tambah ke keranjang</Text>
-                </View>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', margin: 16 }}>
+                <TouchableOpacity onPress={addCart} style={{ width: '75%'}}>
+                    <View style={styles.pickButton}>
+                        <Text style={styles.buttonTitle}>Tambah ke keranjang</Text>
+                    </View>
+                </TouchableOpacity>
+                <CartIcon navigation={navigation}/>
+            </View>
         </ScrollView>
     );
 }
@@ -396,7 +343,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         textAlign: 'center',
         marginTop: 8,
-        padding: 8
+        padding: 8,
     },
     buttonTitle: {
     alignItems: 'center',

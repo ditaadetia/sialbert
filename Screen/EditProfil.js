@@ -15,6 +15,7 @@ import * as yup from 'yup'
 import axios from 'axios';
 import FormData from 'form-data';
 const win = Dimensions.get("window");
+import { useIsFocused } from '@react-navigation/native';
 
 import openedEye from "../assets/image/opened-eye.png";
 import closeEye from "../assets/image/closed-eye.png";
@@ -41,6 +42,7 @@ import picture_account from "../assets/image/acount-inactive.png";
     const [fileUri, setFileUri] = useState('');
     const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
     const {nama, email, no_hp, foto, kontak_darurat, alamat, id} = storedCredentials;
+    const isFocused = useIsFocused();
 
     const pickImage = async () => {
       // No permissions request is necessary for launching the image library
@@ -203,13 +205,13 @@ import picture_account from "../assets/image/acount-inactive.png";
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekUser/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setAvatar([...hasil]);
+        setAvatar(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
 
   console.log(avatar.status)
 
@@ -278,7 +280,7 @@ import picture_account from "../assets/image/acount-inactive.png";
             <View>
               <Formik
                 validationSchema={editProfilValidationSchema}
-                enableReinitialize={true}
+                // enableReinitialize={true}
                 initialValues={{  nama: nama, email: email, no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, image:'tes.jpeg'}}
                 // initialValues={data}
                 onSubmit={(values, {setSubmitting})  => {

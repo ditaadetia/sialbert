@@ -175,7 +175,12 @@ export default function formPembayaran({ navigation, route }) {
                     <View style={styles.border2}/>
                     <View style={{ justifyContent:'space-between', padding: 8, flexDirection: 'row' }}>
                         <Text>Total</Text>
-                        <Text>Rp.{total_bayar.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        {Moment(date) <= Moment(teng) &&
+                            <Text>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        }
+                        {Moment(date) > Moment(teng) &&
+                            <Text>Rp.{total_bayar.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
+                        }
                     </View>
                 </Card>
                 <Card style={styles.card}>
@@ -196,7 +201,12 @@ export default function formPembayaran({ navigation, route }) {
                     <View style={{ margin: 16 }}>
                         <Text style={{ fontWeight: 'bold' }}>Jumlah Transfer:</Text>
                         <View style={{ justifyContent: 'space-between' }}>
+                        {Moment(date) <= Moment(teng) &&
                             <Text style={{ fontWeight:'bold', fontSize: 32 }}>{total_harga}</Text>
+                        }
+                        {Moment(date) > Moment(teng) &&
+                            <Text style={{ fontWeight:'bold', fontSize: 32 }}>{total_bayar}</Text>
+                        }
                         </View>
                     </View>
                     <View style={styles.border2}/>

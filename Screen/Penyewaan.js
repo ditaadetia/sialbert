@@ -20,6 +20,7 @@ import * as Permissions from "expo-permissions";
 import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
+import { useIsFocused } from '@react-navigation/native';
 
 import Rent from "../assets/image/rent-active.png";
 
@@ -55,6 +56,7 @@ export default function MenuUtama({navigation}) {
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email, id} = storedCredentials;
+  const isFocused = useIsFocused();
 
   // const [downloadProgress, setDownloadProgress] = useState(0);
   const [document, setDocument] = useState(null);
@@ -87,7 +89,7 @@ export default function MenuUtama({navigation}) {
     await Notifications.requestPermissionsAsync();
     setNotificationChannel();
     let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const downloadProgressUpdater = ({
     totalBytesWritten,
@@ -102,28 +104,28 @@ export default function MenuUtama({navigation}) {
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   useEffect(async() => {
     setIsLoading(true);
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setEquipments([...hasil]);
-        setCari([...hasil]);
+        setEquipments(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const listOrders = ({item}) => {
     const alat = [...item.alat]
@@ -247,11 +249,11 @@ export default function MenuUtama({navigation}) {
                   <Text style={{ textAlign:'center', margin: 4, color: "#C4C4C4"}}>Lihat Detail</Text>
                   <View style={styles.border2}/>
                   <View style={{ flexDirection:'row', margin:4 }}>
-                    <TouchableOpacity>
+                    {/* <TouchableOpacity>
                       <View style={styles.btn}>
                         <Text style={styles.buttonTitle}>Download Bukti Bayar</Text>
                       </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     {item.ket_persetujuan_kepala_dinas == 'setuju' &&
                       <TouchableOpacity onPress={async () => {
                         await downloadToFolder(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {

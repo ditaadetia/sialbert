@@ -12,6 +12,8 @@ import ActivityIndicatorExample  from "../components/ActivityIndicatorExample";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CredentialsContext } from '../components/CredentialsContext';
 import { StatusBar } from 'expo-status-bar';
+import axios from 'axios';
+import { useIsFocused } from '@react-navigation/native';
 
 import Rent from "../assets/image/rent-active.png";
 
@@ -29,6 +31,7 @@ export default function MenuUtama({navigation}) {
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const {nama, email, id} = storedCredentials;
   const [refreshing, setRefreshing] = useState(true);
+  const isFocused = useIsFocused();
 
 
   useEffect(async() => {
@@ -36,14 +39,14 @@ export default function MenuUtama({navigation}) {
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const listOrders = ({item}) => {
     const alat = [...item.alat]

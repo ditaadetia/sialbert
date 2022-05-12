@@ -155,8 +155,8 @@ function nav() {
     >
       <Tab.Screen name='Home' component={MenuUtama} options={{ headerShown: false }}/>
       <Tab.Screen name='Penyewaan' component={Penyewaan} options={{ headerShown: false }}/>
-      <Tab.Screen name='Reschedule' component={Reschedule} options={{ headerShown: false }}/>
-      <Tab.Screen name='Pembatalan' component={Pembatalan} options={{ headerShown: false }}/>
+      <Tab.Screen name='Reschedule' component={Reschedule} options={{ headerShown: false }} screenOptions={{unmountOnBlur: true}}/>
+      <Tab.Screen name='Pembatalan' component={Pembatalan} options={{ headerShown: false }} screenOptions={{unmountOnBlur: true}}/>
       <Tab.Screen name='Setting' component={Setting} options={{ headerShown: false }}/>
       {/* <Tab.Screen
         name='Setting'
@@ -274,22 +274,6 @@ export default function App({navigation}) {
                   name="Detail"
                   component={Detail}
                   options={{ headerShown: true, headerBackTitleVisible: false,
-                    headerRight: () =>
-                      // <View style={{ flexDirection:'row' }}>
-                      //   <TouchableOpacity style={{ padding: 5 }} onPress={() => {navigation.navigate('Cart')}}>
-                      //     <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', right: 18, bottom: 18, alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
-                      //         <Text>{items.reduce((sum, item) => (sum + item.qty), 0)}</Text>
-                      //     </View>
-                      //     {/* <Text>{nama}</Text> */}
-                      //     {/* <Text>{items.reduce((sum, item) => (sum + item.totalPrice), 0)}</Text> */}
-                      //     <Icon name="ios-cart" size={28} color='#ffd700'/>
-                      //   </TouchableOpacity>
-                      //   <TouchableOpacity style={{ padding: 5 }}>
-                      //     <Icon name="notifications" size={28} color='#ffd700'/>
-                      //   </TouchableOpacity>
-                      // </View>
-                      <CartIcon navigation={navigation}/>
-                    // headerLeft: () => <Icon name="notifications" size={28} color='#ffd700'/>
                   }}
                   />
                   <Stack.Screen

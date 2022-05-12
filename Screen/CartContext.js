@@ -1,9 +1,11 @@
 import React, {createContext, useState} from 'react';
+import { useIsFocused } from '@react-navigation/native';
 // import { getProduct } from './services/ProductsService.js';
 export const CartContext = createContext();
 export function CartProvider(props) {
     const [items, setItems] = useState([]);
     const [data, setData] = useState([]);
+    const isFocused = useIsFocused();
     
     useEffect(async() => {
         setIsLoading(true);
@@ -21,7 +23,7 @@ export function CartProvider(props) {
     const id= data.id
     const harga=data.harga_sewa_perhari
     const nama_alat=data.nama
-    }, []);
+    }, [isFocused]);
     function addItemToCart(id) {
         const product = id;
         setItems((prevItems) => {

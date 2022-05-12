@@ -376,7 +376,7 @@ export default function FormulirOrder({navigation, route}) {
         <Text style={{ fontWeight: 'bold', margin: 16 }}>Isi Formulir Pengajuan</Text>
       </View>
       <Formik
-        enableReinitialize={true}
+        // enableReinitialize={true}
         initialValues={{
           category_order_id:value.category_order_id,
           nama_kegiatan: value.nama_kegiatan,

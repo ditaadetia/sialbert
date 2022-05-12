@@ -7,13 +7,13 @@ export function CartIcon({navigation}) {
   const {items, setItems} = useContext(CartContext);
   const [refreshing, setRefreshing] = useState(true);
     return (
-        <TouchableOpacity style={{ padding: 5 }} onPress={() => {navigation.navigate('Cart')}}>
-            <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', right: 18, bottom: 18, alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
+        <TouchableOpacity style={{ padding: 5, marginLeft: 16 }} onPress={() => {navigation.navigate('Cart')}}>
+            <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
                 <Text>{items.length}</Text>
             </View>
             {/* <Text>{nama}</Text> */}
         {/* <Text>{items.reduce((sum, item) => (sum + item.totalPrice), 0)}</Text> */}
-            <Icon name="ios-cart" size={28} color='#ffd700'/>
+            <Icon name="ios-cart" size={48} color='#ffd700'/>
         </TouchableOpacity>
     );
 }

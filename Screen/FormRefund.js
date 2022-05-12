@@ -194,7 +194,7 @@ export default function FormRefund({ navigation, route }) {
         </Card>
         <Formik
         validationSchema={rescheduleValidationSchema}
-          enableReinitialize={true}
+          // enableReinitialize={true}
           initialValues={{ waktu_mulai: '2021-11-25 00:00:00', waktu_selesai: '2021-11-25 00:00:00', keterangan: '', detail_order_id: detail_reschedule, order_id: order_id, ket_verif_admin:'belum', ket_Persetujuan_kepala_uptd: 'belum'}}
           onSubmit={(values, {setSubmitting})  => {
             handleReschedule(values, setSubmitting);

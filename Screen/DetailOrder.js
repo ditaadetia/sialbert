@@ -17,6 +17,7 @@ import logo from "../assets/icon.png";
 import axios from 'axios';
 import { Formik, form } from 'formik';
 import * as yup from 'yup';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function DetailOrder({ navigation, route }) {
   const {order} = route.params;
@@ -35,6 +36,7 @@ export default function DetailOrder({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const isFocused = useIsFocused();
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
   const alat = [...order.alat]
@@ -55,33 +57,39 @@ export default function DetailOrder({ navigation, route }) {
     return total + harga_sewa_perjam;
   },0)
 
+  if(total_hari >0){
+    var total_harga= total_harga_perhari
+  }else{
+    var total_harga= total_harga_perjam
+  }
+
   useEffect(async() => {
     setIsLoading(true);
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
 
   useEffect(async() => {
     setIsLoading(true);
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setEquipments([...hasil]);
-        setCari([...hasil]);
+        setEquipments(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
   var idLocale=require('moment/locale/id');
   Moment.locale('id');
   var dtMulai = order.tanggal_mulai
@@ -93,13 +101,13 @@ export default function DetailOrder({ navigation, route }) {
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekPayments/${order_id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setPayment([...hasil]);
+        setPayment(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
 
-  }, []);
+  }, [isFocused]);
 
   console.log(payment.data)
 
@@ -194,12 +202,12 @@ export default function DetailOrder({ navigation, route }) {
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekSkr/${id_order}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setSkr([...hasil]);
+        setSkr(hasil);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const handleMessage = (message, type = 'failed') => {
     setMessage(message);
@@ -296,7 +304,7 @@ export default function DetailOrder({ navigation, route }) {
                           <View>
                             <View style={{ flexDirection:'row', justifyContent: "space-between", paddingHorizontal:8}}>
                               <View style={{ flexDirection:'row' }}>
-                                <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                                <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8, marginTop: 8 }} />
                                 <View style={{ justifyContent:'center', textAlignVertical:'center' }}>
                                   <Text>{item.nama}</Text>
                                   <Text>x1</Text>
@@ -354,10 +362,11 @@ export default function DetailOrder({ navigation, route }) {
                   )}
                   <View style={{ flexDirection:'row', justifyContent:'space-between' }}>
                     <Text style={{ fontWeight:'bold', fontSize:16, fontWeight:'bold', margin:16 }}> Total :</Text>
-                    {total_hari > 0 ?
+                    {/* {total_hari > 0 ?
                       <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga_perhari.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>:
                       <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
-                    }
+                    } */}
+                    <Text style={{ textAlign:'right', fontSize:16, fontWeight:'bold', margin:16 }}>Rp.{total_harga.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
                   </View>
                   {payment.status == '3' &&
                     <TouchableOpacity style={{ marginHorizontal: 16 }}

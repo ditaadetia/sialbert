@@ -18,6 +18,7 @@ import illus from "../assets/image/illustrasi.png";
 import FloatingTabBar from "../components/FloatingTabBar";
 import More from "../assets/image/more.png";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useIsFocused } from '@react-navigation/native';
 
 const win = Dimensions.get("window");
 
@@ -28,6 +29,7 @@ export default function MenuUtama({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
 
   const {storedCredentials, setStoredCredentials} = useContext(CredentialsContext);
+  const isFocused = useIsFocused();
   const {nama, email} = storedCredentials;
   // const {storedCart, setStoredCart} = useContext(CartContext);
   const {items, setItems} = useContext(CartContext);
@@ -53,14 +55,14 @@ export default function MenuUtama({navigation}) {
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/equipments')
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const cariData = (text) => {
     const newData = cari.filter((item) => {

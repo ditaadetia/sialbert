@@ -22,6 +22,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
 import { shareAsync } from 'expo-sharing';
 import axios from 'axios';
+import { useIsFocused } from '@react-navigation/native';
 
 import Rent from "../assets/image/rent-active.png";
 
@@ -71,6 +72,7 @@ export default function MenuUtama({navigation}) {
   const [document, setDocument] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState("0%");
   const [selectedValue, setFieldValue] = useState('1');
+  const isFocused = useIsFocused();
 
   async function setNotificationChannel() {
     const loadingChannel = await Notifications.getNotificationChannelAsync(
@@ -99,7 +101,7 @@ export default function MenuUtama({navigation}) {
     await Notifications.requestPermissionsAsync();
     setNotificationChannel();
     let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const downloadProgressUpdater = ({
     totalBytesWritten,
@@ -114,28 +116,28 @@ export default function MenuUtama({navigation}) {
     fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/riwayat-pembatalan/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
-        setData([...hasil]);
-        setCari([...hasil]);
+        setData(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   useEffect(async() => {
     setIsLoading(true);
     fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
-        setEquipments([...hasil]);
-        setCari([...hasil]);
+        setEquipments(hasil);
+        setCari(hasil);
         setIsLoading(false);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
       let isMounted = true
-  }, []);
+  }, [isFocused]);
 
   const openSettingModal = (order_id) => {
     setOrderId(order_id);
@@ -153,7 +155,7 @@ export default function MenuUtama({navigation}) {
     const harga_perjam = alat?.[0]?.harga_sewa_perjam * total_jam
     const sum = harga_perhari + harga_perjam
     const nama = alat?.[0]?.nama
-    const order_id = alat?.[0]?.id
+    // const order_id = alat.order_id
     const total_harga = alat.reduce((total,item)=>{
       const harga_sewa_perhari = total_hari * item.harga_sewa_perhari
       const harga_sewa_perjam = total_jam * item.harga_sewa_perjam
@@ -190,44 +192,47 @@ export default function MenuUtama({navigation}) {
               ket_verif_admin: 'belum',
               ket_persetujuan_kepala_uptd: 'belum',
               ket_persetujuan_kepala_dinas: 'belum',
+              refund_bendahara: 0,
+              bukti_refund:'',
             },
           })
           .then((response) => {
             const result = response.data;
-            const { message, success, status } = result;
+            const { pesan, success, status } = result;
             console.log(response.data);
-            alat.map((item)=> {
-              axios({
-                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
-                method:"POST",
-                data:
-                {
-                  order_id:order_id,
-                  detail_order_id: item.id,
-                },
+            if(pesan == 'Pengajuan Refund Berhasil!'){
+              alat.map((item)=> {
+                axios({
+                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
+                  method:"POST",
+                  data:
+                  {
+                    order_id:order_id,
+                    detail_order_id: item.id,
+                  },
+                })
+                .then((response) => {
+                  const result = response.data;
+                  const { message, success, status } = result;
+                  console.log(response.data);
+                  setVisible(false)
+                  setIsDisabled(false);
+                  setModalVisible(!modalVisible)
+                })
+                .catch((error)=> {
+                  // console.error('error', error);
+                  console.log(error.response)
+                  handleMessage("Gagal!");
+                });
               })
-              .then((response) => {
-                const result = response.data;
-                const { message, success, status } = result;
-                console.log(response.data);
-                setVisible(false)
-                setIsDisabled(false);
-                setModalVisible(!modalVisible)
-              })
-              .catch((error)=> {
-                // console.error('error', error);
-                console.log(error.response)
-                handleMessage("Gagal!");
-              });
-            })
-            if(status == 'success'){
               Alert.alert("Berhasil", "Pengajuan Refund Berhasil!", [
                 {
                   text:"OK",
                   onPress: () => navigation.navigate('Pembatalan'),
                 },
               ]);
-            } else if(status == 'failed'){
+            }
+            else if(pesan == 'Anda telah mengajukan pengembalian Dana!'){
               Alert.alert("Tidak dapat mengajukan pengembalian dana!", "Anda telah mengajukan pengembalian dana untuk pesanan ini.");
             }
             setVisible(false)
@@ -247,51 +252,54 @@ export default function MenuUtama({navigation}) {
             {
               order_id:order_id,
               tenant_id: id,
-              metode_refund: selectedValue,
+              metode_refund: lainnya,
               no_rekening: noRek,
               nama_penerima: nama_di_rekening,
               detail_order_id: item.id,
               ket_verif_admin: 'belum',
               ket_persetujuan_kepala_uptd: 'belum',
               ket_persetujuan_kepala_dinas: 'belum',
+              refund_bendahara: 0,
+              bukti_refund:'',
             },
           })
           .then((response) => {
             const result = response.data;
-            const { message, success, status } = result;
+            const { pesan, success, status } = result;
             console.log(response.data);
-            alat.map((item)=> {
-              axios({
-                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
-                method:"POST",
-                data:
-                {
-                  order_id:order_id,
-                  detail_order_id: item.id,
-                },
+            if(pesan == 'Pengajuan Refund Berhasil!'){
+              alat.map((item)=> {
+                axios({
+                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
+                  method:"POST",
+                  data:
+                  {
+                    order_id:order_id,
+                    detail_order_id: item.id,
+                  },
+                })
+                .then((response) => {
+                  const result = response.data;
+                  const { message, success, status } = result;
+                  console.log(response.data);
+                  setVisible(false)
+                  setIsDisabled(false);
+                  setModalVisible(!modalVisible)
+                })
+                .catch((error)=> {
+                  // console.error('error', error);
+                  console.log(error.response)
+                  handleMessage("Gagal!");
+                });
               })
-              .then((response) => {
-                const result = response.data;
-                const { message, success, status } = result;
-                console.log(response.data);
-                setVisible(false)
-                setIsDisabled(false);
-                setModalVisible(!modalVisible)
-              })
-              .catch((error)=> {
-                // console.error('error', error);
-                console.log(error.response)
-                handleMessage("Gagal!");
-              });
-            })
-            if(status == 'success'){
               Alert.alert("Berhasil", "Pengajuan Refund Berhasil!", [
                 {
                   text:"OK",
                   onPress: () => navigation.navigate('Pembatalan'),
                 },
               ]);
-            } else if(status == 'failed'){
+            }
+            else if(pesan == 'Anda telah mengajukan pengembalian Dana!'){
               Alert.alert("Tidak dapat mengajukan pengembalian dana!", "Anda telah mengajukan pengembalian dana untuk pesanan ini.");
             }
             setVisible(false)
