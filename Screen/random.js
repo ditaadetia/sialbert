@@ -54,7 +54,7 @@ export default function EditProfil({route, navigation, props}) {
 
   const handleEditProfil = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/editProfil/1`;
+    const url = `http://6355-180-242-234-59.ngrok.io/api/editProfil/1`;
 
     axios
       .put(url, credentials)
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',

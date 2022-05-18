@@ -13,7 +13,7 @@ import { DataTable } from 'react-native-paper';
 
 import Add from "../assets/image/plus.png";
 
-export default function formPembayaran({ navigation, route }) {
+export default function FormPembayaran({ navigation, route }) {
     const {id_order} = route.params
     const {skr} = route.params
     const {dateSkr} = route.params
@@ -45,12 +45,13 @@ export default function formPembayaran({ navigation, route }) {
         handleMessage(null);
         if (buktiPembayaran != null) {
           axios({
-            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/payments`,
+            url:`http://6355-180-242-234-59.ngrok.io/api/payments`,
             method:"POST",
             data:
             {
               order_id:id_order,
               tenant_id: id,
+              total: total_bayar
             },
         })
         .then((response) => {
@@ -66,7 +67,7 @@ export default function formPembayaran({ navigation, route }) {
 
             if (buktiPembayaran != null) {
             axios({
-                url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/bukti-pembayaran/${id_order}`,
+                url:`http://6355-180-242-234-59.ngrok.io/api/bukti-pembayaran/${id_order}`,
                 method:"POST",
                 data: datasBuktiPembayaran
             })
@@ -139,11 +140,11 @@ export default function formPembayaran({ navigation, route }) {
             <View style={{ height: '60%'}}>
                 <PDFReader
                     source={{
-                    uri: `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/skrPdf/${id_order}`,
+                    uri: `http://6355-180-242-234-59.ngrok.io/api/skrPdf/${id_order}`,
                     }}
                 />
             </View>
-            <ScrollView style={{ paddingBottom: 16 }}>
+            <ScrollView style={{ paddingBottom: 16, backgroundColor:'#fff' }}>
                 <Card style={styles.card}>
                     <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
                         <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Rincian Pembayaran</Text>
@@ -212,7 +213,7 @@ export default function formPembayaran({ navigation, route }) {
                     <View style={styles.border2}/>
                 </Card>
                 <TouchableOpacity onPress={pickBuktiPembayaran}>
-                    <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{ margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
                         <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
                             <Image source={Add} style={{ width: 45, height: 45 }}/>
                             {/* {ktp &&
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        backgroundColor: '#ffd700',
+        backgroundColor: '#ffcd04',
         borderRadius: 8,
         height: 48,
         justifyContent: 'center',

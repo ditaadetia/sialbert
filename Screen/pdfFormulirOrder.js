@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import PDFReader from "rn-pdf-reader-js";
 import SignatureScreen from "react-native-signature-canvas";
@@ -17,14 +18,17 @@ import * as MediaLibrary from "expo-media-library";
 import axios from "axios";
 import FormData from "form-data";
 
-export default function pdfFormulirOrder({ navigation, text, onOK }) {
+export default function PdfFormulirOrder({ navigation, route, text, onOK }) {
   const [message, setMessage] = useState();
+  const {order_id} = route.params;
   const [messageType, setMessageType] = useState();
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
   const { nama, email, id } = storedCredentials;
   const ref = useRef();
   const [signature, setSign] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   // Called after ref.current.readSignature() reads an empty string
   const handleEmpty = () => {
@@ -51,6 +55,18 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
     ref.current.readSignature();
   };
 
+  const letHide = () => {
+    if (visible === true) {
+      setVisible(false)
+    } else {
+      setVisible(true)
+    }
+  }
+
+  const doYourTask = () => {
+    setIsDisabled(true);
+  }
+
   const uploadBase64 = async (base64String) => {
     // this.setState({ uploading: true });
 
@@ -76,7 +92,7 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
 
   //Just and ordinary upload fetch function
   const uploadImageAsync = (uri) => {
-    let apiUrl = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/ttdPemohon/1`;
+    let apiUrl = `http://6355-180-242-234-59.ngrok.io/api/orders/post/ttdPemohon/${order_id}`;
 
     let formData = new FormData();
 
@@ -111,9 +127,13 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
             onPress: () => navigation.navigate("Penyewaan"),
           },
         ]);
+        setVisible(false);
+        setIsDisabled(false);
       })
       .catch((error) => {
         console.log("error", error);
+        setVisible(false);
+        setIsDisabled(false);f
       });
   };
 
@@ -136,79 +156,32 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
           Tanda Tangan Formulir Pengajuan
         </Text>
       </View>
-      <View style={{ margin: 16, flexDirection: "row" }}>
-        <View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <View
-              style={{
-                borderColor: "#C4C4C4",
-                backgroundColor: "#C4C4C4",
-                borderWidth: 1,
-                height: 24,
-                width: 24,
-                borderRadius: 20,
-              }}
-            >
-              <Text style={{ textAlign: "center" }}>1</Text>
-            </View>
-            <Text style={{ textAlign: "center" }}>Step 1</Text>
+      <View style={{ margin:16, flexDirection: 'row', justifyContent:'space-between' }}>
+        <View style={{justifyContent:'center', alignItems:'center' }}>
+          <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+            <Text style={{textAlign: 'center' }}>1</Text>
           </View>
+          <Text style={{textAlign: 'center', alignContent:'center', alignItems:'center', textAlignVertical:'center' }}>Step 1</Text>
         </View>
-        <View
-          style={{
-            backgroundColor: "#ffd700",
-            height: 1,
-            width: "33%",
-            marginVertical: 12,
-          }}
-        />
-        <View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <View
-              style={{
-                borderColor: "#C4C4C4",
-                backgroundColor: "#C4C4C4",
-                borderWidth: 1,
-                height: 24,
-                width: 24,
-                borderRadius: 20,
-              }}
-            >
-              <Text style={{ textAlign: "center" }}>2</Text>
-            </View>
-            <Text style={{ textAlign: "center" }}>Step 2</Text>
+        <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+        <View style={{ justifyContent:'center', alignItems:'center' }}>
+          <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+            <Text style={{textAlign: 'center' }}>2</Text>
           </View>
+          <Text style={{textAlign: 'center' }}>Step 2</Text>
         </View>
-        <View
-          style={{
-            backgroundColor: "#ffd700",
-            height: 1,
-            width: "33%",
-            marginVertical: 12,
-          }}
-        />
-        <View>
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <View
-              style={{
-                borderColor: "#ffd700",
-                backgroundColor: "#ffd700",
-                borderWidth: 1,
-                height: 24,
-                width: 24,
-                borderRadius: 20,
-              }}
-            >
-              <Text style={{ textAlign: "center" }}>3</Text>
+        <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+        <View style={{ justifyContent:'center', alignItems:'center' }}>
+            <View style={{ borderColor:'#ffcd04', backgroundColor:'#ffcd04', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+              <Text style={{textAlign: 'center' }}>3</Text>
             </View>
-            <Text style={{ textAlign: "center" }}>Step 3</Text>
-          </View>
+            <Text style={{textAlign: 'center' }}>Step 3</Text>
         </View>
       </View>
-      <View style={{ height: "50%" }}>
+      <View style={{ height: "55%" }}>
         <PDFReader
           source={{
-            uri: `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/lihat-formulir-order/${id}`,
+            uri: `http://6355-180-242-234-59.ngrok.io/api/lihat-formulir-order/${order_id}`,
           }}
         />
       </View>
@@ -259,15 +232,39 @@ export default function pdfFormulirOrder({ navigation, text, onOK }) {
                   <Text style={styles.buttonTitle}>Clear</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
+              <TouchableOpacity onPress={(e) =>
+                {
+                  letHide(e),
+                  doYourTask(e),
+                  handleConfirm(e)
+                }
+              }
+              disabled={isDisabled}
+              style={{ width: "45%", marginTop: 8 }}
+              >
+                <View style={styles.button}>
+                  {visible == true &&
+                    <ActivityIndicator
+                      size="large"
+                      color="#00B8D4"
+                      animating={visible}
+                    />
+                  }
+                  {visible == false &&
+                    <Text style={styles.buttonTitle}>Confirm</Text>
+                  }
+                </View>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
                 onPress={handleConfirm}
                 style={{ width: "45%", marginTop: 8 }}
               >
                 <View style={styles.button}>
                   <Text style={styles.buttonTitle}>Confirm</Text>
                 </View>
+              </TouchableOpacity> */}
             </View>
-          </View>
+        </View>
         </View>
       </ScrollView>
     </>
@@ -290,7 +287,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: "center",
-    backgroundColor: "#ffd700",
+    backgroundColor: "#ffcd04",
     borderRadius: 8,
     height: 36,
     justifyContent: "center",

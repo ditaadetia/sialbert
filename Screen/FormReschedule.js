@@ -63,7 +63,7 @@ export default function DetaiReschedule({ navigation, route }) {
 
   const handleReschedule = (credentials, isSubmitting, alasan_refund) => {
     handleMessage(null);
-    const url = `http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/post`;
+    const url = `http://6355-180-242-234-59.ngrok.io/api/reschedules/post`;
 
     if(dayDiffAwal != dayDiff || hoursDiffAwal != hoursDiff)
     {
@@ -73,10 +73,12 @@ export default function DetaiReschedule({ navigation, route }) {
           onPress: () => {},
         },
       ]);
+      setVisible(false);
+      setIsDisabled(false);
     }
     else{
       axios({
-        url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/post`,
+        url:`http://6355-180-242-234-59.ngrok.io/api/reschedules/post`,
         method:"POST",
         data:
         {
@@ -195,7 +197,7 @@ export default function DetaiReschedule({ navigation, route }) {
             <View style={{ margin:16 }}>
               <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                 <View>
-                  <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                  <Image source={{ uri:'http://6355-180-242-234-59.ngrok.io/storage/'+reschedule.foto }} style={{ width:58, height:58, marginRight:8 }} />
                   <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{reschedule.nama}</Text>
                 </View>
                 <View>
@@ -287,7 +289,6 @@ export default function DetaiReschedule({ navigation, route }) {
                   onChange={onChange}
                   minimumDate={new Date()}
                   locale='id'
-                  display="spinner"
                   />
               )}
               {show2 && (
@@ -581,7 +582,7 @@ const styles = StyleSheet.create({
   },
   pickButton: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 36,
     justifyContent: 'center',
@@ -597,7 +598,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   pickedDate: {
-      color: '#ffd700',
+      color: '#ffcd04',
       fontSize: 14,
       textAlign: 'center',
   },

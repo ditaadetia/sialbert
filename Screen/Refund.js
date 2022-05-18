@@ -97,10 +97,10 @@ export default function MenuUtama({navigation}) {
   }
 
   useEffect(async () => {
+    let isMounted = true
     await MediaLibrary.requestPermissionsAsync();
     await Notifications.requestPermissionsAsync();
     setNotificationChannel();
-    let isMounted = true
   }, [isFocused]);
 
   const downloadProgressUpdater = ({
@@ -112,8 +112,9 @@ export default function MenuUtama({navigation}) {
   };
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/riwayat-pembatalan/${id}`)
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/riwayat-pembatalan/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -122,12 +123,12 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -136,13 +137,7 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
-
-  const openSettingModal = (order_id) => {
-    setOrderId(order_id);
-    setModalVisible(!modalVisible);
-  }
 
   const openSettingModal = (order_id) => {
     setOrderId(order_id);
@@ -184,7 +179,7 @@ export default function MenuUtama({navigation}) {
       if(selectedValue != 'Pilih' && nama_di_rekening != ''){
         if(selectedValue != 'Bank Lainnya'){
           axios({
-            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/refunds/${order_id}`,
+            url:`http://6355-180-242-234-59.ngrok.io/api/refunds/${order_id}`,
             method:"POST",
             data:
             {
@@ -208,7 +203,7 @@ export default function MenuUtama({navigation}) {
             if(pesan == 'Pengajuan Refund Berhasil!'){
               alat.map((item)=> {
                 axios({
-                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
+                  url:`http://6355-180-242-234-59.ngrok.io/api/detail-refunds/${item.id}`,
                   method:"POST",
                   data:
                   {
@@ -251,7 +246,7 @@ export default function MenuUtama({navigation}) {
           });
         } else {
           axios({
-            url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/refunds/${order_id}`,
+            url:`http://6355-180-242-234-59.ngrok.io/api/refunds/${order_id}`,
             method:"POST",
             data:
             {
@@ -275,7 +270,7 @@ export default function MenuUtama({navigation}) {
             if(pesan == 'Pengajuan Refund Berhasil!'){
               alat.map((item)=> {
                 axios({
-                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-refunds/${item.id}`,
+                  url:`http://6355-180-242-234-59.ngrok.io/api/detail-refunds/${item.id}`,
                   method:"POST",
                   data:
                   {
@@ -409,9 +404,9 @@ export default function MenuUtama({navigation}) {
                         </View>
                         <View style={styles.border2}/>
                         <View style={{ margin:16 }}>
-                          <Text>{item.nama_instansi}</Text>
+                          <Text>{item.nama_kegiatan}</Text>
                           <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                            <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                            <Image source={{ uri:'http://6355-180-242-234-59.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                             <View>
                               <Text>{nama}</Text>
                               <Text>x1</Text>
@@ -471,7 +466,7 @@ export default function MenuUtama({navigation}) {
                     <View style={styles.centeredView}>
                       <View style={styles.modalView}>
                       <View style={{ width: '100%' }}>
-                        <View style={{ margin: 8, backgroundColor: '#ffd700', borderRadius: 20, borderColor: '#ffd700', borderWidth:2 }}>
+                        <View style={{ margin: 8, backgroundColor: '#ffcd04', borderRadius: 20, borderColor: '#ffcd04', borderWidth:2 }}>
                           <Picker
                             style={styles.pickerCustomeStyle}
                             mode='dropdown'
@@ -562,52 +557,56 @@ export default function MenuUtama({navigation}) {
 
   return (
     <>
-      <View style={{ height: '100%', paddingBottom: 48 }}>
-        <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
-          <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Pembatalan</Text>
-        </View>
-        <StatusBar style="auto" />
-        <View style={styles.container}>
-          <View style={{ justifyContent: 'center', flexDirection: "row", flex:1}}>
-            {isLoading ?
-              <View style={{
-                justifyContent: 'center',
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                marginTop:0,
-                textAlign: 'center',
-                flex: 1,
-                alignItems: 'center'
-              }}>
-                <ActivityIndicatorExample style={ styles.progress }/>
-              </View> : (
-              <View>
-                {data.length <= 0 &&
-                  <View style={{ margin: 16 }}>
-                      <Text>Anda belum pernah melakukan pembatalan</Text>
-                  </View>
-                }
-                {data.length > 0 &&
+      <View style={{ backgroundColor: '#fff' }}>
+        <View style={{ height: '100%', paddingBottom: 48, margin: 16 }}>
+          <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+            <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Pembatalan</Text>
+          </View>
+          <StatusBar style="auto" />
+          <View style={{ borderLeftColor:'blue' }}>
+            <View style={styles.container}>
+              <View style={{ justifyContent: 'center', flexDirection: "row", flex:1}}>
+                {isLoading ?
+                  <View style={{
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    textAlignVertical: 'center',
+                    marginTop:0,
+                    textAlign: 'center',
+                    flex: 1,
+                    alignItems: 'center'
+                  }}>
+                    <ActivityIndicatorExample style={ styles.progress }/>
+                  </View> : (
                   <View>
-                    <FlatList
-                      style={{ margin:0 }}
-                      data={data}
-                      vertical
-                      key={1}
-                      numColumns={1}
-                      nestedScrollEnabled
-                      // fadingEdgeLength={10}
-                      keyExtractor={item=>item.id}
-                      renderItem={listOrders}
-                      onEndReachedThreshold={0.5}
-                      extraData={data}
-                      // getItemCount={getItemCount}
-                      // getItem={getItem}
-                    />
+                    {data.length <= 0 &&
+                      <View style={{ margin: 16 }}>
+                          <Text>Anda belum pernah melakukan pembatalan</Text>
+                      </View>
+                    }
+                    {data.length > 0 &&
+                      <View>
+                        <FlatList
+                          style={{ margin:0 }}
+                          data={data}
+                          vertical
+                          key={1}
+                          numColumns={1}
+                          nestedScrollEnabled
+                          // fadingEdgeLength={10}
+                          keyExtractor={item=>item.id}
+                          renderItem={listOrders}
+                          onEndReachedThreshold={0.5}
+                          extraData={data}
+                          // getItemCount={getItemCount}
+                          // getItem={getItem}
+                        />
+                      </View>
+                    }
                   </View>
-                }
+                )}
               </View>
-            )}
+            </View>
           </View>
         </View>
       </View>
@@ -620,7 +619,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#25185A",
   },
   container: {
-    height: '100%'
+    height: '100%',
   },
   perda: {
     // flex: 1,
@@ -792,6 +791,7 @@ const styles = StyleSheet.create({
     height: 300,
     borderColor:'#2196F3',
     borderWidth:2,
+    marginVertical: 8
   },
   centeredView: {
     flex: 1,
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   button: {
-    backgroundColor: '#25185A',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',

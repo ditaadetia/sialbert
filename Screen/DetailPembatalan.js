@@ -59,7 +59,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/orders')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -73,7 +73,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -92,7 +92,7 @@ export default function DetailOrder({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekPayments/${order_id}`)
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/cekPayments/${order_id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setPayment(hasil);
@@ -124,7 +124,7 @@ export default function DetailOrder({ navigation, route }) {
 
     if(alasan !== ''){
       axios({
-        url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/pembatalan/${detail_order_id}`,
+        url:`http://6355-180-242-234-59.ngrok.io/api/pembatalan/${detail_order_id}`,
         method:"POST",
         data:
         {
@@ -161,14 +161,14 @@ export default function DetailOrder({ navigation, route }) {
   }
 
   useEffect(async() => {
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekSkr/${id_order}`)
+    let isMounted = true
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/cekSkr/${id_order}`)
       .then((response) => response.json())
       .then((hasil) => {
         setSkr(hasil);
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
 
   const handleMessage = (message, type = 'failed') => {
@@ -219,7 +219,7 @@ export default function DetailOrder({ navigation, route }) {
               </View>
               <View style={{ padding:16 }}>
                 {payment.status == '1' &&
-                  <Badge style={{ backgroundColor:'#ffd700' }}>{payment.message}</Badge>
+                  <Badge style={{ backgroundColor:'#ffcd04' }}>{payment.message}</Badge>
                 }
                 {payment.status == '2' &&
                   <Badge style={{ backgroundColor:'green' }}>{payment.message}</Badge>
@@ -266,7 +266,7 @@ export default function DetailOrder({ navigation, route }) {
                           <View>
                             <View style={{ flexDirection:'row', justifyContent: "space-between", paddingHorizontal:8}}>
                               <View style={{ flexDirection:'row' }}>
-                                <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8, marginTop: 8 }} />
+                                <Image source={{ uri:'http://6355-180-242-234-59.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8, marginTop: 8 }} />
                                 <View style={{ justifyContent:'center', textAlignVertical:'center' }}>
                                   <Text>{item.nama}</Text>
                                   <Text>x1</Text>
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 20,
     padding: 10,
     elevation: 2

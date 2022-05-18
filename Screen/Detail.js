@@ -74,12 +74,7 @@ export default function Detail({ navigation, route }) {
                     alat.qty++
                 }
                 else {
-                    Alert.alert("Cart", "Alat sudah ada di keranjang!", [
-                        {
-                          text:"OK",
-                          onPress: () => {},
-                        },
-                    ])
+                    Alert.alert("Alat sudah ada di keranjang!")
                     return [...prevItems];
                 }
             })
@@ -90,8 +85,9 @@ export default function Detail({ navigation, route }) {
     }
 
     useEffect(async() => {
+        let isMounted = true
         setIsLoading(true);
-        fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/schedule/' + alat.id)
+        fetch('http://6355-180-242-234-59.ngrok.io/api/schedule/' + alat.id)
           .then((response) => response.json())
           .then((hasil) => {
             setData(hasil);
@@ -100,7 +96,6 @@ export default function Detail({ navigation, route }) {
           })
           // .finally(() => setLoading(false));
           .catch(error => { console.log; });
-        let isMounted = true
     }, [isFocused]);
     const listOrders = ({item}) => {
         const tanggal = [...item.tanggal_mulai]
@@ -178,7 +173,7 @@ export default function Detail({ navigation, route }) {
     //         [tanggal_mulai]: {
     //             startingDay: true,
     //             endingDay: false,
-    //             color: '#ffd700'
+    //             color: '#ffcd04'
     //         },
     //     }
     //     return {
@@ -186,7 +181,7 @@ export default function Detail({ navigation, route }) {
     //       [tanggal_selesai]: {
     //         startingDay: false,
     //         endingDay: true,
-    //         color: '#ffd700'
+    //         color: '#ffcd04'
     //       },
     //     };
     // }, {});
@@ -197,11 +192,11 @@ export default function Detail({ navigation, route }) {
         let start = Moment(tanggal_mulai).startOf('day').add(1, 'days');
         let end = Moment(tanggal_selesai).startOf('day');
         const dateRange = {
-            [tanggal_mulai]: { selected: true, startingDay: true, color: '#ffd700' },
-            [tanggal_selesai]: { selected: true, endingDay: true, color: '#ffd700' },
+            [tanggal_mulai]: { selected: true, startingDay: true, color: '#ffcd04' },
+            [tanggal_selesai]: { selected: true, endingDay: true, color: '#ffcd04' },
         };
         while (end.isAfter(start)) {
-            Object.assign(dateRange, { [start.format('YYYY-MM-DD')]: { selected: true, color: '#ffd700' } });
+            Object.assign(dateRange, { [start.format('YYYY-MM-DD')]: { selected: true, color: '#ffcd04' } });
             start = start.add(1, 'days');
         }
         return {...acc, ...dateRange};
@@ -265,7 +260,7 @@ export default function Detail({ navigation, route }) {
                 <View style= {{ flexDirection:'row', justifyContent: 'space-between' }}>
                     <View style={{ padding:16 }}>
                         <Text style={styles.textHeader}>{alat.nama}</Text>
-                        <Text>Barang tersedia {alat.total} stok</Text>
+                        <Text>{alat.keterangan}</Text>
                     </View>
                     <View style={{ padding:16}}>
                         <Text>Rp.{alat.harga_sewa_perjam.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')},-</Text>
@@ -276,6 +271,18 @@ export default function Detail({ navigation, route }) {
             </View>
             <SafeAreaView>
                 <View>
+                {!isLoading ?
+                    <View style={{
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        textAlignVertical: 'center',
+                        marginTop:0,
+                        textAlign: 'center',
+                        flex: 1,
+                        alignItems: 'center'
+                    }}>
+                        <ActivityIndicatorExample style={ styles.progress }/>
+                    </View> : (
                     <Calendar
                         markingType={'period'}
                         onDayPress={day => {
@@ -287,6 +294,7 @@ export default function Detail({ navigation, route }) {
                             selectedColor: 'blue'
                         }}
                     />
+                )}
                 </View>
             </SafeAreaView>
             <View style={{ flexDirection: 'row', margin: 16 }}>
@@ -319,7 +327,7 @@ const styles = StyleSheet.create({
         marginTop: 16
     },
     textHeader: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: "bold",
     },
     pickedDateContainer: {
@@ -337,7 +345,7 @@ const styles = StyleSheet.create({
     },
     pickButton: {
         alignItems: 'center',
-        backgroundColor: '#ffd700',
+        backgroundColor: '#ffcd04',
         borderRadius: 8,
         height: 48,
         justifyContent: 'center',

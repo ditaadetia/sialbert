@@ -29,23 +29,25 @@ export default function Cart({navigation}) {
     }
 
     return (
-        <ScrollView keyboardShouldPersistTaps='handled'>
+        <ScrollView keyboardShouldPersistTaps='handled' style={{backgroundColor:'#fff'}}>
             {refreshing ? <ActivityIndicator /> : null}
-            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15, margin: 16}}>
               <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Keranjang Anda</Text>
             </View>
             {items.length <= 0 &&
                 <View style={{ margin: 16 }}>
+                  <View style={{  alignItems:'center' }}>
                     <Text>Keranjang Anda masih kosong</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Alat')} style={{ margin: 16 }}>
-                        <View style={styles.btn}>
-                            <Text style={styles.buttonTitle}>Tambahkan Alat</Text>
-                        </View>
-                    </TouchableOpacity>
+                  </View>
+                  <TouchableOpacity onPress={() => navigation.navigate('Alat')} style={{ margin: 16 }}>
+                      <View style={styles.btn}>
+                          <Text style={styles.buttonTitle}>Tambahkan Alat</Text>
+                      </View>
+                  </TouchableOpacity>
                 </View>
             }
             {items.length > 0 &&
-                <View>
+                <View style={{ margin: 16 }}>
                     {items.map((item, i) =>
                         <View style={{ padding: 16, alignItems:'center', flexDirection:'row' }} key={i} idx={i}>
                             <Card style={styles.card}>
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
     height: 48,
     justifyContent: 'center',
     textAlign: 'center',
-    padding:8
+    padding:8,
   },
   buttonTitle: {
     alignItems: 'center',

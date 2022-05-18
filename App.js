@@ -14,8 +14,8 @@ import MenuUtama from "./Screen/MenuUtama";
 import Detail from "./Screen/Detail";
 import Alat from "./Screen/Alat";
 import Penyewaan from "./Screen/Penyewaan";
-import pdfFormulirOrder from "./Screen/pdfFormulirOrder";
-import formPembayaran from "./Screen/formPembayaran";
+import PdfFormulirOrder from "./Screen/PdfFormulirOrder";
+import FormPembayaran from "./Screen/FormPembayaran";
 import FormulirOrder from "./Screen/FormulirOrder";
 import FormSecondStep from "./Screen/forms/FormSecondStep";
 import DetailOrder from "./Screen/DetailOrder";
@@ -52,7 +52,7 @@ const Stack = createNativeStackNavigator();
 //   );
 // }
 const Tab = createBottomTabNavigator();
-function nav() {
+function Nav() {
   const [appReady, setAppReady] = useState(false);
   const [storedCredentials, setStoredCredentials] = useState("");
   const [storedCart, setStoredCart] = useState([]);
@@ -247,7 +247,7 @@ export default function App({navigation}) {
           {({storedCredentials}) => (
           <>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName="nav">
+                <Stack.Navigator initialRouteName="Nav">
                 {storedCredentials ? (
                 <>
                   {/* <Stack.Screen
@@ -256,8 +256,8 @@ export default function App({navigation}) {
                   options={{ headerShown: false }}
                   /> */}
                   <Stack.Screen
-                  name="nav"
-                  component={nav}
+                  name="Nav"
+                  component={Nav}
                   options={{ headerShown: false }}
                   />
                   <Stack.Screen
@@ -298,7 +298,7 @@ export default function App({navigation}) {
                   />
                   <Stack.Screen
                   name="Pembayaran"
-                  component={formPembayaran}
+                  component={FormPembayaran}
                   options={{ headerShown: true }}
                   />
                   <Stack.Screen
@@ -308,7 +308,7 @@ export default function App({navigation}) {
                   />
                   <Stack.Screen
                   name="pdfFormulirOrder"
-                  component={pdfFormulirOrder}
+                  component={PdfFormulirOrder}
                   options={{ headerShown: false }}
                   />
                   <Stack.Screen

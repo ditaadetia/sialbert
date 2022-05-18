@@ -42,8 +42,9 @@ export default function MenuUtama({navigation}) {
   }
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/equipments-all')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/equipments-all')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -52,7 +53,6 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-    let isMounted = true
   }, [isFocused]);
 
   // useEffect(() => {
@@ -126,13 +126,13 @@ export default function MenuUtama({navigation}) {
     <>
       <View style={{ backgroundColor: '#FFFFFF' }}>
         <View style={styles.headerContainer}>
-          <Icon name="notifications" size={28} color='#ffd700'/>
+          <Icon name="notifications" size={28} color='#ffcd04'/>
           <Text style={styles.textHeader}>SI-ALBERT</Text>
           <TouchableOpacity style={{ padding: 5 }} onPress={() => {navigation.navigate('Cart')}}>
             <View style={{ position: 'absolute', height: 25, width: 25, borderRadius: 15, backgroundColor: 'green', right: 18, bottom: 18, alignItems: 'center', justifyContent: 'center', zIndex:2000 }}>
                 <Text>{items.length}</Text>
             </View>
-            <Icon name="ios-cart" size={28} color='#ffd700'/>
+            <Icon name="ios-cart" size={28} color='black'/>
           </TouchableOpacity>
         </View>
         <View style={styles.container}>

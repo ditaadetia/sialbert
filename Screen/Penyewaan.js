@@ -85,10 +85,10 @@ export default function MenuUtama({navigation}) {
   }
 
   useEffect(async () => {
+    let isMounted = true
     await MediaLibrary.requestPermissionsAsync();
     await Notifications.requestPermissionsAsync();
     setNotificationChannel();
-    let isMounted = true
   }, [isFocused]);
 
   const downloadProgressUpdater = ({
@@ -100,8 +100,9 @@ export default function MenuUtama({navigation}) {
   };
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/${id}`)
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/orders/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -110,12 +111,12 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/detail-orders')
       .then((response) => response.json())
       .then((hasil) => {
         setEquipments(hasil);
@@ -124,7 +125,6 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
 
   const listOrders = ({item}) => {
@@ -174,44 +174,53 @@ export default function MenuUtama({navigation}) {
                       <Text style={{ fontWeight:'bold'}}>{Moment(dt).format('DD MMMM YYYY')}</Text>
                     </View>
                     {(() => {
-                    if(item.ket_persetujuan_kepala_dinas === 'setuju'){
-                      return(
-                        <View style={{ borderWidth:2, borderRadius:8, borderColor: '#11CF00', alignItems:'center', padding:2}}>
-                          <Text style={{ textAlign:'right', color:'#11CF00', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan telah disetujui</Text>
-                        </View>
-                      )
-                    }
-                    if(item.ket_persetujuan_kepala_uptd !== 'tolak' && item.ket_verif_admin !== 'tolak'){
-                      if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'verif'){
-                        return(
-                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
-                            <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu persetujuan</Text>
-                          </View>
-                        )
-                      }
-                      else if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'belum'){
-                        return(
-                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
-                            <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu verifikasi</Text>
-                          </View>
-                        )
-                      }
-                    }
-                    if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak' || item.ket_persetujuan_kepala_dinas === 'tolak'){
+                    if(item.ttd_pemohon == ''){
                       return(
                         <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FB1313', alignItems:'center', padding:2}}>
-                          <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan Ditolak</Text>
+                          <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Belum ditandatangan</Text>
                         </View>
                       )
+                    }
+                    else{
+                      if(item.ket_persetujuan_kepala_dinas === 'setuju'){
+                        return(
+                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#11CF00', alignItems:'center', padding:2}}>
+                            <Text style={{ textAlign:'right', color:'#11CF00', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan telah disetujui</Text>
+                          </View>
+                        )
+                      }
+                      if(item.ket_persetujuan_kepala_uptd !== 'tolak' && item.ket_verif_admin !== 'tolak'){
+                        if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'verif'){
+                          return(
+                            <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
+                              <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu persetujuan</Text>
+                            </View>
+                          )
+                        }
+                        else if((item.ket_persetujuan_kepala_dinas === 'belum' || item.ket_persetujuan_kepala_uptd === 'belum') && item.ket_verif_admin === 'belum'){
+                          return(
+                            <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FAD603', alignItems:'center', padding:2}}>
+                              <Text style={{ textAlign:'right', color:'#FAD603', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Menunggu verifikasi</Text>
+                            </View>
+                          )
+                        }
+                      }
+                      if(item.ket_verif_admin === 'tolak' || item.ket_persetujuan_kepala_uptd === 'tolak' || item.ket_persetujuan_kepala_dinas === 'tolak'){
+                        return(
+                          <View style={{ borderWidth:2, borderRadius:8, borderColor: '#FB1313', alignItems:'center', padding:2}}>
+                            <Text style={{ textAlign:'right', color:'#FB1313', alignItems: 'flex-end', justifyContent: 'flex-end', alignContent: 'flex-end'}}>Pengajuan Ditolak</Text>
+                          </View>
+                        )
+                      }
                     }
                     return null;
                     })()}
                   </View>
                   <View style={styles.border2}/>
                   <View style={{ margin:16 }}>
-                    <Text>{item.nama_instansi}</Text>
+                    <Text>{item.nama_kegiatan}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
-                      <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://6355-180-242-234-59.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <View>
                         <Text>{nama}</Text>
                         <Text>x1</Text>
@@ -256,17 +265,27 @@ export default function MenuUtama({navigation}) {
                     </TouchableOpacity> */}
                     {item.ket_persetujuan_kepala_dinas == 'setuju' &&
                       <TouchableOpacity onPress={async () => {
-                        await downloadToFolder(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
+                        await downloadToFolder(`http://6355-180-242-234-59.ngrok.io/api/downloadDokumenSewa/${id_order}`, `dokumen_sewa_${nama_instansi}.pdf`, "Download", channelId, {
                           downloadProgressCallback: downloadProgressUpdater,
                           downloadProgressCallback: ToastAndroid.show(`Sedang Mendownload, Mohon Menunggu!`, ToastAndroid.SHORT)
                           // ToastAndroid.show(`Sedang Mendownload ${downloadProgress}`, ToastAndroid.SHORT)
                         })
                       }}>
                         {/* <TouchableOpacity onPress={async () => {
-                          await downloadToFolder('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                          await downloadToFolder('http://6355-180-242-234-59.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
                         }}> */}
                         <View style={styles.btn}>
                           <Text style={styles.buttonTitle}>Download Perjanjian Sewa</Text>
+                        </View>
+                      </TouchableOpacity>
+                    }
+                    {item.ttd_pemohon == '' &&
+                      <TouchableOpacity onPress={() => navigation.navigate('pdfFormulirOrder', {order_id: item.id})}>
+                        {/* <TouchableOpacity onPress={async () => {
+                          await downloadToFolder('http://6355-180-242-234-59.ngrok.io/api/downloadDokumenSewa/1', filename, folder, channelId)
+                        }}> */}
+                        <View style={styles.btn}>
+                          <Text style={styles.buttonTitle}>Tanda Tangan Formulir</Text>
                         </View>
                       </TouchableOpacity>
                     }
@@ -306,16 +325,19 @@ export default function MenuUtama({navigation}) {
 
   return (
     <>
-      <View>
+      <View style={{ backgroundColor: '#fff' }}>
         <TouchableOpacity  style={{ width:'50%' }} onPress={() => navigation.navigate('Cart')}>
-          <View style={{ borderWidth:2, margin: 8, borderRadius:20, borderColor: '#ffd700', alignItems:'center', padding: 8, flexDirection:'row' }}>
-            <Ionicons name="add" size={32} color="#ffd700" />
-            <Text style={{ color: '#ffd700' }}>Ajukan Penyewaan</Text>
+          <View style={{ borderWidth:2, margin: 8, borderRadius:20, borderColor: '#ffcd04', alignItems:'center', padding: 8, flexDirection:'row' }}>
+            <Ionicons name="add" size={32} color="#ffcd04" />
+            <Text style={{ color: '#ffcd04' }}>Ajukan Penyewaan</Text>
           </View>
         </TouchableOpacity>
         <StatusBar style="auto" />
+        <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', marginHorizontal: 16, marginVertical:8, borderTopLeftRadius:15, borderTopRightRadius:15}}>
+            <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Penyewaan</Text>
+          </View>
         <View style={styles.container}>
-          <SafeAreaView style={{ marginBottom: 170, justifyContent: 'center', flexDirection: "row", flex:1}}>
+          <SafeAreaView style={{ marginBottom: 300, justifyContent: 'center', flexDirection: "row", flex:1}}>
           {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -336,6 +358,7 @@ export default function MenuUtama({navigation}) {
                 }
                 {data.length > 0 &&
                   <View>
+                  <Text style={{ marginHorizontal: 16 }}>Pengajuan Anda baru diproses jika telah di tanda tangan!</Text>
                     <FlatList
                       style={{ margin:0 }}
                       data={data}
@@ -367,7 +390,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#25185A",
   },
   container: {
-    height: '100%'
+    height: '100%',
+    marginHorizontal: 16
   },
   perda: {
     // flex: 1,
@@ -502,7 +526,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     margin:4,
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
@@ -533,7 +557,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width:0, height:2},
     shadowOpacity: 1,
     width: '100%',
-    height: 300,
+    height: '100%',
     borderColor:'#2196F3',
     borderWidth:2,
   }

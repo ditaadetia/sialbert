@@ -35,8 +35,9 @@ export default function MenuUtama({navigation}) {
 
 
   useEffect(async() => {
+    let isMounted = true
     setIsLoading(true);
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules/${id}`)
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/reschedules/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -45,7 +46,6 @@ export default function MenuUtama({navigation}) {
       })
       // .finally(() => setLoading(false));
       .catch(error => { console.log; });
-      let isMounted = true
   }, [isFocused]);
 
   const listOrders = ({item}) => {
@@ -108,9 +108,10 @@ export default function MenuUtama({navigation}) {
                   </View>
                   <View style={styles.border2}/>
                   <View style={{ margin:16 }}>
+                    <Text>{item.nama_kegiatan}</Text>
                     <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                       <View>
-                        <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                        <Image source={{ uri:'http://34e7-2001-448a-6060-f025-b1a0-596-c980-beb4.ngrok.io/storage/'+alat?.[0]?.foto }} style={{ width:58, height:58, marginRight:8 }} />
                         <Text style={{ fontWeight:'100', marginBottom:4, fontSize:12 }}>{alat?.[0]?.nama}</Text>
                       </View>
                       <View>
@@ -177,13 +178,14 @@ export default function MenuUtama({navigation}) {
 
   return (
     <>
-      <View>
+    <View style={{ backgroundColor: '#fff' }}>
+      <View style={{ height: '100%', paddingBottom: 48, margin: 16, }}>
       <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#ffcd04', borderTopLeftRadius:15, borderTopRightRadius:15}}>
         <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Riwayat Perubahan Jadwal</Text>
       </View>
       {refreshing ? <ActivityIndicator /> : null}
         <View style={styles.container}>
-          <SafeAreaView style={{ marginBottom: 120, justifyContent: 'center', flexDirection: "row", flex:1}}>
+          <SafeAreaView style={{ marginBottom: 64, justifyContent: 'center', flexDirection: "row", flex:1}}>
             {isLoading ?
               <View style={{
                 justifyContent: 'center',
@@ -197,26 +199,36 @@ export default function MenuUtama({navigation}) {
                 <ActivityIndicatorExample style={ styles.progress }/>
               </View> : (
               <View>
-                <FlatList
-                  style={{ margin:0 }}
-                  data={data}
-                  vertical
-                  key={1}
-                  numColumns={1}
-                  nestedScrollEnabled
-                  // fadingEdgeLength={10}
-                  keyExtractor={item=>item.id}
-                  renderItem={listOrders}
-                  onEndReachedThreshold={0.5}
-                  extraData={data}
-                  // getItemCount={getItemCount}
-                  // getItem={getItem}
-                />
+                {data.length <= 0 &&
+                  <View style={{ margin: 16 }}>
+                      <Text>Anda belum pernah melakukan perubahan jadwal</Text>
+                  </View>
+                }
+                {data.length > 0 &&
+                  <View>
+                    <FlatList
+                      style={{ margin:0 }}
+                      data={data}
+                      vertical
+                      key={1}
+                      numColumns={1}
+                      nestedScrollEnabled
+                      // fadingEdgeLength={10}
+                      keyExtractor={item=>item.id}
+                      renderItem={listOrders}
+                      onEndReachedThreshold={0.5}
+                      extraData={data}
+                      // getItemCount={getItemCount}
+                      // getItem={getItem}
+                    />
+                  </View>
+                }
               </View>
             )}
           </SafeAreaView>
         </View>
       </View>
+    </View>
     </>
   );
 }
@@ -367,7 +379,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     margin:4,
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',

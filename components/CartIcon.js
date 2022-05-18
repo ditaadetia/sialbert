@@ -13,7 +13,7 @@ export function CartIcon({navigation}) {
             </View>
             {/* <Text>{nama}</Text> */}
         {/* <Text>{items.reduce((sum, item) => (sum + item.totalPrice), 0)}</Text> */}
-            <Icon name="ios-cart" size={48} color='#ffd700'/>
+            <Icon name="ios-cart" size={48} color='black'/>
         </TouchableOpacity>
     );
 }

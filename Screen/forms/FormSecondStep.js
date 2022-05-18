@@ -223,7 +223,7 @@ export default function FormulirOrder({navigation, route}) {
     if(hoursDiff > 0){
       if (ktp != null) {
         axios({
-          url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/${id}`,
+          url:`http://6355-180-242-234-59.ngrok.io/api/orders/post/${id}`,
           method:"POST",
           data:
           {
@@ -250,7 +250,7 @@ export default function FormulirOrder({navigation, route}) {
 
           if (ktp != null) {
             axios({
-              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/ktp/${id}`,
+              url:`http://6355-180-242-234-59.ngrok.io/api/orders/post/ktp/${id}`,
               method:"POST",
               data: datasKtp
             })
@@ -259,7 +259,7 @@ export default function FormulirOrder({navigation, route}) {
               const { message, success, status, hasil } = result;
               items.map((item)=> {
                 axios({
-                  url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/detail-orders/post/${id}`,
+                  url:`http://6355-180-242-234-59.ngrok.io/api/detail-orders/post/${id}`,
                   method:"POST",
                   data:
                   {
@@ -281,7 +281,7 @@ export default function FormulirOrder({navigation, route}) {
               Alert.alert("Berhasil", "Pengajuan Pemesanan Berhasil!", [
                 {
                   text:"OK",
-                  onPress: () => navigation.navigate('pdfFormulirOrder'),
+                  onPress: () => navigation.navigate('pdfFormulirOrder', {order_id: hasil}),
                 },
               ]);
               console.log(response.data);
@@ -305,7 +305,7 @@ export default function FormulirOrder({navigation, route}) {
 
           if (ktp != null) {
             axios({
-              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/aktaNotaris/${id}`,
+              url:`http://6355-180-242-234-59.ngrok.io/api/orders/post/aktaNotaris/${id}`,
               method:"POST",
               data: datasAktaNotaris
             })
@@ -330,7 +330,7 @@ export default function FormulirOrder({navigation, route}) {
   
           if (ktp != null) {
             axios({
-              url:`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/orders/post/suratPengantar/${id}`,
+              url:`http://6355-180-242-234-59.ngrok.io/api/orders/post/suratPengantar/${id}`,
               method:"POST",
               data: datasSuratPengantar
             })
@@ -371,7 +371,7 @@ export default function FormulirOrder({navigation, route}) {
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: '#fff'}}>
       <View style={{ justifyContent:'center', alignItems:'center' }}>
         <Text style={{ fontWeight: 'bold', margin: 16 }}>Isi Formulir Pengajuan</Text>
       </View>
@@ -396,50 +396,30 @@ export default function FormulirOrder({navigation, route}) {
       >
         {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
           <View style={styles.root}>
-              <View style={{ margin:16, flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => navigation.navigate('Formulir Order Step 1', {value: values})}>
-                  <View style={{justifyContent:'center', alignItems:'center' }}>
-                    <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                      <Text style={{textAlign: 'center' }}>1</Text>
-                    </View>
-                    <Text style={{textAlign: 'center' }}>Step 1</Text>
-                  </View>
-                  </TouchableOpacity>
-                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-                <View style={{ justifyContent:'center', alignItems:'center' }}>
-                  <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                    <Text style={{textAlign: 'center' }}>2</Text>
-                  </View>
-                  <Text style={{textAlign: 'center' }}>Step 2</Text>
+            <View style={{ margin:16, flexDirection: 'row', justifyContent:'space-between' }}>
+              <View style={{justifyContent:'center', alignItems:'center' }}>
+                <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                  <Text style={{textAlign: 'center' }}>1</Text>
                 </View>
-                <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-                <View style={{ justifyContent:'center', alignItems:'center' }}>
+                <Text style={{textAlign: 'center', alignContent:'center', alignItems:'center', textAlignVertical:'center' }}>Step 1</Text>
+              </View>
+              <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+              <View style={{ justifyContent:'center', alignItems:'center' }}>
+                <View style={{ borderColor:'#ffcd04', backgroundColor:'#ffcd04', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                  <Text style={{textAlign: 'center' }}>2</Text>
+                </View>
+                <Text style={{textAlign: 'center' }}>Step 2</Text>
+              </View>
+              <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+              <View style={{ justifyContent:'center', alignItems:'center' }}>
                   <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
                     <Text style={{textAlign: 'center' }}>3</Text>
                   </View>
                   <Text style={{textAlign: 'center' }}>Step 3</Text>
-                </View>
               </View>
-              <View>
-                {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
-                  <Text style={styles.currentStepText}>{`Step ${currentStep} of ${totalSteps}`}
-                  </Text>
-                </View> */}
-                {/* <Image
-                  source={require("../../assets/image/2-2.png")}
-                  style={{ marginBottom: 8, width: '100%' }}
-                  resizeMode="cover"
-                /> */}
-                {/* <Button title='Print to PDF file' onPress={printToFile}/>
-                {Platform.OS === 'ios' &&
-                  <>
-                    <View style={styles.spacer} />
-                    <Button title='Select printer' onPress={selectPrinter}/>
-                    <View style={styles.spacer} />
-                    {selectedPrinter ? <Text style={styles.printer}>{`Selected printer: ${selectedPrinter.name}`}</Text> : undefined}
-                  </>
-                } */}
-                <View style={{ padding: 8 }}>
+            </View>
+            <View>
+                <View style={{ padding: 16 }}>
                   <Card style={styles.card}>
                     <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
                       <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Jangka Waktu Penyewaan</Text>
@@ -458,7 +438,7 @@ export default function FormulirOrder({navigation, route}) {
                       <Picker.Item label="Perjam" value="2" key={2}/>
                     </Picker> */}
                     <View style={styles.container}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8, paddingVertical: 16 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16 }}>
                         <View>
                             <Text style={{ fontWeight:"bold", textAlign:"center", marginBottom:4 }}>Tanggal Mulai</Text>
                             <View style={styles.pickedDateContainer}>
@@ -501,7 +481,6 @@ export default function FormulirOrder({navigation, route}) {
                         onChange={onChange}
                         minimumDate={new Date()}
                         locale='id'
-                        display="spinner"
                         />
                     )}
                     {show2 && (
@@ -524,8 +503,8 @@ export default function FormulirOrder({navigation, route}) {
                     }
                   </Card>
                 </View>
-              </View>
-              <View>
+            </View>
+            <View>
                 {/* <View style={styles.form}>
                   <Text style={{ marginLeft:24, marginTop:16 }}>Metode Pembayaran :</Text>
                   <TextInput
@@ -543,8 +522,8 @@ export default function FormulirOrder({navigation, route}) {
                   }
                 </View> */}
               <TouchableOpacity onPress={pickKtp}>
-                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                <View style={{ margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: '100%', width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
                       <Image source={Add} style={{ width: 45, height: 45 }}/>
                       {/* {ktp &&
                       <Text>{ktp, datasKtp}</Text>
@@ -558,8 +537,8 @@ export default function FormulirOrder({navigation, route}) {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={pickAktaNotaris}>
-                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                <View style={{ margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: '100%', width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
                       <Image source={Add} style={{ width: 45, height: 45 }}/>
                       <View style={{ width:'80%' }}>
                         <Text style={{ fontSize:18, fontWeight: 'bold', marginLeft: 16 }}>Akta Notaris (Opsional)</Text>
@@ -570,8 +549,8 @@ export default function FormulirOrder({navigation, route}) {
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={pickSuratPengantar}>
-                <View style={{ elevation: 12, margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
-                    <View style={{height: 40, width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
+                <View style={{ margin: 16, height: 120, backgroundColor: '#fff', padding: 4, borderRadius: 20, borderColor: '#6C6B6B', borderWidth:2 }}>
+                    <View style={{height: '100%', width: '100%', flexDirection:'row', justifyContent:'center', alignItems:'center', flex:1}}>
                       <Image source={Add} style={{ width: 45, height: 45 }}/>
                       <View  style={{ width:'80%' }}>
                         <Text style={{ fontSize:16, fontWeight: 'bold', marginLeft: 16}}>Surat Pengantar dari RT/RW/Lurah (Opsional)</Text>
@@ -686,7 +665,7 @@ export default function FormulirOrder({navigation, route}) {
                 </View>
               </TouchableOpacity>
             </View>
-          </View>
+            </View>
           </View>
         )}
       </Formik>
@@ -748,12 +727,14 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
     textAlign: 'center',
-    margin: 16
+    marginHorizontal: 16,
+    marginBottom: 16,
+    marginTop: -16
   },
   btn: {
     backgroundColor: '#25185A',
@@ -769,7 +750,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 0,
     color: '#FFFFFF',
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: '600',
     lineHeight: 22,
   },
@@ -778,7 +759,7 @@ const styles = StyleSheet.create({
   },
   pickButton: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 36,
     justifyContent: 'center',
@@ -789,12 +770,12 @@ const styles = StyleSheet.create({
   pickedDateContainer: {
     padding: 20,
     backgroundColor: '#fff',
-    borderColor: '#ffd700',
+    borderColor: '#ffcd04',
     borderWidth: 3,
     borderRadius: 10,
   },
   pickedDate: {
-      color: '#ffd700',
+      color: '#ffcd04',
       fontSize: 14,
       textAlign: 'center',
   },

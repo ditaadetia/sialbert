@@ -63,7 +63,7 @@ export default function FormulirOrder({navigation, route}) {
 
   const handleRegister = (credentials, setSubmitting) => {
     handleMessage(null);
-    const url = 'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/register';
+    const url = 'http://6355-180-242-234-59.ngrok.io/api/register';
 
     axios
       .post(url, credentials)
@@ -107,7 +107,7 @@ export default function FormulirOrder({navigation, route}) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch(`http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/cekUser/${id}`)
+    fetch(`http://6355-180-242-234-59.ngrok.io/api/cekUser/${id}`)
       .then((response) => response.json())
       .then((hasil) => {
         setAvatar(hasil);
@@ -135,194 +135,191 @@ export default function FormulirOrder({navigation, route}) {
       }
       {!isLoading &&
         <ScrollView style={styles.root}>
-            <View style={{ justifyContent:'center', alignItems:'center' }}>
-              <Text style={{ fontWeight: 'bold', margin: 16 }}>Isi Formulir Pengajuan</Text>
-            </View>
-            <Formik
-              validationSchema={formOrderValidationSchema}
-              // enableReinitialize={true}
-              // initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_penyewa: nama, email: email, no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, nama_instansi: '', jabatan:'', alamat_instansi:''}}
-              initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_instansi: '', jabatan:'', alamat_instansi:''}}
-              onSubmit={(values, {setSubmitting})  => {
-                navigation.navigate('Formulir Order Step 2', {value: values})
-              }}
-            >
-              {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
-                <View style={styles.root}>
+          <View style={{ justifyContent:'center', alignItems:'center' }}>
+            <Text style={{ fontWeight: 'bold', margin: 16 }}>Isi Formulir Pengajuan</Text>
+          </View>
+          <Formik
+            validationSchema={formOrderValidationSchema}
+            // enableReinitialize={true}
+            // initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_penyewa: nama, email: email, no_hp: no_hp, kontak_darurat: kontak_darurat, alamat: alamat, nama_instansi: '', jabatan:'', alamat_instansi:''}}
+            initialValues={{ category_order_id:selectedValue, nama_kegiatan: '', tenant_id:id, nama_instansi: '', jabatan:'', alamat_instansi:''}}
+            onSubmit={(values, {setSubmitting})  => {
+              navigation.navigate('Formulir Order Step 2', {value: values})
+            }}
+          >
+            {({ handleChange, handleBlur, handleSubmit, touched, values, isSubmitting, errors }) => (
+              <View style={styles.root}>
+                <View>
+                  <View style={{ margin:16, flexDirection: 'row', justifyContent:'space-between' }}>
+                    <View style={{justifyContent:'center', alignItems:'center' }}>
+                      <View style={{ borderColor:'#ffcd04', backgroundColor:'#ffcd04', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                        <Text style={{textAlign: 'center' }}>1</Text>
+                      </View>
+                      <Text style={{textAlign: 'center', alignContent:'center', alignItems:'center', textAlignVertical:'center' }}>Step 1</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+                    <View style={{ justifyContent:'center', alignItems:'center' }}>
+                      <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                        <Text style={{textAlign: 'center' }}>2</Text>
+                      </View>
+                      <Text style={{textAlign: 'center' }}>Step 2</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#ffcd04', width: '25%', marginTop:24, height: 1}}/>
+                    <View style={{ justifyContent:'center', alignItems:'center' }}>
+                      <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
+                        <Text style={{textAlign: 'center' }}>3</Text>
+                      </View>
+                      <Text style={{textAlign: 'center' }}>Step 3</Text>
+                    </View>
+                  </View>
                   <View>
-                    <View style={{ margin:16, flexDirection: 'row' }}>
-                      <View style={{justifyContent:'center', alignItems:'center' }}>
-                        <View style={{ borderColor:'#ffd700', backgroundColor:'#ffd700', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                          <Text style={{textAlign: 'center' }}>1</Text>
-                        </View>
-                        <Text style={{textAlign: 'center' }}>Step 1</Text>
-                      </View>
-                      <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-                      <TouchableOpacity onPress={handleSubmit}>
-                        <View style={{ justifyContent:'center', alignItems:'center' }}>
-                          <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                            <Text style={{textAlign: 'center' }}>2</Text>
-                          </View>
-                          <Text style={{textAlign: 'center' }}>Step 2</Text>
-                        </View>
-                      </TouchableOpacity>
-                      <View style={{ backgroundColor: '#ffd700', height: 1, width: '33%', marginVertical:12}}/>
-                        <View style={{ justifyContent:'center', alignItems:'center' }}>
-                          <View style={{ borderColor:'#C4C4C4', backgroundColor:'#C4C4C4', borderWidth:1, height:24, width: 24, borderRadius:20 }}>
-                            <Text style={{textAlign: 'center' }}>3</Text>
-                          </View>
-                          <Text style={{textAlign: 'center' }}>Step 3</Text>
-                        </View>
-                      </View>
-                    {/* <View style={{ justifyContent:'center', alignItems:'center' }}>
-                      <Text style={styles.currentStepText}>1 of 2
-                      </Text>
+                    <Text style={{ marginLeft:16, marginTop:4 }}>Status Kegiatan :</Text>
+                    <View style={{ margin: 8, backgroundColor: '#ffcd04', borderRadius: 20, borderColor: '#ffcd04', borderWidth:2 }}>
+                      <Picker
+                        style={styles.pickerCustomeStyle}
+                        mode='dropdown'
+                        style={{ color: 'white'}}
+                        value={values.category_order_id}
+                        selectedValue={selectedValue}
+                        onValueChange={(itemValue, itemIndex) =>
+                          setFieldValue(itemValue)
+                        }
+                        >
+                        <Picker.Item label="Umum" value="1" key={1}/>
+                        <Picker.Item label="Kegianan Rutin " value="2" key={2}/>
+                        <Picker.Item label="Dinas Lain" value="3" key={3}/>
+                        <Picker.Item label="Sosial Masyarakat " value="4" key={4}/>
+                      </Picker>
                     </View>
-                    <View style={{ marginBottom: 8, flexDirection:'row' }}>
-                      <Image source={borderdark} style={{ marginBottom: 8, width: '50%' }} resizeMode="cover"/>
-                      <Image source={borderlight} style={{ marginBottom: 8, width: '50%' }} resizeMode="cover"/>
+                  </View>
+                  <View>
+                    <View style={styles.form}>
+                      <Text style={{ marginLeft:16, marginTop:4 }}>Nama Kegiatan :</Text>
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="next"
+                        placeholder="Nama Kegiatan"
+                        style={styles.textInput}
+                        onChangeText={handleChange('nama_kegiatan')}
+                      />
                     </View>
-                    <Image source={from1} style={{ marginBottom: 8, width: '100%' }} resizeMode="cover"/> */}
-                    <View>
-                      <Text style={{ marginLeft:16, marginTop:4 }}>Status Kegiatan :</Text>
-                      <View style={{ margin: 8, backgroundColor: '#ffd700', borderRadius: 20, borderColor: '#ffd700', borderWidth:2 }}>
-                        <Picker
-                          style={styles.pickerCustomeStyle}
-                          mode='dropdown'
-                          style={{ color: 'white'}}
-                          value={values.category_order_id}
-                          selectedValue={selectedValue}
-                          onValueChange={(itemValue, itemIndex) =>
-                            setFieldValue(itemValue)
-                          }
-                          >
-                          <Picker.Item label="Umum" value="1" key={1}/>
-                          <Picker.Item label="Kegianan Rutin " value="2" key={2}/>
-                          <Picker.Item label="Dinas Lain" value="3" key={3}/>
-                          <Picker.Item label="Sosial Masyarakat " value="4" key={4}/>
-                        </Picker>
-                      </View>
-                    </View>
-                    <View>
+                    {(errors.nama_kegiatan && touched.nama_kegiatan) &&
+                      <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama_kegiatan}</Text>
+                    }
+                  </View>
+                  <View style={styles.border}></View>
+                  <View style={{ flexDirection:'row' }}>
+                    <View style={{ width: '50%' }}>
                       <View style={styles.form}>
-                        <Text style={{ marginLeft:16, marginTop:4 }}>Nama Kegiatan :</Text>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>Nama Penyewa:</Text>
+                        <Text style={styles.textInput}>{nama}</Text>
+                      </View>
+                    </View>
+                    <View style={{ width: '50%' }}>
+                      <View style={styles.form}>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>Email :</Text>
+                        <Text style={styles.textInput}>{email}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection:'row' }}>
+                    <View style={{ width:'50%' }}>
+                      <View style={styles.form}>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>No. Handphone:</Text>
+                        <Text style={styles.textInput}>{avatar.no_hp}</Text>
+                      </View>
+                    </View>
+                    <View style={{ width:'50%' }}>
+                      <View style={styles.form}>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>Kontak Darurat:</Text>
+                        <Text style={styles.textInput}>{avatar.kontak_darurat}</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <View style={styles.form}>
+                      <Text style={{ marginLeft:16, marginTop:4 }}>Alamat :</Text>
+                      <Text style={styles.textInputAlamat}>{avatar.alamat}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.border3}/>
+                  <View style={{ paddingHorizontal:16, width: '100%' }}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Edit Profil')}
+                    >
+                      <View>
+                        <View style={{flexDirection:'row', justifyContent: "space-between"}}>
+                          <Text>Ajukan Perubahan Informasi Penyewa</Text>
+                          <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.border3}/>
+                  <View style={styles.border}></View>
+                  <View style={{ flexDirection:'row' }}>
+                    <View style={{ width: '50%' }}>
+                      <View style={styles.form}>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>Nama Instansi :</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCorrect={false}
                           returnKeyType="next"
-                          placeholder="Nama Kegiatan"
+                          placeholder="Nama Instansi"
                           style={styles.textInput}
-                          onChangeText={handleChange('nama_kegiatan')}
+                          onChangeText={handleChange('nama_instansi')}
+                          editable={true}
                         />
                       </View>
-                      {(errors.nama_kegiatan && touched.nama_kegiatan) &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama_kegiatan}</Text>
+                      {(errors.nama_instansi && touched.nama_instansi) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama_instansi}</Text>
                       }
                     </View>
-                    <View style={styles.border}></View>
-                    <View style={{ flexDirection:'row' }}>
-                      <View style={{ width: '50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Nama Penyewa:</Text>
-                          <Text style={styles.textInput}>{nama}</Text>
-                        </View>
-                      </View>
-                      <View style={{ width: '50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Email :</Text>
-                          <Text style={styles.textInput}>{email}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={{ flexDirection:'row' }}>
-                      <View style={{ width:'50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>No. Handphone:</Text>
-                          <Text style={styles.textInput}>{avatar.no_hp}</Text>
-                        </View>
-                      </View>
-                      <View style={{ width:'50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Kontak Darurat:</Text>
-                          <Text style={styles.textInput}>{avatar.kontak_darurat}</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <View>
+                    <View style={{ width: '50%' }}>
                       <View style={styles.form}>
-                        <Text style={{ marginLeft:16, marginTop:4 }}>Alamat :</Text>
-                        <Text style={styles.textInputAlamat}>{avatar.alamat}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.border3}/>
-                    <View style={{ paddingHorizontal:16, width: '100%' }}>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('Edit Profil')}
-                      >
-                        <View>
-                          <View style={{flexDirection:'row', justifyContent: "space-between"}}>
-                            <Text>Ajukan Perubahan Nama Penyewa</Text>
-                            <MaterialCommunityIcons name="arrow-right" size={24} color='#FAD603'/>
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.border3}/>
-                    <View style={styles.border}></View>
-                    <View style={{ flexDirection:'row' }}>
-                      <View style={{ width: '50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Nama Instansi :</Text>
-                          <TextInput
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            returnKeyType="next"
-                            placeholder="Nama Instansi"
-                            style={styles.textInput}
-                            onChangeText={handleChange('nama_instansi')}
-                            editable={true}
-                          />
-                        </View>
-                        {(errors.nama_instansi && touched.nama_instansi) &&
-                          <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.nama_instansi}</Text>
-                        }
-                      </View>
-                      <View style={{ width: '50%' }}>
-                        <View style={styles.form}>
-                          <Text style={{ marginLeft:16, marginTop:4 }}>Jabatan Penyewa :</Text>
-                          <TextInput
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            returnKeyType="next"
-                            placeholder="Jabatan"
-                            style={styles.textInput}
-                            onChangeText={handleChange('jabatan')}
-                            editable={true}
-                          />
-                        </View>
-                        {(errors.jabatan && touched.jabatan) &&
-                          <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.jabatan}</Text>
-                        }
-                      </View>
-                    </View>
-                    <View>
-                      <View style={styles.form}>
-                        <Text style={{ marginLeft:16, marginTop:4 }}>Alamat Instansi :</Text>
+                        <Text style={{ marginLeft:16, marginTop:4 }}>Jabatan Penyewa :</Text>
                         <TextInput
                           autoCapitalize="none"
                           autoCorrect={false}
                           returnKeyType="next"
-                          placeholder="Alamat Instansi"
-                          style={styles.textInputAlamat}
-                          onChangeText={handleChange('alamat_instansi')}
+                          placeholder="Jabatan"
+                          style={styles.textInput}
+                          onChangeText={handleChange('jabatan')}
+                          editable={true}
                         />
                       </View>
-                      {(errors.alamat_instansi && touched.alamat_instansi) &&
-                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.alamat_instansi}</Text>
+                      {(errors.jabatan && touched.jabatan) &&
+                        <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.jabatan}</Text>
                       }
                     </View>
-                    {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
-                    <View>
+                  </View>
+                  <View>
+                    <View style={styles.form}>
+                      <Text style={{ marginLeft:16, marginTop:4 }}>Alamat Instansi :</Text>
+                      <TextInput
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        returnKeyType="next"
+                        placeholder="Alamat Instansi"
+                        style={styles.textInputAlamat}
+                        onChangeText={handleChange('alamat_instansi')}
+                      />
+                    </View>
+                    {(errors.alamat_instansi && touched.alamat_instansi) &&
+                      <Text style={{ fontSize: 10, color: 'red', marginLeft:16 }}>{errors.alamat_instansi}</Text>
+                    }
+                  </View>
+                  {/* <Text type ={messageType} style={styles.message}>{message}</Text> */}
+                  <View>
+                    <TouchableOpacity
+                      onPress={handleSubmit}
+                    >
+                      <View style={styles.button}>
+                        <Text style={styles.buttonTitle}>LANJUTKAN</Text>
+                      </View>
+                    </TouchableOpacity>
+                    {/* {!isSubmitting && (
                       <TouchableOpacity
                         onPress={handleSubmit}
                       >
@@ -330,33 +327,25 @@ export default function FormulirOrder({navigation, route}) {
                           <Text style={styles.buttonTitle}>LANJUTKAN</Text>
                         </View>
                       </TouchableOpacity>
-                      {/* {!isSubmitting && (
-                        <TouchableOpacity
-                          onPress={handleSubmit}
-                        >
-                          <View style={styles.button}>
-                            <Text style={styles.buttonTitle}>LANJUTKAN</Text>
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                      {isSubmitting && (
-                        <View style={styles.button}>
-                          <ActivityIndicatorExample />
-                        </View>
-                      )} */}
-                  </View>
-                  <TextInput
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    returnKeyType="next"
-                    onChangeText={handleChange('tenant_id')}
-                    editable={false}
-                    type="hidden"
-                  />
+                    )}
+                    {isSubmitting && (
+                      <View style={styles.button}>
+                        <ActivityIndicatorExample />
+                      </View>
+                    )} */}
+                </View>
+                <TextInput
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="next"
+                  onChangeText={handleChange('tenant_id')}
+                  editable={false}
+                  type="hidden"
+                />
+                </View>
               </View>
-            </View>
             )}
-            </Formik>
+          </Formik>
         </ScrollView>
       }
     </SafeAreaView>
@@ -440,7 +429,7 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#ffd700',
+    backgroundColor: '#ffcd04',
     borderRadius: 8,
     height: 48,
     justifyContent: 'center',
@@ -473,11 +462,11 @@ const styles = StyleSheet.create({
   pickerCustomeStyle: {
     color: "red",
   },
-  button: {
-    alignItems: 'center',
-    backgroundColor: '#ffd700',
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2
-  },
+  // button: {
+  //   alignItems: 'center',
+  //   backgroundColor: '#ffcd04',
+  //   borderRadius: 20,
+  //   padding: 10,
+  //   elevation: 2
+  // },
 });

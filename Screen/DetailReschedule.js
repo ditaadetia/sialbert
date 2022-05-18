@@ -37,7 +37,7 @@ export default function DetaiReschedule({ navigation, route }) {
 
   useEffect(async() => {
     setIsLoading(true);
-    fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/reschedules')
+    fetch('http://6355-180-242-234-59.ngrok.io/api/reschedules')
       .then((response) => response.json())
       .then((hasil) => {
         setData(hasil);
@@ -55,15 +55,15 @@ export default function DetaiReschedule({ navigation, route }) {
   var dtSelesai = reschedule.tanggal_selesai
 
   return (
-    <ScrollView style={{ padding:8 }}>
-      <Card style={{ backgroundColor: '#C4C4C4' }}>
+    <ScrollView style={{ padding:8, backgroundColor: '#fff' }}>
+      <Card style={{ backgroundColor: '#fff' }}>
         <View style={{ flexDirection:'row', justifyContent: "space-between", height: 48, backgroundColor: '#25185A'}}>
           <Image style={styles.icon} source={logo} />
           <Text style={{ marginRight:16, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Kode Reschedule ALB-Res-{reschedule.id}</Text>
         </View>
         <View style={{ padding:16 }}>
           <Card style={styles.card}>
-            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:13, borderTopRightRadius:13}}>
               <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Data Reschedule</Text>
             </View>
             <View style={{ flexDirection:'row', justifyContent: "space-between", padding:8}}>
@@ -72,7 +72,7 @@ export default function DetaiReschedule({ navigation, route }) {
             </View>
           </Card>
           <Card style={styles.card}>
-            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:15, borderTopRightRadius:15}}>
+            <View style={{ height: 48, textAlignVertical: 'center', backgroundColor: '#25185A', borderTopLeftRadius:13, borderTopRightRadius:13}}>
               <Text style={{ marginLeft:16, marginTop:14, textAlignVertical: 'center', fontWeight:'bold', color: '#ffffff' }}>Detail Rescehdule</Text>
             </View>
             {alat.map((item)=>
@@ -80,7 +80,7 @@ export default function DetaiReschedule({ navigation, route }) {
                 <View style={{ margin:16 }}>
                   <View style={{ flexDirection:'row', justifyContent: "space-between" }}>
                     <View>
-                      <Image source={{ uri:'http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
+                      <Image source={{ uri:'http://6355-180-242-234-59.ngrok.io/storage/'+item.foto }} style={{ width:58, height:58, marginRight:8 }} />
                       <Text style={{ fontWeight:'100', marginBottom:4, fontSize:11 }}>{item.nama}</Text>
                     </View>
                     <View>

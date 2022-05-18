@@ -8,8 +8,9 @@ export function CartProvider(props) {
     const isFocused = useIsFocused();
     
     useEffect(async() => {
+        let isMounted = true
         setIsLoading(true);
-        fetch('http://311c-2001-448a-6060-f025-e5cf-8ee-86e5-f879.ngrok.io/api/equipments')
+        fetch('http://6355-180-242-234-59.ngrok.io/api/equipments')
         .then((response) => response.json())
         .then((hasil) => {
             setData(hasil);
@@ -18,8 +19,7 @@ export function CartProvider(props) {
         })
         // .finally(() => setLoading(false));
         .catch(error => { console.log; });
-        let isMounted = true
-        
+
     const id= data.id
     const harga=data.harga_sewa_perhari
     const nama_alat=data.nama
